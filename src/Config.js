@@ -44,3 +44,6 @@ const axiosInstance = axios.create({
 
 
   export default axiosInstance;
+
+
+export const baseURL = 'http://127.0.0.1:8000'

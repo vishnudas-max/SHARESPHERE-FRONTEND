@@ -17,29 +17,6 @@ function EditPost() {
     const { id } = useParams()
     const access = localStorage.getItem('access')
     const imgref = useRef()
-    const posts = useSelector(state => state.posts.posts)
-    const currentpost = posts.find(post => post.id === Number(id))
-
-    useEffect(() => {
-        const fetchPost = async () => {
-            try {
-                const response = await api.get(`posts/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${access}`
-                    }
-                })
-                console.log(response.data)
-            }
-            catch (error) {
-                console.log('something went Wrong !')
-            }
-        }
-        fetchPost()
-
-    }, []);
-
-
-    console.log(post)
     const handelPost = async (e) => {
         e.preventDefault()
         const formData = new FormData()

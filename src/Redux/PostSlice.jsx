@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import api from '../Config'
 
-export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
+export const fetchPosts = createAsyncThunk('get/posts/', async () => {
     let access = localStorage.getItem('access')
     const response = await api.get('posts/', {
         headers: {
@@ -24,10 +24,25 @@ const PostSlice = createSlice({
             state.posts.push(action.payload)
         },
         delPost: (state, action) => {
-            state.posts= []
-            state.status= 'idle'
-            state.error= null
-        }
+            state.posts = []
+            state.status = 'idle'
+            state.error = null
+        },
+        addLike: (state, action) => {
+            state.posts.filter(post => {
+                if (post.id === action.payload) {
+                    post.likes_count = post.likes_count + 1
+                }
+
+            })
+         },
+         removeLike: (state,action) =>{
+            state.posts.filter(post=>{
+                if(post.id === action.payload){
+                    post.likes_count = post.likes_count - 1
+                }
+            })
+         }
     },
     extraReducers: (builder) => {
         builder
@@ -45,5 +60,5 @@ const PostSlice = createSlice({
     }
 })
 
-export const { AddpostToStore,delPost } = PostSlice.actions
+export const { AddpostToStore, delPost, addLike,removeLike } = PostSlice.actions
 export default PostSlice.reducer

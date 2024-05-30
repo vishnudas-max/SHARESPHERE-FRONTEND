@@ -24,7 +24,7 @@ function Navbar() {
           <AddPost setAddPost={addPostCloseFun} />
         </PrivetRoute>
       }
-      <nav className='border-r border-gray-700  w-[320px] h-screen hidden  md:block fixed top-0 bg-[#000300]'>
+      <nav className='border-r border-gray-700  w-[320px] h-screen hidden  md:block fixed top-0 bg-[#000300] select-none'>
         <div className='max-w-[200px] mx-auto pt-9'>
           <h1 className='text-white text-2xl font-semibold'><span className='text-3xl font-bold'>S</span>HARESPHERE</h1>
         </div>
@@ -43,7 +43,7 @@ function Navbar() {
          <p className='text-red-600 font-semibold absolute bottom-10 left-14 cursor-pointer' onClick={handleLogout}>LOGOUT</p>
       </nav>
 
-      <nav className='border-t border-gray-700 fixed  flex p-1 w-screen bottom-0 md:bottom-[-100%] transition-all ease-in-out delay-700 bg-[#000300] z-40'>
+      <nav className='border-t border-gray-700 fixed  flex p-1 w-screen bottom-0 md:bottom-[-100%] transition-all ease-in-out delay-700 bg-[#000300] z-40 select-none'>
         <ul className='flex justify-between px-5 w-full items-center p-1'>
           <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillHome size={20} /></span></li>
           <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiOutlineSearch size={20} /></span></li>

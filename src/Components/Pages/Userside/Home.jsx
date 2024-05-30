@@ -9,24 +9,42 @@ import TextToggle from './HelperComponents/TextToggle'
 import Commets from './HelperComponents/Commets'
 import Navbar from './HelperComponents/Navbar'
 import { useDispatch } from 'react-redux'
-import { fetchPosts } from '../../../Redux/PostSlice'
+import { fetchPosts ,addLike,removeLike, delPost} from '../../../Redux/PostSlice'
+import api from '../../../Config'
+
 
 function Home() {
   const dispatch = useDispatch()
   const posts = useSelector((state) => state.posts.posts);
   const status = useSelector((state) => state.posts.status);
   const error = useSelector((state) => state.posts.error);
-
+  const username = useSelector(state=> state.authInfo.username)
   const [viewComment, setViewCommet] = useState({ "index": null, "view": false })
+  const [likedPosts, setLikedPosts] = useState([])
+  let access = localStorage.getItem('access')
 
   useEffect(() => {
+    api.get('get/user/liked/posts/',{
+      headers:{
+        Authorization: `Bearer ${access}`
+      }
+    }).then(res=>{
+      let likedposts =res.data.flat(Infinity)
+      setLikedPosts(likedposts)
+    }).catch(err=>{
+      console.log(err)
+    })
+
     if (status === 'idle') {
       dispatch(fetchPosts())
     }
   },
-    [dispatch, status])
+    [dispatch, status,setLikedPosts])
 
 
+
+  
+  // handling-coment-view--
   const handleView = (index) => {
     let data = {
       "index": index,
@@ -34,9 +52,35 @@ function Home() {
     }
     setViewCommet(data)
   }
+  // handling-comment-view-end-here---
+
+  // postlike-code--
+  const handlelike = async (postid) => {
+    try {
+      const access = localStorage.getItem('access')
+      const res = await api.post(`postlike/${postid}/toggle-like/`, {}, {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      })
+      if (res.status === 204) {
+         dispatch(removeLike(postid))
+         setLikedPosts(likedPosts.filter(id => id !== postid));
+        
+
+      } else {
+        dispatch(addLike(postid))
+        setLikedPosts([...likedPosts, postid]);
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+  // post-like-code-end---
+
   return (
     <>
-
       <Navbar />
 
       <div className='text-white md:ml-[320px] max-w-full grid grid-cols-10'>
@@ -76,10 +120,10 @@ function Home() {
 
             {/* feed-start-here--- */}
             {status === 'success' &&
-
+             
               posts.map((post, index) => {
                 return (
-                  <div className='px-2 pt-3'>
+                  <div className='px-2 pt-3' key={index}>
 
                     {/* post-start-here-- */}
 
@@ -104,13 +148,31 @@ function Home() {
                       {/* post bottom-- */}
                       <div className='flex justify-between px-4'>
                         <div className='flex gap-x-2'>
-                          <AiFillHeart />
+                          <AiFillHeart onClick={() => handlelike(post.id)} style={{color:likedPosts.includes(post.id)?'red':'white'}}/>
                           <AiFillMessage />
                         </div>
                         <GiSaveArrow />
                       </div>
-
-                      <p className='md:text-xs text-[11px] px-3 text-gray-400'>Drake and 20 other's liked this post</p>
+                      {/* {post.likes_count > 2 ? (
+                        <p className='md:text-xs text-[11px] px-3 text-gray-400'>
+                          {post.liked_users[0].userID.username} and {post.likes_count - 1} Others liked this post
+                        </p>
+                      ) : post.likes_count > 1 ? (
+                        <p className='md:text-xs text-[11px] px-3 text-gray-400'>
+                          {post.liked_users[0].userID.username} and {post.liked_users[1].userID.username} Liked this post
+                        </p>
+                      ) : post.likes_count === 1 ? (
+                        <p className='md:text-xs text-[11px] px-3 text-gray-400'>
+                          {post.liked_users[0].userID.username} Liked this post
+                        </p>
+                      ) :
+                        <p className='md:text-xs text-[11px] px-3 text-gray-400'>
+                          {post.likes_count} Likes
+                        </p>
+                      } */}
+                        <p className='md:text-xs text-[11px] px-3 text-gray-400'>
+                          {post.likes_count} Likes
+                        </p>
 
                       <TextToggle
                         text={post.caption} />
@@ -148,7 +210,7 @@ function Home() {
                       <div className='w-40 h-4 bg-gray-700 rounded-md mt-2'></div>
                     </div>
                     <div className='col-span-1 h-[80px] rounded-md animate-pulse flex justify-end'>
-                    <button className='h-4 rounded-md w-6 bg-gray-700 mr-3'></button>
+                      <button className='h-4 rounded-md w-6 bg-gray-700 mr-3'></button>
                     </div>
                   </div>
                 </div>
