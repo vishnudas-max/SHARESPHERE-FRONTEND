@@ -4,6 +4,12 @@ import { useSelector } from 'react-redux'
 import messi from '../../../media/images/messi.webp'
 import { AiOutlineMore } from 'react-icons/ai'
 import PostOptions from './HelperComponents/PostOptions'
+import api from '../../../Config'
+import Loader from '../Userside/HelperComponents/Loader'
+import { FaCircleUser } from "react-icons/fa6";
+import { IoSend } from "react-icons/io5";
+
+
 
 function ViewPost() {
   const { id } = useParams()
@@ -11,36 +17,86 @@ function ViewPost() {
   const posts = useSelector(state => state.posts.posts)
   const userID = useSelector(state => state.authInfo.userID)
   const [optionson, setOptions] = useState(false)
+  const [comments, setComments] = useState(null)
+  let access = localStorage.getItem('access')
+  const [showReply, setShowReply] = useState({})
+  const [comment, AddComment] = useState('')
+  const [replycomment, setreplycomment] = useState('')
+
+  const fetchComment = async () => {
+    try {
+      const response = await api.get(`post/comment/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      })
+      setComments(response.data)
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
 
   useEffect(() => {
     if (posts.length === 0) {
       navigate('/home/');
     }
+
+    fetchComment()
+
   }, [posts, navigate])
 
+  // getting current post-
   const post = posts.find(post => post.id === Number(id))
-  const comments = [
-    { comment: 'This is a great post!', time: '12:45:53' },
-    { comment: 'Thanks for sharing!', time: '13:15:23' },
-    { comment: 'I totally agree with you.', time: '14:30:45' },
-    { comment: 'This is another comment for a different post.', time: '15:45:53' },
-    { comment: 'Interesting perspective!', time: '16:05:13' },
-    { comment: 'I learned something new today.', time: '17:20:33' },
-    { comment: 'Nice photo!', time: '18:35:43' },
-    { comment: 'Where was this taken?', time: '19:50:53' },
-    { comment: 'Amazing!', time: '20:10:03' },
-    { comment: 'Great shot!', time: '21:25:13' },
-    { comment: 'I love this!', time: '22:40:23' },
-    { comment: 'Wonderful post.', time: '23:55:33' },
-    { comment: 'Very informative.', time: '00:10:43' },
-    { comment: 'I enjoyed reading this.', time: '01:25:53' },
-    { comment: 'Excellent content!', time: '02:41:03' },
-    { comment: 'This is very helpful.', time: '03:56:13' },
-    { comment: 'I appreciate this post.', time: '05:11:23' },
-    { comment: 'Thanks for the insight.', time: '06:26:33' },
-    { comment: 'I found this useful.', time: '07:41:43' },
-    { comment: 'Great information!', time: '08:56:53' }
-  ]
+  // getting current post end--
+
+  const postComment = async e => {
+    e.preventDefault()
+    if (!userID) {
+      alert(userID)
+    }
+    let data = {
+      "userID": userID,
+      "postID": id,
+      "comment": comment
+    }
+    try {
+      const response = await api.post(`post/comment/${id}/`, data, {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      })
+      AddComment('')
+      fetchComment()
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+
+  const postCommentReply = async () => {
+    // Ensure replycomment is a string
+
+    let comment = `@${showReply.username} ${replycomment}`;
+    let data = {
+      "userID": userID, // Ensure userID is a valid string or number
+      "postID": id, // Ensure id is a valid string or number
+      "comment": comment,
+      "parent_comment": showReply.id // Ensure commentID is a valid string or number
+    };
+
+    try {
+      const response = await api.post(`post/comment/${id}/`, data, {
+        headers: {
+          Authorization: `Bearer ${access}` // Ensure access is a valid string
+        }
+      });
+      fetchComment();
+      setreplycomment('')
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
 
   // Check if post is found
@@ -51,32 +107,44 @@ function ViewPost() {
   // Convert the uploadDate to a JavaScript Date object and format it
   const uploadDate = new Date(post.uploadDate).toLocaleDateString();
 
+  const handleRepliesView =(id,username) => {
+    console.log(id,username)
+    if (showReply.id) {
+      setShowReply({})
+    } else {
+      setShowReply({'id': id, 'username': username })
+    }
+  }
+
   return (
     <div className='select-none'>
       {posts.length !== 0 &&
         <div className="grid grid-cols-3 gap-1 h-screen">
 
-          <div className="col-span-3 md:col-span-2 max-w-[800px] md:h-[screen] mx-auto my-auto px-5 ">
-            <img src={post.contend} alt="Post" className='max-w-[500px] max-h-[700px]' />
+          <div className="col-span-3 md:col-span-2 md:max-w-[800px] max-w-full md:h-[screen] mx-auto my-auto px-5 ">
+            <img src={post.contend} alt="Post" className='md:max-w-[500px] max-w-full max-h-[700px]' />
           </div>
-
           <div className='col-span-3 md:col-span-1 bg-zinc-900 px-2 pt-3 text-white flex-col h-screen sticky top-14  overflow-hidden '>
 
             <div className='border-b border-gray-400 md:py-4 py-2'>
               <div className='w-full flex justify-between'>
                 <div className='flex gap-x-2 items-center'>
-                  <img src={messi} alt="profilepic" className='rounded-full size-12' />
+                  {post.userID.profile_pic ?
+                    <img src={messi} alt="profilepic" className='rounded-full size-12' />
+                    :
+                    <FaCircleUser className='md:size-14 size-10 ' />
+                  }
                   <h1 className='font-semibold text-xl'>{post.userID.username}</h1>
                 </div>
                 {userID === post.userID.id &&
-                  <AiOutlineMore color='white' className='size-8 cursor-pointer' onClick={()=>setOptions(o => !o)} />
-                      
+                  <AiOutlineMore color='white' className='size-8 cursor-pointer' onClick={() => setOptions(o => !o)} />
+
                 }
                 {
                   optionson &&
-                  <PostOptions animate={true} id={post.id}/>
+                  <PostOptions animate={true} id={post.id} />
                 }
-                   
+
 
               </div>
 
@@ -88,31 +156,81 @@ function ViewPost() {
 
             <div className='mt-3 grid grid-cols-5 py-3 border-b border-gray-400'>
               <div className='col-span-3 py-3 flex items-center'>
-                <input type="text" placeholder='Add comment..' className='px-1 text-[14px] bg-transparent outline-none border-b border-gray-600' />
+                <input type="text" placeholder='Add comment..' className='px-1 text-[14px] bg-transparent outline-none border-b border-gray-600' value={comment} onChange={e => AddComment(e.target.value)} />
+                <IoSend onClick={postComment} className='cursor-pointer size-5 ml-5 text-blue-500' />
               </div>
-              <div className='col-span-2 flex items-center justify-end '>
-                <button className='mr-3 md:px-4 px-3 py-1 text-[13px] md:text-[14px] border h-fit rounded-md hover:text-black hover:bg-gray-200 font-semibold '>Post</button>
-              </div>
+
+
+
             </div>
 
             {/* conmments-- */}
-            <div className='flex-col h-full overflow-y-scroll no-scrollbar '>
-              {
-                comments.map((comment, index) => (
-                  <div className='mt-3 p-2 flex gap-y-2 items-center' key={index}>
-                    <img src={messi} alt="" className='size-10 rounded-full' />
-                    <div className='flex-col justify-between gap-x-2'>
-                      <p className='font-semibold text-gray-300'>@Vishnu</p>
-                      <p className='ml-2 font-thin md:text-[14px] text-[13px]'>{comment.comment}</p>
-                      <p className='text-xs ml-2 text-gray-400'>{comment.time}</p>
+            <div className='h-full'>
+              <div className='flex-col overflow-y-scroll no-scrollbar h-[450px]'>
+                {comments ? (
+                  comments.map((comment, index) => (
+                    <div className='mt-3 p-2 relative' key={index}>
+                      <div className='flex gap-y-2 items-center '>
+                        {comment.userID.profile_pic ? (
+                          <img src={comment.userID.profile_pic} alt="" className='size-10 rounded-full' />
+                        ) : (
+                          <FaCircleUser className='md:size-12 size-7' />
+                        )}
+                        <div className='flex-col justify-between'>
+                          <div className='flex  gap-x-2 items-center'>
+                            <p className='font-semibold text-gray-300 text-[14px] ml-2'>{comment.userID.username}</p>
+                            <p className='text-xs text-gray-400'>{comment.comment_time}</p>
+
+                          </div>
+
+                          <p className='ml-2 font-thin md:text-[14px] text-[13px] cursor-pointer' onClick={() => handleRepliesView(comment.id,comment.userID.username)}>{comment.comment}</p>
+
+                        </div>
+                      </div>
+
+                      {/* input field for adding reply-- */}
+                      {showReply['id'] === comment.id &&
+
+                        <div className='flex gap-x-3 mt-2'>
+                          <div className='flex border-b border-gray-600 gap-x-1'>
+                            <span>@{showReply['username']}</span>
+                            <input type="text" placeholder='Add reply....' className='w-full h-fit bg-transparent outline-none ' value={replycomment}
+                              onChange={e => setreplycomment(e.target.value)} />
+                            <IoSend onClick={postCommentReply} className='cursor-pointer size-9 ml-5 text-blue-500' />
+                          </div>
+
+                        </div>
+
+                      }
+                      {/* input field for adding reply end here-- */}
+
+                      {/* Mapping through replies */}
+                      {comment.replies && showReply['id'] === comment.id && comment.replies.map((reply, replyIndex) => (
+                        <div className='ml-10 mt-3 p-2 flex gap-y-2 items-center right-0' key={replyIndex}>
+                          {reply.userID.profile_pic ? (
+                            <img src={reply.userID.profile_pic} alt="" className='size-10 rounded-full' />
+                          ) : (
+                            <FaCircleUser className='md:size-10 size-7' />
+                          )}
+                          <div className='flex-col justify-between gap-x-2 select-text'>
+                            <div className='flex items-center'>
+                              <p className='font-semibold text-gray-300 ml-2'>{reply.userID.username}</p>
+                              <p className='text-[11px] ml-1 text-gray-400'>{reply.comment_time}</p>
+                            </div>
+                            <p className='ml-2 font-thin md:text-[14px] text-[13px]'>{reply.comment}</p>
+                          </div>
+                        </div>
+                      ))}
+
                     </div>
-                  </div>
-                ))
-              }
+                  ))
+                ) : (
+                  <Loader />
+                )}
+
+              </div>
+              {/* comments-end-- */}
             </div>
-            {/* comments-end-- */}
-
-
           </div>
         </div>
       }

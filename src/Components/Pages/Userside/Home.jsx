@@ -9,8 +9,9 @@ import TextToggle from './HelperComponents/TextToggle'
 import Commets from './HelperComponents/Commets'
 import Navbar from './HelperComponents/Navbar'
 import { useDispatch } from 'react-redux'
-import { fetchPosts ,addLike,removeLike, delPost} from '../../../Redux/PostSlice'
+import { fetchPosts, addLike, removeLike } from '../../../Redux/PostSlice'
 import api from '../../../Config'
+import PrivetRoute from '../../Wrappers/PrivetRoute';
 
 
 function Home() {
@@ -18,20 +19,20 @@ function Home() {
   const posts = useSelector((state) => state.posts.posts);
   const status = useSelector((state) => state.posts.status);
   const error = useSelector((state) => state.posts.error);
-  const username = useSelector(state=> state.authInfo.username)
+  const username = useSelector(state => state.authInfo.username)
   const [viewComment, setViewCommet] = useState({ "index": null, "view": false })
   const [likedPosts, setLikedPosts] = useState([])
   let access = localStorage.getItem('access')
 
   useEffect(() => {
-    api.get('get/user/liked/posts/',{
-      headers:{
+    api.get('get/user/liked/posts/', {
+      headers: {
         Authorization: `Bearer ${access}`
       }
-    }).then(res=>{
-      let likedposts =res.data.flat(Infinity)
+    }).then(res => {
+      let likedposts = res.data.flat(Infinity)
       setLikedPosts(likedposts)
-    }).catch(err=>{
+    }).catch(err => {
       console.log(err)
     })
 
@@ -39,11 +40,11 @@ function Home() {
       dispatch(fetchPosts())
     }
   },
-    [dispatch, status,setLikedPosts])
+    [dispatch, status, setLikedPosts])
 
 
 
-  
+
   // handling-coment-view--
   const handleView = (index) => {
     let data = {
@@ -64,9 +65,9 @@ function Home() {
         }
       })
       if (res.status === 204) {
-         dispatch(removeLike(postid))
-         setLikedPosts(likedPosts.filter(id => id !== postid));
-        
+        dispatch(removeLike(postid))
+        setLikedPosts(likedPosts.filter(id => id !== postid));
+
 
       } else {
         dispatch(addLike(postid))
@@ -120,7 +121,7 @@ function Home() {
 
             {/* feed-start-here--- */}
             {status === 'success' &&
-             
+
               posts.map((post, index) => {
                 return (
                   <div className='px-2 pt-3' key={index}>
@@ -148,7 +149,7 @@ function Home() {
                       {/* post bottom-- */}
                       <div className='flex justify-between px-4'>
                         <div className='flex gap-x-2'>
-                          <AiFillHeart onClick={() => handlelike(post.id)} style={{color:likedPosts.includes(post.id)?'red':'white'}}/>
+                          <AiFillHeart onClick={() => handlelike(post.id)} style={{ color: likedPosts.includes(post.id) ? 'red' : 'white' }} />
                           <AiFillMessage />
                         </div>
                         <GiSaveArrow />
@@ -170,9 +171,9 @@ function Home() {
                           {post.likes_count} Likes
                         </p>
                       } */}
-                        <p className='md:text-xs text-[11px] px-3 text-gray-400'>
-                          {post.likes_count} Likes
-                        </p>
+                      <p className='md:text-xs text-[11px] px-3 text-gray-400'>
+                        {post.likes_count} Likes
+                      </p>
 
                       <TextToggle
                         text={post.caption} />
@@ -180,7 +181,9 @@ function Home() {
 
                       {/* comments--- */}
                       {index === viewComment.index &&
-                        <Commets view={viewComment.view} />
+                        <PrivetRoute>
+                          <Commets view={viewComment.view} postID={post.id} />
+                        </PrivetRoute>
                       }
                       {/* commens-end-here-- */}
 
