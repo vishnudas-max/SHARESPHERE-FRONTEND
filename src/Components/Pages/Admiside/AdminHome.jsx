@@ -36,6 +36,7 @@ function AdminHome() {
     <>
       <AdminNavbar />
       <div className='text-white md:ml-[320px] max-w-full grid grid-cols-12 '>
+        
         <div className='col-span-12 px-4 py-3 md:py-5 border-b border-gray-500 fixed w-full bg-[#000300]'>
           <nav class="flex " aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
@@ -57,6 +58,7 @@ function AdminHome() {
             </ol>
           </nav>
         </div>
+
         {overViewData ?
           <div className='col-span-12 h-fit md:mt-16 mt-10 flex justify-around px-10 py-6'>
             <div className='h-fit md:w-32 w-20 rounded-xl bg-zinc-900 md:py-3 py-2 flex-col'>

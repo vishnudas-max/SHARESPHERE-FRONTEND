@@ -142,7 +142,11 @@ function Home() {
                       {/* post-conted-start-here-- */}
                       <Link to={`/home/post/${post.id}`}>
                         <div className='px-4 py-3'>
-                          <img src={post.contend} alt="post" className='border border-gray-400 mx-auto' />
+                          { post.contend ?
+                            <img src={post.contend} alt="post" className='border border-gray-400 mx-auto' />
+                            :
+                            <div className='w-full h-[300px] bg-gray-700'></div>
+                          }
                         </div>
                       </Link>
                       {/* post-cotent-end-here--- */}
