@@ -4,6 +4,7 @@ import AddPost from './AddPost'
 import PrivetRoute from '../../../Wrappers/PrivetRoute'
 import { useDispatch } from 'react-redux'
 import { delAuth } from '../../../../Redux/UserdataSlice'
+import { Link } from 'react-router-dom'
 
 function Navbar() {
   const dispatch = useDispatch()
@@ -30,7 +31,7 @@ function Navbar() {
         </div>
         <div className='max-w-[200px] mx-auto mt-4'>
           <ul className='flex-col'>
-            <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillHome size={24} /></span>Home</li>
+            <Link to={'/home/'}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillHome size={24} /></span>Home</li></Link>
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiOutlineSearch size={24} /></span>Explore</li>
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillMessage size={24} /></span>Message</li>
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillNotification size={24} /></span>Notification</li>

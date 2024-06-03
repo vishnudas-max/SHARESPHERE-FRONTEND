@@ -9,6 +9,7 @@ import PrivetRoute from '../Components/Wrappers/PrivetRoute';
 import AuthChecker from '../Components//Wrappers/AuthChecker';
 import ViewPost from '../Components/Pages/Userside/ViewPost';
 import EditPost from '../Components/Pages/Userside/EditPost';
+import UserProfile from '../Components/Pages/Userside/UserProfile';
 
 function UserWrapper() {
   return (
@@ -50,6 +51,12 @@ function UserWrapper() {
         <Route path='home/post/edit/:id' element={
           <PrivetRoute>
             <EditPost />
+          </PrivetRoute>
+        } />
+
+        <Route path='home/user/profile/:id' element={
+          <PrivetRoute>
+            <UserProfile />
           </PrivetRoute>
         } />
 

@@ -19,12 +19,29 @@ function Home() {
   const posts = useSelector((state) => state.posts.posts);
   const status = useSelector((state) => state.posts.status);
   const error = useSelector((state) => state.posts.error);
-  const username = useSelector(state => state.authInfo.username)
+  const user = useSelector(state => state.authInfo.username)
   const [viewComment, setViewCommet] = useState({ "index": null, "view": false })
   const [likedPosts, setLikedPosts] = useState([])
+  const [userSuggetions, setUserSuggetions] = useState(null)
   let access = localStorage.getItem('access')
 
+  // fetching suggested users---
+  const fetchuserSuggetions = async () => {
+    try {
+      const response = await api.get('suggested/users/', {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      })
+      setUserSuggetions(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  // fetching suggested users end here--
+
   useEffect(() => {
+
     api.get('get/user/liked/posts/', {
       headers: {
         Authorization: `Bearer ${access}`
@@ -36,9 +53,11 @@ function Home() {
       console.log(err)
     })
 
+
     if (status === 'idle') {
       dispatch(fetchPosts())
     }
+    fetchuserSuggetions()
   },
     [dispatch, status, setLikedPosts])
 
@@ -80,6 +99,29 @@ function Home() {
   }
   // post-like-code-end---
 
+
+  const followUser = async (username) => {
+    try {
+      const response = await api.post(`follow/${username}`, {}, {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      });
+
+      let data = userSuggetions.map((user) => {
+        if (user.username === username) {
+          return { ...user, is_following: response.data.following_Status };
+        } else {
+          return user;
+        }
+      });
+      console.log(response.data)
+      setUserSuggetions(data);
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <>
       <Navbar />
@@ -142,7 +184,7 @@ function Home() {
                       {/* post-conted-start-here-- */}
                       <Link to={`/home/post/${post.id}`}>
                         <div className='px-4 py-3'>
-                          { post.contend ?
+                          {post.contend ?
                             <img src={post.contend} alt="post" className='border border-gray-400 mx-auto' />
                             :
                             <div className='w-full h-[300px] bg-gray-700'></div>
@@ -158,6 +200,7 @@ function Home() {
                         </div>
                         <GiSaveArrow />
                       </div>
+
                       {/* {post.likes_count > 2 ? (
                         <p className='md:text-xs text-[11px] px-3 text-gray-400'>
                           {post.liked_users[0].userID.username} and {post.likes_count - 1} Others liked this post
@@ -175,6 +218,7 @@ function Home() {
                           {post.likes_count} Likes
                         </p>
                       } */}
+
                       <p className='md:text-xs text-[11px] px-3 text-gray-400'>
                         {post.likes_count} Likes
                       </p>
@@ -240,44 +284,35 @@ function Home() {
             <h1 className='text-xs md:text-xl font-semibold text-center border-b border-gray-700'>WHO TO FOLLOW</h1>
 
             <div className='max-w-[250px] mx-auto px-2 py-3'>
+              {
+                userSuggetions ?
+                  userSuggetions.map((user, index) => (
 
-              <div className='flex items-center justify-between mb-3'>
-                <div className='flex items-center gap-x-2'>
-                  <img src={messi} alt="" className='size-8 rounded-full' />
-                  <h3 className='font-sans text-[13px]'>@John_02</h3>
-                </div>
-                <button className='border border-gray-500 text-xs px-3 py-1 rounded-md'>Follow</button>
-              </div>
+                    <div className='flex items-center justify-between mb-3 select-none' key={user.id}>
+                      <Link to={`/home/user/profile/${user.id}`}><div className='flex items-center gap-x-2'>
+                        <img src={messi} alt="" className='size-8 rounded-full' />
+                        <h3 className='font-sans text-[13px]'>{user.username}</h3>
+                      </div>
+                      </Link>
+                      {user.is_following ?
+                        <p className='text-xs' onClick={() => followUser(user.username)}>Following</p>
+                        :
+                        <button className='border border-gray-500 text-xs px-3 py-1 rounded-md' onClick={() => followUser(user.username)}>Follow</button>}
+                    </div>
+                  ))
+                  :
 
-              <div className='flex items-center justify-between mb-3'>
-                <div className='flex items-center gap-x-2'>
-                  <img src={messi} alt="" className='size-8 rounded-full' />
-                  <h3 className='font-sans text-[13px]'>@John_02</h3>
-                </div>
-                <button className='border border-gray-500 text-xs px-3 py-1 rounded-md'>Follow</button>
-              </div>
 
-              <div className='flex items-center justify-between mb-3'>
-                <div className='flex items-center gap-x-2'>
-                  <img src={messi} alt="" className='size-8 rounded-full' />
-                  <h3 className='font-sans text-[13px]'>@John_02</h3>
-                </div>
-                <button className='border border-gray-500 text-xs px-3 py-1 rounded-md'>Follow</button>
-              </div>
-              <div className='flex items-center justify-between mb-3'>
-                <div className='flex items-center gap-x-2'>
-                  <img src={messi} alt="" className='size-8 rounded-full' />
-                  <h3 className='font-sans text-[13px]'>@John_02</h3>
-                </div>
-                <button className='border border-gray-500 text-xs px-3 py-1 rounded-md'>Follow</button>
-              </div>
-              <div className='flex items-center justify-between mb-3'>
-                <div className='flex items-center gap-x-2'>
-                  <img src={messi} alt="" className='size-8 rounded-full' />
-                  <h3 className='font-sans text-[13px]'>@John_02</h3>
-                </div>
-                <button className='border border-gray-500 text-xs px-3 py-1 rounded-md'>Follow</button>
-              </div>
+                  Array(5).fill().map((_, index) => (
+                    <div className='flex items-center justify-between mb-3'>
+                      <div className='flex items-center gap-x-2' key={index}>
+                        <div className='size-9 bg-gray-700 rounded-full'></div>
+                        <div className='bg-gray-700 w-24 h-5 rounded-full'></div>
+                      </div>
+                      <div className='w-14 h-6 rounded-md bg-gray-700'></div>
+                    </div>
+                  ))
+              }
 
             </div>
             <Link >
