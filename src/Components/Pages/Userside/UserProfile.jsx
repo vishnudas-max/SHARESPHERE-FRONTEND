@@ -98,7 +98,7 @@ function UserProfile() {
                                     userProfile.posts.map((post, index) => (
                                         <div className="col-span-1 flex justify-center border-1 border-gray-600" key={index}>
                                             <Link to={`/home/post/${post.id}`}>
-                                                <img src={{baseURL}+post.contend} alt="post" className='max-h-52' />
+                                                <img src={baseURL+post.contend} alt="post" className='max-h-52' />
                                             </Link>
                                         </div>
                                     ))

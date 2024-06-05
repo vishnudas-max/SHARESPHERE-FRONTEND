@@ -57,7 +57,7 @@ function EditPost() {
                     <input type="text" placeholder="What's happening...." className='bg-transparent border-b border-gray-500 outline-none w-[300px] md:w-[700px] '
                         onChange={e => setCaption(e.target.value)} value={caption} />
 
-                    <input type="file" class="w-full text-sm text-slate-500 mt-3  hidden"
+                    <input type="file" accept="image/*"  class="w-full text-sm text-slate-500 mt-3  hidden"
                         onChange={e => setConted(e.target.files[0])}
                         ref={imgref}
                     />

@@ -10,6 +10,7 @@ import AuthChecker from '../Components//Wrappers/AuthChecker';
 import ViewPost from '../Components/Pages/Userside/ViewPost';
 import EditPost from '../Components/Pages/Userside/EditPost';
 import UserProfile from '../Components/Pages/Userside/UserProfile';
+import Profile from '../Components/Pages/Userside/Profile';
 
 function UserWrapper() {
   return (
@@ -57,6 +58,13 @@ function UserWrapper() {
         <Route path='home/user/profile/:id' element={
           <PrivetRoute>
             <UserProfile />
+          </PrivetRoute>
+        } />
+
+       
+        <Route path='home/profile/' element={
+          <PrivetRoute>
+            <Profile />
           </PrivetRoute>
         } />
 

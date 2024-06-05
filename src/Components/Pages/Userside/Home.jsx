@@ -1,7 +1,7 @@
-import React, { useState, useEffect, CSSProperties } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { AiOutlineSearch, AiOutlineArrowRight, AiFillPlusCircle, AiFillHeart, AiFillMessage } from 'react-icons/ai'
+import { AiOutlineSearch, AiOutlineArrowRight, AiFillPlusCircle, AiFillHeart, AiFillMessage, AiOutlineClose } from 'react-icons/ai'
 import { GiSaveArrow } from "react-icons/gi";
 import messi from '../../../media/images/messi.webp'
 import MobileTop from './HelperComponents/MobileTop'
@@ -12,18 +12,83 @@ import { useDispatch } from 'react-redux'
 import { fetchPosts, addLike, removeLike } from '../../../Redux/PostSlice'
 import api from '../../../Config'
 import PrivetRoute from '../../Wrappers/PrivetRoute';
+import { Image, Shimmer } from 'react-shimmer'
+import { BsFileImageFill } from "react-icons/bs";
+import { ToastContainer, toast } from 'react-toastify';
+import { fetchStory } from '../../../Redux/StoriesSlice';
+import { FaCircleUser } from "react-icons/fa6";
+import UserStoryView from './UserStoryView';
 
 
 function Home() {
   const dispatch = useDispatch()
   const posts = useSelector((state) => state.posts.posts);
   const status = useSelector((state) => state.posts.status);
+  const storyStatus = useSelector(state => state.stories.status)
+  const allStories = useSelector(state => state.stories.stories)
   const error = useSelector((state) => state.posts.error);
   const user = useSelector(state => state.authInfo.username)
+  const userID = useSelector(state => state.authInfo.userID)
   const [viewComment, setViewCommet] = useState({ "index": null, "view": false })
   const [likedPosts, setLikedPosts] = useState([])
   const [userSuggetions, setUserSuggetions] = useState(null)
+  const [showAddStory, ToogleShowAddStory] = useState(false)
   let access = localStorage.getItem('access')
+  const [addStoryImg, setStoryImg] = useState(null)
+  const imgRef = useRef()
+  const [viewStory, setViewStory] = useState(null)
+  const currentUserStories = allStories.find(story => story.id == userID)
+
+  const closeStory = useCallback(() => {
+    setViewStory(null)
+  },
+    [viewStory])
+
+  // adding story--
+  const AddStory = async () => {
+    if (!addStoryImg) {
+      toast.error('Select a image to share !', {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        style: { backgroundColor: 'red', color: 'black' },
+      })
+    }
+    let data = {
+      content: addStoryImg,
+      userID: userID
+    }
+    try {
+      const response = await api.post('user/story/', data, {
+        headers: {
+          Authorization: `Bearer ${access}`,
+          "Content-Type": 'multipart/form-data'
+        }
+      })
+
+      setStoryImg(null)
+      dispatch(fetchStory())
+      toast.success('Story Added', {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        style: { backgroundColor: 'green', color: 'black' },
+      })
+      setTimeout(() => {
+        ToogleShowAddStory(false);
+      }, 1000);
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+  // addin story closed---
 
   // fetching suggested users---
   const fetchuserSuggetions = async () => {
@@ -41,7 +106,6 @@ function Home() {
   // fetching suggested users end here--
 
   useEffect(() => {
-
     api.get('get/user/liked/posts/', {
       headers: {
         Authorization: `Bearer ${access}`
@@ -57,9 +121,16 @@ function Home() {
     if (status === 'idle') {
       dispatch(fetchPosts())
     }
-    fetchuserSuggetions()
+    if (storyStatus === 'idle') {
+      dispatch(fetchStory())
+    }
+
+    if (userSuggetions === null) {
+      fetchuserSuggetions()
+    }
+
   },
-    [dispatch, status, setLikedPosts])
+    [dispatch, status, setLikedPosts, userSuggetions, storyStatus])
 
 
 
@@ -122,32 +193,99 @@ function Home() {
       console.log(error)
     }
   }
+
+
   return (
     <>
       <Navbar />
 
       <div className='text-white md:ml-[320px] max-w-full grid grid-cols-10'>
-        <div className='col-span-12 md:col-span-6 border-r border-gray-700  '>
+        <div className='col-span-12 md:col-span-6 border-r border-gray-700  relative'>
+
+          {/* continer to add story-- */}
+          <div className={`absolute z-20 w-full h-[400px] bg-[#000300] mt-12 md:mt-0 transition-all ease-in-out delay-70000 shadow-lg shadow-gray-900 ${showAddStory ? 'top-0 scale-100 opacity-100' : 'top-[-420px] scale-0 opacity-0'}`}>
+            <ToastContainer />
+            <div className='px-3 py-2'>
+              <div className='flex justify-between pr-1 items-center'>
+                <div className='flex items-center gap-x-2 p-5'>
+                  <BsFileImageFill className='text-blue-500 size-9' />
+                  <div onClick={() => imgRef.current.click()} className='cursor-pointer'>
+                    <span className='text-sm text-gray-400'>Upload Image here</span>
+                  </div>
+                  <input type="file" hidden ref={imgRef} accept="image/*" onChange={e => setStoryImg(e.target.files[0])} />
+                </div>
+                <button className='border border-gray-300 h-fit px-4 rounded-md md:text-sm md:py-1 md:px-5 hover:bg-gray-200 hover:text-black' onClick={AddStory}>Post</button>
+                <AiOutlineClose className='text-gray-300 cursor-pointer' size={24} onClick={() => ToogleShowAddStory(false)} />
+              </div>
+            </div>
+            <div className='w-full p-6 flex justify-center h-60'>
+              {addStoryImg && <img src={URL.createObjectURL(addStoryImg)} className='max-h-full' alt="Story" />}
+            </div>
+          </div>
+          {/* container to add story end -here-- */}
+
+
           <MobileTop />
           {
-            status === 'loading' && <h1 className='text-[30px]'>Loading......</h1>
+            status === 'loading' && <h1 className='text-[30px]' >Loading......</h1>
           }
           <div>
-            {/* story-- */}
-            <div className='flex border-b border-gray-700 px-2 py-1'>
-              <div className="flex-shrink-0 py-2 flex-col pl-4">
-                <img src={messi} alt="" className="md:size-20 size-16 rounded-full border-[3px] border-gray-200 mx-auto add-plus" />
-                <p className='text-xs w-fit mx-auto flex items-center gap-x-2'>Your story<AiFillPlusCircle className='md:size-4' /></p>
-              </div>
 
-              <div className="flex w-full overflow-x-scroll no-scrollbar py-2 ">
-                {Array(12).fill().map((_, index) => (
-                  <div key={index} className="flex-shrink-0 flex-col ml-7">
-                    <img src={messi} alt="" className="md:size-20 size-16 rounded-full border-[3px]  border-green-500" />
-                    <p className='text-xs w-fit mx-auto'>_John_</p>
-                  </div>
-                ))}
+            {/* story-- */}
+
+            {/* story-view-component-- */}
+            {
+              viewStory &&
+              <UserStoryView userID={viewStory.userID} closeStory={closeStory} />
+            }
+            {/* story-view-comeponent-end-here-- */}
+            <div className='flex border-b border-gray-700 px-2 py-1'>
+              {/* current -user -story-- */}
+              <div className="flex-shrink-0 py-2 flex-col pl-4">
+                {storyStatus === 'success' && currentUserStories.profile_pic ?
+                  <img
+                    src={currentUserStories.profile_pic}
+                    alt=""
+                    className="md:size-20 size-16 rounded-full border-[3px] border-green-500"
+                    onClick={currentUserStories && currentUserStories.stories.length > 0 ? () => setViewStory({ 'userID': currentUserStories.id }) : undefined}
+                  />
+                  :
+                  <FaCircleUser className='md:size-20 size-16 border-[3px] border-green-400 rounded-full' onClick={currentUserStories && currentUserStories.stories.length > 0 ? () => setViewStory({ 'userID': currentUserStories.id }) : undefined} />
+                }
+                <p className='text-xs w-fit mx-auto flex items-center gap-x-2'>Your story<AiFillPlusCircle className='md:size-4' onClick={() => ToogleShowAddStory(!showAddStory)} /></p>
               </div>
+              {/* current -user-story -end -here- */}
+
+
+              {/* stories start here-- */}
+              {storyStatus === 'success' | storyStatus === 'failed' ?
+                <div className="flex w-full overflow-x-scroll no-scrollbar py-2 ">
+                  {allStories.map((story, index) => {
+                    if (story.id !== userID) {
+                      return (
+                        <div key={story.id} className="flex-shrink-0 flex-col ml-7">
+                          {story.profile_pic ?
+                            <img src={story.profile_pic} alt="" className="md:size-20 size-16 rounded-full border-[3px]  border-green-500" onClick={() => setViewStory({ 'userID': story.id })} />
+                            : <FaCircleUser className='md:size-20 size-16 border-[3px] border-green-400 rounded-full' onClick={() => setViewStory({ 'userID': story.id })} />
+                          }
+                          <p className='text-xs w-fit mx-auto'>{story.username}</p>
+                        </div>
+                      )
+                    }
+
+                  })}
+                </div>
+                :
+                <div className="flex w-full overflow-x-scroll no-scrollbar py-2 ">
+                  {Array(12).fill().map((_, index) => (
+                    <div key={index} className="flex-shrink-0 flex-col ml-7">
+
+                      <div className='md:size-20 size-16 bg-gray-700 rounded-full'></div>
+                      <p className='h-3 mt-1 rounded-xl w-16 mx-auto bg-gray-700'></p>
+                    </div>
+                  ))}
+                </div>
+              }
 
             </div>
             {/* story-end-- */}
@@ -183,12 +321,10 @@ function Home() {
 
                       {/* post-conted-start-here-- */}
                       <Link to={`/home/post/${post.id}`}>
-                        <div className='px-4 py-3'>
-                          {post.contend ?
-                            <img src={post.contend} alt="post" className='border border-gray-400 mx-auto' />
-                            :
-                            <div className='w-full h-[300px] bg-gray-700'></div>
-                          }
+                        <div className='px-4 py-3 flex justify-center'>
+                          <Image src={post.contend} className='border border-gray-400 mx-auto'
+                            fallback={<Shimmer width={660} height={300} />}
+                          />
                         </div>
                       </Link>
                       {/* post-cotent-end-here--- */}
@@ -323,7 +459,7 @@ function Home() {
 
           </div>
         </div>
-      </div>
+      </div >
     </>
   )
 }

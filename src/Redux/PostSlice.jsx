@@ -31,7 +31,7 @@ const PostSlice = createSlice({
         addLike: (state, action) => {
             state.posts.filter(post => {
                 if (post.id === action.payload) {
-                    post.likes_count = post.likes_count + 1
+                     post.likes_count = post.likes_count + 1
                 }
 
             })
@@ -39,7 +39,7 @@ const PostSlice = createSlice({
          removeLike: (state,action) =>{
             state.posts.filter(post=>{
                 if(post.id === action.payload){
-                    post.likes_count = post.likes_count - 1
+                    return post.likes_count = post.likes_count - 1
                 }
             })
          }

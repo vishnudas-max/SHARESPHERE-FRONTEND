@@ -2,9 +2,10 @@ import React, { useState, useCallback } from 'react'
 import { AiFillHome, AiOutlineSearch, AiFillMessage, AiFillNotification, AiFillPlusCircle, AiFillProfile, AiOutlineMore } from 'react-icons/ai'
 import AddPost from './AddPost'
 import PrivetRoute from '../../../Wrappers/PrivetRoute'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { delAuth } from '../../../../Redux/UserdataSlice'
 import { Link } from 'react-router-dom'
+import { delStories } from '../../../../Redux/StoriesSlice'
 
 function Navbar() {
   const dispatch = useDispatch()
@@ -16,6 +17,7 @@ function Navbar() {
   const handleLogout =()=>{
     localStorage.clear()
     dispatch(delAuth())
+    dispatch(delStories())
 
   }
   return (
@@ -36,7 +38,7 @@ function Navbar() {
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillMessage size={24} /></span>Message</li>
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillNotification size={24} /></span>Notification</li>
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl' onClick={() => setAddPost(c => !c)}><span><AiFillPlusCircle size={24} /></span>Create Post</li>
-            <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillProfile size={24} /></span>Profile</li>
+            <Link to={`/home/profile/`}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillProfile size={24} /></span>Profile</li></Link>
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span className='flex items-center'><AiOutlineMore size={23} className='rotate-90' /></span>More</li>
           </ul>
          
