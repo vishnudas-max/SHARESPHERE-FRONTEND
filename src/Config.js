@@ -2,6 +2,8 @@ import axios from 'axios'
 import { delAuth } from './Redux/UserdataSlice';
 import { useDispatch } from 'react-redux';
 
+
+
 const axiosInstance = axios.create({
   baseURL: 'http://127.0.0.1:8000/api/'
 });

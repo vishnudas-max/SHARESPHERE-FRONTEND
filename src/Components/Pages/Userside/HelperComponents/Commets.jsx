@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react'
-import messi from '../../../../media/images/messi.webp'
 import api from '../../../../Config'
 import Loader from './Loader'
 import { FaCircleUser } from "react-icons/fa6";
 import { useSelector } from 'react-redux';
 import { IoSend } from "react-icons/io5";
+import { addComment_count } from '../../../../Redux/PostSlice';
+import { useDispatch } from 'react-redux';
 
 function Commets({ view, postID }) {
-
+    const dispatch = useDispatch()
     const profile_pic = useSelector(state => state.authInfo.profile_pic)
     const username = useSelector(state => state.authInfo.username)
     const [comments, setComments] = useState(null)
@@ -16,6 +17,7 @@ function Commets({ view, postID }) {
     const [comment, AddComment] = useState('')
     const userID = useSelector(state => state.authInfo.userID)
     const [replycomment, setreplycomment] = useState('')
+    
 
 
     // function to fetchcomment-
@@ -68,6 +70,7 @@ function Commets({ view, postID }) {
             }
           })
           AddComment('')
+          dispatch(addComment_count(postID))
           fetchComment()
         }
         catch (error) {
@@ -95,6 +98,7 @@ function Commets({ view, postID }) {
             }
           });
           fetchComment();
+          dispatch(addComment_count(postID))
           setreplycomment('')
         } catch (error) {
           console.error(error);

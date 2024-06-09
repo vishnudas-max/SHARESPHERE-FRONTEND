@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { baseURL } from '../../../Config'
 import { FaCircleUser } from "react-icons/fa6";
+import { IoClose } from "react-icons/io5";
 
 function UserStoryView({ userID, closeStory }) {
     const UserWithStories = useSelector(state => state.stories.stories)
@@ -29,6 +30,7 @@ function UserStoryView({ userID, closeStory }) {
    
     return (
         <div className="fixed max-w-full h-screen bg-[#000300] left-0 right-0 z-40">
+            <IoClose color='white' className='absolute top-16 right-32 size-9' onClick={()=>closeStory()}/>
             <div className='px-3 py-5 flex gap-x-2'>
                 <div>
                     {currentUserStories.profile_pic ?

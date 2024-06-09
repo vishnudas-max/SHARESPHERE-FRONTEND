@@ -9,7 +9,7 @@ import TextToggle from './HelperComponents/TextToggle'
 import Commets from './HelperComponents/Commets'
 import Navbar from './HelperComponents/Navbar'
 import { useDispatch } from 'react-redux'
-import { fetchPosts, addLike, removeLike } from '../../../Redux/PostSlice'
+import { fetchPosts, addLike, removeLike, Toggle_is_following } from '../../../Redux/PostSlice'
 import api from '../../../Config'
 import PrivetRoute from '../../Wrappers/PrivetRoute';
 import { Image, Shimmer } from 'react-shimmer'
@@ -106,6 +106,13 @@ function Home() {
   // fetching suggested users end here--
 
   useEffect(() => {
+    if (userSuggetions === null) {
+      fetchuserSuggetions()
+    }
+  },
+    [userSuggetions])
+
+  useEffect(() => {
     api.get('get/user/liked/posts/', {
       headers: {
         Authorization: `Bearer ${access}`
@@ -117,7 +124,6 @@ function Home() {
       console.log(err)
     })
 
-
     if (status === 'idle') {
       dispatch(fetchPosts())
     }
@@ -125,15 +131,11 @@ function Home() {
       dispatch(fetchStory())
     }
 
-    if (userSuggetions === null) {
-      fetchuserSuggetions()
-    }
-
   },
-    [dispatch, status, setLikedPosts, userSuggetions, storyStatus])
+    [dispatch, status, setLikedPosts, storyStatus])
 
 
-
+  console.log(userSuggetions)
 
   // handling-coment-view--
   const handleView = (index) => {
@@ -178,7 +180,7 @@ function Home() {
           Authorization: `Bearer ${access}`
         }
       });
-
+      dispatch(Toggle_is_following(username))
       let data = userSuggetions.map((user) => {
         if (user.username === username) {
           return { ...user, is_following: response.data.following_Status };
@@ -289,8 +291,6 @@ function Home() {
 
             </div>
             {/* story-end-- */}
-
-
             {/* feed-selection-- */}
             <div className='grid grid-cols-2'>
               <div className='col-span-1 h-8 text-center bg-gray-900'>All</div>
@@ -311,18 +311,28 @@ function Home() {
                     <div className='mt-4 relative' key={index}>
                       {/* post-header-- */}
                       <div className='flex justify-between px-3 items-center'>
-                        <div className='flex gap-x-1 items-center'>
-                          <img src={messi} alt="" className='size-8 rounded-full' />
-                          <p className='font-thin text-[13px]'>_John</p>
+                        {/* postuserprofile_pic and usernme-- */}
+                        <div className='flex gap-x-1 items-center w-fit'>
+                          {post.userID.profile_pic ?
+                            <img src={post.userID.profile_pic} alt="user" className='size-8 rounded-full' />
+                            :
+                            <FaCircleUser className='md:size-9 size-7' />
+                          }
+
+                          <Link to={user !== post.userID.username ? `/home/user/profile/${post.userID.id}` : `/home/profile/`}>
+                            <p className='md:text-sm text-xs font-normal'>{post.userID.username}</p>
+                          </Link>
+
                         </div>
-                        <button className='text-[11px] px-5 h-fit py-[2px] rounded-md border border-gray-400'>Follow</button>
+                        {/* postuser profile pic and username end-- */}
+                        {post.is_following === false && <button className='text-[11px] px-5 h-fit py-[2px] rounded-md border border-gray-400' onClick={() => followUser(post.userID.username)}>Follow</button>}
                       </div>
                       {/* post-header-end-here--- */}
 
                       {/* post-conted-start-here-- */}
                       <Link to={`/home/post/${post.id}`}>
-                        <div className='px-4 py-3 flex justify-center'>
-                          <Image src={post.contend} className='border border-gray-400 mx-auto'
+                        <div className='px-4 py-3 flex justify-center select-none'>
+                          <Image src={post.contend} className='border border-gray-400 mx-auto select-none'
                             fallback={<Shimmer width={660} height={300} />}
                           />
                         </div>
@@ -331,29 +341,11 @@ function Home() {
                       {/* post bottom-- */}
                       <div className='flex justify-between px-4'>
                         <div className='flex gap-x-2'>
-                          <AiFillHeart onClick={() => handlelike(post.id)} style={{ color: likedPosts.includes(post.id) ? 'red' : 'white' }} />
-                          <AiFillMessage />
+                          <AiFillHeart onClick={() => handlelike(post.id)} className='cursor-pointer md:size-6 size-4' style={{ color: likedPosts.includes(post.id) ? 'red' : 'white' }} />
+                          <AiFillMessage onClick={() => handleView(index)} className='cursor-pointer md:size-6 size-4' />
                         </div>
                         <GiSaveArrow />
                       </div>
-
-                      {/* {post.likes_count > 2 ? (
-                        <p className='md:text-xs text-[11px] px-3 text-gray-400'>
-                          {post.liked_users[0].userID.username} and {post.likes_count - 1} Others liked this post
-                        </p>
-                      ) : post.likes_count > 1 ? (
-                        <p className='md:text-xs text-[11px] px-3 text-gray-400'>
-                          {post.liked_users[0].userID.username} and {post.liked_users[1].userID.username} Liked this post
-                        </p>
-                      ) : post.likes_count === 1 ? (
-                        <p className='md:text-xs text-[11px] px-3 text-gray-400'>
-                          {post.liked_users[0].userID.username} Liked this post
-                        </p>
-                      ) :
-                        <p className='md:text-xs text-[11px] px-3 text-gray-400'>
-                          {post.likes_count} Likes
-                        </p>
-                      } */}
 
                       <p className='md:text-xs text-[11px] px-3 text-gray-400'>
                         {post.likes_count} Likes
@@ -361,7 +353,7 @@ function Home() {
 
                       <TextToggle
                         text={post.caption} />
-                      <p className='md:text-xs text-[11px] mx-3 text-gray-500 cursor-pointer' onClick={() => handleView(index)}>View all 10 comments</p>
+                      <p className='md:text-xs text-[11px] mx-3 text-gray-500 cursor-pointer' onClick={() => handleView(index)}>{post.comment_count > 0 ? `View ${post.comment_count} Comments` : 'No Comments'}</p>
 
                       {/* comments--- */}
                       {index === viewComment.index &&
@@ -403,18 +395,16 @@ function Home() {
                 </div>
               ))
             }
-
-
           </div>
         </div>
 
 
         {/* right side-- */}
         <div className='col-span-4  py-5 hidden md:block'>
-          <div className='w-fit mx-auto h-fit sticky top-5 flex items-center'>
+          {/* <div className='w-fit mx-auto h-fit sticky top-5 flex items-center'>
             <input type="text" placeholder='Search' className='bg-gray-900 md:px-3 pl-2 pr-7 py-1 md:py-3 rounded-3xl  m-auto max-w-[340px]' />
             <AiOutlineSearch className='absolute right-2 size-4 md:size-6' />
-          </div>
+          </div> */}
 
           <div className='border border-gray-700 sticky top-[70px] md:top-[100px] py-2 md:py-4 px-1 md:px-2 mx-auto max-w-[280px] rounded-md'>
             <h1 className='text-xs md:text-xl font-semibold text-center border-b border-gray-700'>WHO TO FOLLOW</h1>
@@ -440,8 +430,8 @@ function Home() {
 
 
                   Array(5).fill().map((_, index) => (
-                    <div className='flex items-center justify-between mb-3'>
-                      <div className='flex items-center gap-x-2' key={index}>
+                    <div className='flex items-center justify-between mb-3' key={index}>
+                      <div className='flex items-center gap-x-2' >
                         <div className='size-9 bg-gray-700 rounded-full'></div>
                         <div className='bg-gray-700 w-24 h-5 rounded-full'></div>
                       </div>
@@ -456,7 +446,6 @@ function Home() {
                 more<AiOutlineArrowRight size={12} />
               </div>
             </Link>
-
           </div>
         </div>
       </div >

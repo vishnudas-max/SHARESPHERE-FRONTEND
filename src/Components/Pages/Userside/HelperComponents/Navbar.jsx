@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { delAuth } from '../../../../Redux/UserdataSlice'
 import { Link } from 'react-router-dom'
 import { delStories } from '../../../../Redux/StoriesSlice'
+import { delPost } from '../../../../Redux/PostSlice'
 
 function Navbar() {
   const dispatch = useDispatch()
@@ -18,6 +19,7 @@ function Navbar() {
     localStorage.clear()
     dispatch(delAuth())
     dispatch(delStories())
+    dispatch(delPost())
 
   }
   return (

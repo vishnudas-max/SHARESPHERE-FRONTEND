@@ -8,11 +8,13 @@ import api from '../../../Config'
 import Loader from '../Userside/HelperComponents/Loader'
 import { FaCircleUser } from "react-icons/fa6";
 import { IoSend } from "react-icons/io5";
-
+import { useDispatch } from 'react-redux'
+import { addComment_count } from '../../../Redux/PostSlice'
 
 
 function ViewPost() {
   const { id } = useParams()
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const posts = useSelector(state => state.posts.posts)
   const userID = useSelector(state => state.authInfo.userID)
@@ -66,6 +68,7 @@ function ViewPost() {
           Authorization: `Bearer ${access}`
         }
       })
+      dispatch(addComment_count(id))
       AddComment('')
       fetchComment()
     }
@@ -93,6 +96,7 @@ function ViewPost() {
       });
       fetchComment();
       setreplycomment('')
+      dispatch(addComment_count(id))
     } catch (error) {
       console.error(error);
     }

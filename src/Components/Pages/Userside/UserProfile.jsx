@@ -6,9 +6,12 @@ import api from '../../../Config'
 import { Link, useParams } from 'react-router-dom';
 import { MdOutlineLockReset } from "react-icons/md";
 import { baseURL } from '../../../Config';
+import { useDispatch } from 'react-redux';
+import { Toggle_is_following } from '../../../Redux/PostSlice';
 
 function UserProfile() {
     const { id } = useParams()
+    const dispatch = useDispatch()
     const access = localStorage.getItem('access')
     const [userProfile, setUserProfile] = useState(null)
 
@@ -40,6 +43,7 @@ function UserProfile() {
                     Authorization: `Bearer ${access}`
                 }
             });
+            dispatch(Toggle_is_following(username))
             console.log(response.data)
             if (response.data.following_Status) {
                 setUserProfile({

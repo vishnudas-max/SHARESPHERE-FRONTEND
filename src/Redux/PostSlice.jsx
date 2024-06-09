@@ -20,9 +20,6 @@ const PostSlice = createSlice({
         error: null
     },
     reducers: {
-        AddpostToStore: (state, action) => {
-            state.posts.push(action.payload)
-        },
         delPost: (state, action) => {
             state.posts = []
             state.status = 'idle'
@@ -36,10 +33,24 @@ const PostSlice = createSlice({
 
             })
          },
-         removeLike: (state,action) =>{
+        removeLike: (state,action) =>{
             state.posts.filter(post=>{
                 if(post.id === action.payload){
                     return post.likes_count = post.likes_count - 1
+                }
+            })
+         },
+        Toggle_is_following:(state,action)=>{
+            state.posts.filter(post=>{
+                if(post.userID.username === action.payload){
+                        post.is_following = !post.is_following
+                }
+            })
+         },
+         addComment_count:(state,action)=>{
+            state.posts.filter(post=>{
+                if(post.id === action.payload){
+                    return post.comment_count = post.comment_count + 1
                 }
             })
          }
@@ -60,5 +71,5 @@ const PostSlice = createSlice({
     }
 })
 
-export const { AddpostToStore, delPost, addLike,removeLike } = PostSlice.actions
+export const {  delPost, addLike,removeLike,Toggle_is_following,addComment_count } = PostSlice.actions
 export default PostSlice.reducer
