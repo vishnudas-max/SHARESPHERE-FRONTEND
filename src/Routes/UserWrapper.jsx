@@ -11,6 +11,7 @@ import ViewPost from '../Components/Pages/Userside/ViewPost';
 import EditPost from '../Components/Pages/Userside/EditPost';
 import UserProfile from '../Components/Pages/Userside/UserProfile';
 import Profile from '../Components/Pages/Userside/Profile';
+import Chat from '../Components/Pages/Userside/Chat';
 
 function UserWrapper() {
   return (
@@ -65,6 +66,12 @@ function UserWrapper() {
         <Route path='home/profile/' element={
           <PrivetRoute>
             <Profile />
+          </PrivetRoute>
+        } />
+
+        <Route path='home/message/' element={
+          <PrivetRoute>
+            <Chat />
           </PrivetRoute>
         } />
 

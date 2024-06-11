@@ -37,7 +37,7 @@ function Navbar() {
           <ul className='flex-col'>
             <Link to={'/home/'}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillHome size={24} /></span>Home</li></Link>
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiOutlineSearch size={24} /></span>Explore</li>
-            <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillMessage size={24} /></span>Message</li>
+            <Link to={`/home/message/`}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillMessage size={24} /></span>Message</li></Link>
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillNotification size={24} /></span>Notification</li>
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl' onClick={() => setAddPost(c => !c)}><span><AiFillPlusCircle size={24} /></span>Create Post</li>
             <Link to={`/home/profile/`}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillProfile size={24} /></span>Profile</li></Link>
