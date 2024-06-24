@@ -39,6 +39,7 @@ function Home() {
   const [viewStory, setViewStory] = useState(null)
   const currentUserStories = allStories.find(story => story.id == userID)
 
+
   const closeStory = useCallback(() => {
     setViewStory(null)
   },
@@ -139,11 +140,18 @@ function Home() {
 
   // handling-coment-view--
   const handleView = (index) => {
-    let data = {
-      "index": index,
-      "view": !viewComment.view
+    if (index === viewComment.index) {
+      setViewCommet({ "index": null, "view": false })
     }
-    setViewCommet(data)
+    else {
+      let data = {
+        "index": index,
+        "view": !viewComment.view
+      }
+      setViewCommet(data)
+    }
+
+
   }
   // handling-comment-view-end-here---
 
@@ -353,13 +361,15 @@ function Home() {
 
                       <TextToggle
                         text={post.caption} />
-                      <p className='md:text-xs text-[11px] mx-3 text-gray-500 cursor-pointer' onClick={() => handleView(index)}>{post.comment_count > 0 ? `View ${post.comment_count} Comments` : 'No Comments'}</p>
-
+                      <p className='md:text-xs text-[11px] mx-3 text-gray-500 cursor-pointer select-none' onClick={() => handleView(index)}>{post.comment_count > 0 ? `View ${post.comment_count} Comments` : 'No Comments'}</p>
                       {/* comments--- */}
                       {index === viewComment.index &&
-                        <PrivetRoute>
-                          <Commets view={viewComment.view} postID={post.id} />
-                        </PrivetRoute>
+                        <div className={`${viewComment.index === index ? 'max-h-[160px]' : 'h-[0px]'} 'mb-0'`}>
+                          <PrivetRoute>
+                            <Commets view={viewComment.view} postID={post.id} />
+                          </PrivetRoute>
+                        </div>
+
                       }
                       {/* commens-end-here-- */}
 

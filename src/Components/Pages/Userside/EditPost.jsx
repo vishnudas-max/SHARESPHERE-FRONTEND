@@ -37,7 +37,7 @@ function EditPost() {
                 },
             })
             dispatch(delPost())
-            navigate(`/home/`)
+            navigate(`/home/post/${id}`)
         }
         catch (error) {
             console.log('something went wrong')
