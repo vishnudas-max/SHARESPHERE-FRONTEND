@@ -5,9 +5,9 @@ import { FaCircleUser, FaVideo, FaFaceSmile } from "react-icons/fa6";
 import { IoMdMore } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
 import api from '../../../Config'
+import { useSelector } from 'react-redux';
 
 function Chat() {
-
 
     let messagedata = [
         { message: 'Hello, how are you?', time: '10:00 AM', type: 'from' },
@@ -32,7 +32,34 @@ function Chat() {
         { message: 'Perfect, talk to you later.', time: '11:30 AM', type: 'to' }
     ];
 
+    const [currentChatRoom, setChatRoom] = useState(null)
+    const [chatMessages, setChatMessages] = useState(null)
+    const [socket, setSocket] = useState(null);
+    const [message, setMessage] = useState('')
+    const currentUser = useSelector(state => state.authInfo.userID)
+
     const [users, setUsers] = useState(null)
+
+    // establishing connection--
+    const ConnectRoom = (userID) => {
+        let access = localStorage.getItem('access')
+        const socket = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${userID}/?token=${access}`);
+        setSocket(socket)
+        socket.onopen = () => {
+            console.log('WebSocket connection established.');
+        };
+
+        socket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        socket.onclose = () => {
+            console.log('WebSocket connection closed.');
+            setChatRoom('')
+        };
+
+        setSocket(socket);
+    }
 
     // function to fetch users--
     const fetchUsers = async () => {
@@ -50,17 +77,51 @@ function Chat() {
 
         }
     }
-    // function to fetch users end here--
 
+    // fetching users for chat--
     useEffect(() => {
         if (users === null) {
             fetchUsers()
         }
-    }, [])
-    console.log(users)
 
-    const [currentChatRoom, setChatRoom] = useState(null)
-    const [chatMessages, setChatMessages] = useState(messagedata)
+    }, [])
+
+
+
+    const handleChat = (index, username, userID) => {
+        setChatRoom({ 'id': index, 'user': username, 'userID': userID })
+        ConnectRoom(userID)
+
+    }
+
+    // sending message --
+    const sendMessage = () => {
+        if (socket) {
+            socket.send(JSON.stringify({ "message": message, "user": currentUser }));
+            setMessage('')
+
+        }
+    }
+
+    useEffect(() => {
+        if (socket) {
+            socket.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                console.log('Message received:', message);
+
+                if (message.type === 'chat_history') {
+                    setChatMessages(message.messages);
+                } else {
+                    setChatMessages((prevMessages) => prevMessages ? [...prevMessages, message] : [message]);
+                }
+            };
+
+            return () => {
+                socket.close();
+            };
+        }
+    }, [socket]);
+
     return (
         <div>
             <Navbar />
@@ -84,15 +145,15 @@ function Chat() {
                     <div className=' h-[650px] overflow-y-scroll no-scrollbar mx-auto'>
                         {users ?
                             users.map((user, index) => (
-                                <div className='px-2 border-b border-gray-800 h-16 flex' key={index} onClick={() => setChatRoom({ 'id': index, 'user': user.username })}>
+                                <div className='px-2 border-b border-gray-800 h-16 flex' key={index} onClick={() => handleChat(index, user.username, user.id)}>
                                     <div className='h-full flex items-center'>
                                         <FaCircleUser className='md:size-10 size-7' />
                                     </div>
                                     <div className=' px-2 w-full grid grid-rows-2 py-2'>
                                         <h3 className='text-md font-normal w-fit row-span-1 '>{user.username}</h3>
                                         <div className='flex justify-between'>
-                                            <p className='md:text-sm text-xs py-1 md:py-0 row-span-1 max-w-28 line-clamp-1 text-gray-300 '>Hai how are you bro</p>
-                                            <p className='text-xs row-span-1 max-w-28 text-gray'>10:20 A:M</p>
+                                            <p className='md:text-sm text-xs py-1 md:py-0 row-span-1 max-w-28 line-clamp-1 text-gray-300 '>{user.last_message.message ? user.last_message.message :'start message'}</p>
+                                            <p className='text-xs row-span-1 max-w-28 text-gray'>{user.last_message ? user.last_message.time:''}</p>
                                         </div>
 
                                     </div>
@@ -105,14 +166,14 @@ function Chat() {
                                         <div className='flex items-center h-full px-2 justify-between'>
                                             <div className='flex items-center h-full px-2'>
                                                 <div className='rounded-full size-9 bg-gray-800'> </div>
-                                            <div>
-                                                <div className='w-20 h-5 rounded-full bg-gray-800'></div>
-                                                <div className='w-44 h-4 mt-1 rounded-full bg-gray-800'></div>
-                                            </div>
+                                                <div>
+                                                    <div className='w-20 h-5 rounded-full bg-gray-800'></div>
+                                                    <div className='w-44 h-4 mt-1 rounded-full bg-gray-800'></div>
+                                                </div>
                                             </div>
                                             <div className='w-10 h-3 rounded-full bg-gray-800'></div>
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             ))
@@ -155,10 +216,10 @@ function Chat() {
 
                         {/* chat start here-- */}
                         <div className="h-[520px] md:h-[590px] bg-gray-700 px-3  grid-cols-2 overflow-y-scroll no-scrollbar pb-3">
-                            {chatMessages.map((message, index) => (
+                            {chatMessages && chatMessages.map((message, index) => (
                                 <div
                                     key={index}
-                                    className={`flex ${message.type === 'to' ? 'justify-end col-span-2' : 'justify-start col-span-2'}`}
+                                    className={`flex ${message.sender_id === currentUser ? 'justify-end col-span-2' : 'justify-start col-span-2'}`}
                                 >
                                     <div className={`bg-gray-900 px-2 mt-2 flex items-start min-h-[40px] gap-x-2 rounded-tr-2xl h-fit rounded-bl-2xl rounded-md max-w-[50%]`}>
                                         <div className="mt-2">
@@ -179,11 +240,13 @@ function Chat() {
                                     <FaFaceSmile color='yellow' className='md:size-7 size-6' />
                                 </div>
                                 <div className='h-fit md:py-2 w-full pr-8'>
-                                    <input type="text" placeholder='text...' className='bg-transparent outline-none px-2 w-full border-b border-gray-600' />
+                                    <input type="text" placeholder='text...' className='bg-transparent outline-none px-2 w-full border-b border-gray-600'
+                                        onChange={e => setMessage(e.target.value)} value={message}
+                                    />
                                 </div>
                             </div>
                             <div className='basis-1/12'>
-                                <IoSend className='md:size-8 text-blue-500 size-6' />
+                                <IoSend className='md:size-8 text-blue-500 size-6' onClick={sendMessage} />
                             </div>
 
                         </div>

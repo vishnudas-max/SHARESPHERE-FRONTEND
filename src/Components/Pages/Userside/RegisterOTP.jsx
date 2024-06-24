@@ -34,9 +34,10 @@ function Register() {
     };
     const handleVerification = (e) => {
         e.preventDefault()
-        const otpNumber = Number(otp.join(''));
+        const otpNumber = otp.join('');
+        console.log(otpNumber)
         let data = {
-            "otp": Number(otp.join('')),
+            "otp":otpNumber,
             "email": email
         }
         api.post('register/confirm/', data)
