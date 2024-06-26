@@ -21,6 +21,7 @@ function Commets({ view, postID }) {
 
 
 
+
     // function to fetchcomment-
     const fetchComment = async () => {
         try {
@@ -198,7 +199,7 @@ function Commets({ view, postID }) {
 
                                     </div>
                                     <div>
-                                        <MdDelete className='size-4 md:size-5  cursor-pointer text-gray-500 float-right' onClick={() => deletecomment(comment.id)} />
+                                        {userID === comment.userID.id && <MdDelete className='size-4 md:size-5  cursor-pointer text-gray-500 float-right' onClick={() => deletecomment(comment.id)} />}
                                     </div>
 
                                 </div>
@@ -237,7 +238,7 @@ function Commets({ view, postID }) {
                                                     </div>
                                                 </div>
                                                 <div className='h-full flex align-middle'>
-                                                    <MdDelete className='size-4 md:size-5 cursor-pointer text-gray-500 float-right' onClick={() => deletecomment(reply.id)} />
+                                                    {userID === reply.userID.id && <MdDelete className='size-4 md:size-5 cursor-pointer text-gray-500 float-right' onClick={() => deletecomment(reply.id)} />}
                                                 </div>
                                             </div>
                                         ))}

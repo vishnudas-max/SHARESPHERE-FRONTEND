@@ -12,6 +12,7 @@ import EditPost from '../Components/Pages/Userside/EditPost';
 import UserProfile from '../Components/Pages/Userside/UserProfile';
 import Profile from '../Components/Pages/Userside/Profile';
 import Chat from '../Components/Pages/Userside/Chat';
+import Notification from '../Components/Pages/Userside/Notification';
 
 function UserWrapper() {
   return (
@@ -72,6 +73,12 @@ function UserWrapper() {
         <Route path='home/message/' element={
           <PrivetRoute>
             <Chat />
+          </PrivetRoute>
+        } />
+
+        <Route path='home/notification/' element={
+          <PrivetRoute>
+            <Notification />
           </PrivetRoute>
         } />
 
