@@ -6,11 +6,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 function Register() {
-    const { email } = useContext(RegisterContext)
+    const { email, SaveEmail } = useContext(RegisterContext)
     const navigate = useNavigate()
-    console.log(email)
     const [otp, setOtp] = useState(Array(4).fill(''));
-
+    const [showResend, setShowResend] = useState(false);
+    const [seconds, setSeconds] = useState(60);
     const handleChange = (e, index) => {
         const value = e.target.value;
 
@@ -37,7 +37,7 @@ function Register() {
         const otpNumber = otp.join('');
         console.log(otpNumber)
         let data = {
-            "otp":otpNumber,
+            "otp": otpNumber,
             "email": email
         }
         api.post('register/confirm/', data)
@@ -58,6 +58,7 @@ function Register() {
             })
     }
     const handleResentOtp = () => {
+
         console.log('hello')
         let data = {
             "email": email
@@ -75,6 +76,8 @@ function Register() {
                     style: { backgroundColor: 'green', color: 'black' },
                 }
                 )
+                setSeconds(60); 
+                setShowResend(false); 
             })
             .catch(res => {
                 toast.warning(res.response.data.message, {
@@ -90,7 +93,7 @@ function Register() {
                 setTimeout(() => {
                     navigate('/register/');
                 }, 1000);
-                
+
 
             }
             )
@@ -101,8 +104,22 @@ function Register() {
         if (email === null) {
             navigate('/register/')
         }
+        if (seconds === 0) {
+            setShowResend(true);
+        }
+
     },
-        [])
+        [seconds])
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSeconds(seconds - 1);
+        }, 1000);
+
+        // Clear timeout on unmount or when seconds reach 0
+        return () => clearTimeout(timer);
+    }, [seconds]);
+
     return (
         <div className='bg-register-bg bg-cover w-full h-screen bg-center'>
             <ToastContainer />
@@ -136,7 +153,11 @@ function Register() {
                                 />
                             ))}
                         </div>
-                        <p onClick={handleResentOtp}>Resent otp</p>
+                        {seconds > 0 ? (
+                            <p className='text-gray-400'>OTP Expires in {seconds}</p>
+                        ) : (
+                            showResend && <p onClick={handleResentOtp}>Resend OTP</p>
+                        )}
                         <button className='bg-blue-600 mx-auto px-5 py-1 md:px-8 md:py-2 rounded-md text-black font-medium mt-4 ' onClick={handleVerification}>VERIFY</button>
 
                     </form>

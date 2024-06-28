@@ -30,7 +30,7 @@ function Login() {
             "username": username,
             "password": password
         }
-        api.post("token/", data)
+        api.post("login/", data)
             .then(res => {
                 console.log(res)
                 localStorage.setItem('access',res.data.access)

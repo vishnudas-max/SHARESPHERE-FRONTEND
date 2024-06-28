@@ -1,11 +1,11 @@
-import React, { useState ,useContext} from 'react'
+import React, { useState, useContext } from 'react'
 import { ReactTyped } from "react-typed";
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from '../../../Config'
-import { useNavigate,Link } from 'react-router-dom'
-import {RegisterContext} from '../../../Contexts/RegisterContextProvider';
+import { useNavigate, Link } from 'react-router-dom'
+import { RegisterContext } from '../../../Contexts/RegisterContextProvider';
 
 
 function Register() {
@@ -14,17 +14,50 @@ function Register() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirm, setConfirm] = useState('')
+    const [firstname, setFirstname] = useState('')
+    const [lastname, setLastname] = useState('')
+    const [phonenumber, setPhonnumber] = useState('')
     const [isvisible, changeVisible] = useState(false)
     const [confirmisvisible, changeconfirmVisible] = useState(false)
     const navigate = useNavigate()
-    const {SaveEmail} = useContext(RegisterContext)
+    const { SaveEmail } = useContext(RegisterContext)
     const [errors, setErrors] = useState({
         username: '',
         email: '',
         password: '',
-        confirm: ''
+        confirm: '',
+        firstname: '',
+        lastname: '',
+        phonenumber: ''
 
     })
+    const handlefirstname = (e) => {
+
+        if (e.target.value === '') {
+            let obj = { ...errors, firstname: 'firstname cannot be empty' }
+            setErrors(obj)
+            setFirstname(e.target.value)
+            return false
+        }
+        else if (e.target.value.startsWith(' ')) {
+            let obj = { ...errors, firstname: 'First name cannot start with a space' };
+            setErrors(obj);
+            setFirstname(e.target.value);
+            return false;
+        }
+        else if (e.target.value.length < 3) {
+            let obj = { ...errors, firstname: 'firstname should be atleast three letters' }
+            setErrors(obj)
+            setFirstname(e.target.value)
+            return false
+        } else {
+            let obj = { ...errors, firstname: '' }
+            setErrors(obj)
+            setFirstname(e.target.value)
+            return true
+        }
+
+    }
     const handleusername = (e) => {
 
         if (e.target.value.length < 3) {
@@ -41,6 +74,26 @@ function Register() {
         }
 
     }
+    const handlelastname = (e) => {
+        setLastname(e.target.value)
+    }
+    const handlephonenumber = (e) => {
+
+        if (e.target.value.length < 10) {
+            let obj = { ...errors, phonenumber: 'Invalid mobile number !' }
+            setErrors(obj)
+            setPhonnumber(e.target.value)
+            return false
+        }
+        else {
+            let obj = { ...errors, phonenumber: '' }
+            setErrors(obj)
+            setPhonnumber(e.target.value)
+            return true
+        }
+
+    }
+
     const handlemail = (e) => {
         var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         let test_result = re.test(e.target.value)
@@ -107,24 +160,17 @@ function Register() {
     }
     const handlesubmit = (e) => {
         e.preventDefault()
-
+        let hasErrors = false;
         Object.keys(errors).forEach(key => {
+            console.log(errors[key])
             if (errors[key] !== '') {
-                toast.error(errors[key], {
-                    position: "top-right",
-                    autoClose: 1000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: true,
-                    style: { backgroundColor: 'red', color: 'black' },
-
-                })
-                return false
+                hasErrors = true
             }
         })
-
-        if (!username || !email || !password) {
+        if (hasErrors) {
+            return; // Exit the function if there are errors
+        }
+        if (!username || !email || !password || !firstname || !phonenumber || !confirm) {
             toast('Fields cannnot be empty!', {
                 position: "top-right",
                 autoClose: 1000,
@@ -137,11 +183,14 @@ function Register() {
             return false
         }
         let data = {
+            "first_name" :firstname,
+            "last_name":lastname,
+            "phone_number":phonenumber,
             "username": username,
             "email": email,
             "password": password
         }
-
+        console.log(data)
         api.post('register/', data)
             .then(data => {
                 SaveEmail(data.data.email)
@@ -185,6 +234,20 @@ function Register() {
                     flex flex-col py-7 h-fit px-5 rounded-lg text-white '>
                         <h1 className=' font-sans font-bold py-2 text-xl sm:tex-2xl md:text-3xl mx-auto'>SIGN UP</h1>
 
+                        {errors.firstname &&
+                            <p className='text-red-500 font-light text-xs ms-2 md:text-sm'>{errors.firstname}</p>
+                        }
+                        <input type="text" placeholder='*First Name' className='w-[300px]
+                         md:w-[450px]  bg-zinc-900 rounded-2xl px-5 py-2 md:py-3 font-thin mb-3'
+                            onChange={e => handlefirstname(e)} value={firstname}
+                        />
+                        {errors.lastname &&
+                            <p className='text-red-500 font-light text-xs ms-2 md:text-sm'>{errors.lastname}</p>
+                        }
+                        <input type="text" placeholder='*Last Name' className='w-[300px]
+                         md:w-[450px]  bg-zinc-900 rounded-2xl px-5 py-2 md:py-3 font-thin mb-3'
+                            onChange={e => handlelastname(e)} value={lastname}
+                        />
                         {errors.username &&
                             <p className='text-red-500 font-light text-xs ms-2 md:text-sm'>{errors.username}</p>
                         }
@@ -199,6 +262,23 @@ function Register() {
                         <input type="text" placeholder='*Email' className='w-[300px]
                          md:w-[450px] bg-zinc-900 rounded-2xl px-5 py-2 md:py-3 font-thin mb-3'
                             onChange={e => handlemail(e)} value={email} />
+
+                        {errors.phonenumber &&
+                            <p className='text-red-500 font-light text-xs ms-2 md:text-sm'>{errors.phonenumber}</p>
+                        }
+                        <input
+                            type="number"
+                            placeholder="*Phone Number"
+                            className="w-[300px] md:w-[450px] bg-zinc-900 rounded-2xl px-5 py-2 md:py-3 font-thin mb-3 no-spinner"
+                            onChange={e => handlephonenumber(e)}
+                            value={phonenumber}
+                            maxLength={10}
+                            onInput={(e) => {
+                                e.target.value = e.target.value.slice(0, 10); // Ensure max length
+                            }}
+                    
+                        />
+
 
 
                         {errors.password &&
