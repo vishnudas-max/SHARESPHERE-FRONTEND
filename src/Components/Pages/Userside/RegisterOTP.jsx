@@ -3,10 +3,10 @@ import { ReactTyped } from "react-typed";
 import api from '../../../Config'
 import { RegisterContext } from '../../../Contexts/RegisterContextProvider';
 import { ToastContainer, toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { redirect, useNavigate } from 'react-router-dom';
 
 function Register() {
-    const { email, SaveEmail } = useContext(RegisterContext)
+    const { regdata, setRegdata } = useContext(RegisterContext)
     const navigate = useNavigate()
     const [otp, setOtp] = useState(Array(4).fill(''));
     const [showResend, setShowResend] = useState(false);
@@ -38,7 +38,7 @@ function Register() {
         console.log(otpNumber)
         let data = {
             "otp": otpNumber,
-            "email": email
+            "email": regdata.email
         }
         api.post('register/confirm/', data)
             .then(res => {
@@ -57,11 +57,12 @@ function Register() {
                 })
             })
     }
+    console.log(regdata)
     const handleResentOtp = () => {
-
-        console.log('hello')
+        
         let data = {
-            "email": email
+            "email": regdata.email,
+            "phone_number":regdata.phonenumber
         }
         api.post('register/resendotp/', data)
             .then(res => {
@@ -101,7 +102,7 @@ function Register() {
     }
 
     useEffect(() => {
-        if (email === null) {
+        if (regdata === null || regdata.email === null || regdata.phonenumber === null) {
             navigate('/register/')
         }
         if (seconds === 0) {

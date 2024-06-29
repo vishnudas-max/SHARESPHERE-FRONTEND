@@ -20,7 +20,7 @@ function Register() {
     const [isvisible, changeVisible] = useState(false)
     const [confirmisvisible, changeconfirmVisible] = useState(false)
     const navigate = useNavigate()
-    const { SaveEmail } = useContext(RegisterContext)
+    const { setRegdata } = useContext(RegisterContext)
     const [errors, setErrors] = useState({
         username: '',
         email: '',
@@ -158,6 +158,7 @@ function Register() {
             return true
         }
     }
+
     const handlesubmit = (e) => {
         e.preventDefault()
         let hasErrors = false;
@@ -190,10 +191,10 @@ function Register() {
             "email": email,
             "password": password
         }
-        console.log(data)
         api.post('register/', data)
             .then(data => {
-                SaveEmail(data.data.email)
+                console.log(data.data)
+                setRegdata({email:data.data.email,phonenumber:data.data.phone_number})
                 navigate('/register/otp/')
             })
             .catch(errors => {
