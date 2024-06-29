@@ -5,9 +5,9 @@ export const RegisterContext = createContext()
 
 function RegisterContextProvider({children}) {
 
-    const [email,SaveEmail] = useState(null)
+    const [regdata,setRegdata] = useState(null)
     return(
-        <RegisterContext.Provider value={{email , SaveEmail}}>
+        <RegisterContext.Provider value={{regdata , setRegdata}}>
             {children}
         </RegisterContext.Provider>
     )

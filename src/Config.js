@@ -49,3 +49,8 @@ const axiosInstance = axios.create({
 
 
 export const baseURL = 'http://127.0.0.1:8000'
+
+export const ENV={
+  GOOGLE_OAUTH2_CLIENT_ID : "176814671300-ea19db6houulg293uof0cefbj6i0if2h.apps.googleusercontent.com",
+  GOOGLE_OAUTH2_CLIENT_SECRET : "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"
+}
