@@ -36,11 +36,8 @@ function PrivetRoute({ children }) {
         return <Navigate to={'/'} />
     }
     if(isAdmin){
-        localStorage.clear()
-        dispatch(delAuth())
-        return <Navigate to={'/'} />
+        return <Navigate to={'/admin/dashboard/'} />
     }
-
     return children;
 }
 

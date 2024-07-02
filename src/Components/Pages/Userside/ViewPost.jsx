@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import messi from '../../../media/images/messi.webp'
-import { AiOutlineMore } from 'react-icons/ai'
+import { AiOutlineMore, } from 'react-icons/ai'
 import PostOptions from './HelperComponents/PostOptions'
 import api from '../../../Config'
 import Loader from '../Userside/HelperComponents/Loader'
@@ -11,6 +11,8 @@ import { IoSend } from "react-icons/io5";
 import { useDispatch } from 'react-redux'
 import { addComment_count } from '../../../Redux/PostSlice'
 import { MdDelete } from "react-icons/md";
+import { MdReport } from "react-icons/md";
+import Navbar from './HelperComponents/Navbar'
 
 
 function ViewPost() {
@@ -25,8 +27,12 @@ function ViewPost() {
   const [showReply, setShowReply] = useState({})
   const [comment, AddComment] = useState('')
   const [replycomment, setreplycomment] = useState('')
-  const [currentpost,setPost] = useState(null)
- 
+  const [currentpost, setPost] = useState(null)
+  const [report_option, SetReportOption] = useState('')
+  const [showreport, toggleshowreport] = useState(false)
+  const [reportError, setReportError] = useState('')
+  const [reportSucces, setReportSucess] = useState('')
+
   const fetchComment = async () => {
     try {
       const response = await api.get(`post/comment/${id}/`, {
@@ -56,10 +62,10 @@ function ViewPost() {
         console.log(error)
       }
     }
-    if(currentpost === null){
+    if (currentpost === null) {
       fetchPost()
     }
-    
+
   },
     [])
 
@@ -67,7 +73,7 @@ function ViewPost() {
   useEffect(() => {
     fetchComment()
 
-  },[])
+  }, [])
 
 
 
@@ -164,14 +170,52 @@ function ViewPost() {
     }
   }
 
+  const reportpost = async () => {
+    if (!report_option) {
+      setReportError('You cannot report post without a valid reason!')
+      setTimeout(() => {
+        setReportError('')
+      }, 2000);
+      return false
+    }
+    try {
+      let data = {
+        report_reason: report_option,
+        reported_post: id
+      }
+      const reponse = await api.post('report/post/', data, {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      })
+      setReportSucess('Reported')
+      setTimeout(() => (
+        setReportSucess('')
+      ), 2000)
+      setTimeout(() => (
+        toggleshowreport(null)
+      ), 1000)
+
+    } catch (error) {
+      setReportError('something wenet wrong ! try again later')
+      setTimeout(() => {
+        setReportError('')
+      }, 2000);
+    }
+  }
+
   return (
     <div className='select-none'>
+
       {currentpost &&
         <div className="grid grid-cols-3 gap-1 h-screen">
-
+          <div className='block md:hidden'>
+            <Navbar />
+          </div>
           <div className="col-span-3 md:col-span-2 md:max-w-[800px] max-w-full md:h-[screen] mx-auto my-auto px-5 ">
             <img src={currentpost.contend} alt="Post" className='md:max-w-[500px] max-w-full max-h-[700px]' />
           </div>
+
           <div className='col-span-3 md:col-span-1 bg-zinc-900 px-2 pt-3 text-white flex-col h-screen sticky top-14  overflow-hidden '>
 
             <div className='border-b border-gray-400 md:py-4 py-2'>
@@ -196,11 +240,60 @@ function ViewPost() {
 
               </div>
 
+
               <div className='mt-3'>
                 <p className='md:text-[15px] text-[13px] text-gray-200'>{currentpost.caption}</p>
-                <p className='md:text-[15px] text-[13px] text-gray-400 font-semibold mt-3'>{currentpost.formatted_uploadDate}</p>
+                <div className='flex justify-between pr-6 items-baseline'>
+                  <p className='md:text-[15px] text-[13px] text-gray-400 font-semibold mt-3'>{currentpost.formatted_uploadDate}</p>
+                  <MdReport className='size-6 text-red-600' onClick={() => toggleshowreport(prev => !prev)} />
+                </div>
               </div>
             </div>
+
+            {/* report container--- */}
+            <div className={`'bg-gray-900 bg-gray-900 w-full mx-auto  px-5 py-2 transition-all ease-in-out delay-100'${showreport ? 'scale-y-100 block' : ' scale-y-0 absolute'}`}>
+              <h1 className='text-center  text-xl'>Report</h1>
+              <div className='w-full h-[.2px] mt-2 mb-2 bg-white'></div>
+              <div className='flex px-2 gap-x-2 items-center'>
+                <label className='flex items-center gap-x-2'>
+                  <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value="it's a spam" className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                  <p className='whitespace-nowrap font-thin text-md'>It's a spam</p>
+                </label>
+              </div>
+              <div className='flex gap-x-2 items-center mt-2 px-2'>
+                <label className='flex items-center gap-x-2'>
+                  <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Hate of speech or symboles' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                  <p className='whitespace-nowrap font-thin text-md'>Hate of speech or symboles</p>
+                </label>
+              </div>
+              <div className='flex gap-x-2 items-center mt-2 px-2'>
+                <label className='flex items-center gap-x-2'>
+                  <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='false information' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                  <p className='whitespace-nowrap font-thin text-md'>False Information</p>
+                </label>
+              </div>
+              <div className='flex gap-x-2 items-center mt-2 px-2'>
+                <label className='flex items-center gap-x-2'>
+                  <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Nudity or Sexual activity' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                  <p className='whitespace-nowrap font-thin text-md'>Nudity or sexual activity</p>
+                </label>
+              </div>
+              <div className='flex gap-x-2 items-center mt-2 px-2'>
+                <label className='flex items-center gap-x-2'>
+                  <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Drugs' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                  <p className='whitespace-nowrap font-thin text-md'>Drugs</p>
+                </label>
+              </div>
+              <div className='flex flex-col items-center mt-3'>
+                {!reportSucces && <button className='bg-red-700 px-4 py-1 rounded-md flex gap-x-1 items-center' onClick={reportpost}><MdReport className='size-5' />Report</button>}
+                {reportError && <p className='text-red-600 text-xs text-center'>{reportError}</p>}
+                <p className={`' text-black px-4 py-1 mt-2 rounded-sm text-xs text-center transition-all delay-100 ease-in-out'
+                                ${reportSucces ? 'scale-x-100  bg-green-600' : 'scale-x-0'}`}>{reportSucces}</p>
+
+              </div>
+
+            </div>
+            {/* reprot container end here---- */}
 
             <div className='mt-3 grid grid-cols-5 py-3 border-b border-gray-400'>
               <div className='col-span-3 py-3 flex items-center'>
@@ -209,9 +302,6 @@ function ViewPost() {
               <IoSend onClick={postComment} className='cursor-pointer size-5 ml-5 text-blue-500' />
               <div>
               </div>
-
-
-
             </div>
 
             {/* conmments-- */}
@@ -240,7 +330,7 @@ function ViewPost() {
 
                         </div>
                         <div>
-                          <MdDelete className='size:4 md:size-5' onClick={() => deletecomment(comment.id)} />
+                          {comment.userID.id === userID && <MdDelete className='size:4 md:size-5' onClick={() => deletecomment(comment.id)} />}
                         </div>
 
                       </div>
@@ -263,20 +353,27 @@ function ViewPost() {
 
                       {/* Mapping through replies */}
                       {comment.replies && showReply['id'] === comment.id && comment.replies.map((reply, replyIndex) => (
-                        <div className='ml-10 mt-3 p-2 flex gap-y-2 items-center right-0' key={replyIndex}>
-                          {reply.userID.profile_pic ? (
-                            <img src={reply.userID.profile_pic} alt="" className='size-10 rounded-full' />
-                          ) : (
-                            <FaCircleUser className='md:size-10 size-7' />
-                          )}
-                          <div className='flex-col justify-between gap-x-2 select-text'>
-                            <div className='flex items-center'>
-                              <p className='font-semibold text-gray-300 ml-2'>{reply.userID.username}</p>
-                              <p className='text-[11px] ml-1 text-gray-400'>{reply.time_ago}</p>
+                        <div className='flex justify-between pr-3 items-center'>
+                          <div className='ml-10 mt-3 p-2 flex gap-y-2 items-center right-0' key={replyIndex}>
+                            {reply.userID.profile_pic ? (
+                              <img src={reply.userID.profile_pic} alt="" className='size-10 rounded-full' />
+                            ) : (
+                              <FaCircleUser className='md:size-10 size-7' />
+                            )}
+                            <div className='flex-col justify-between gap-x-2 select-text'>
+                              <div className='flex items-center'>
+                                <p className='font-semibold text-gray-300 ml-2'>{reply.userID.username}</p>
+                                <p className='text-[11px] ml-1 text-gray-400'>{reply.time_ago}</p>
+                              </div>
+                              <p className='ml-2 font-thin md:text-[14px] text-[13px]'>{reply.comment}</p>
                             </div>
-                            <p className='ml-2 font-thin md:text-[14px] text-[13px]'>{reply.comment}</p>
+                          </div>
+                          <div>
+                            {reply.userID.id === userID && <MdDelete className='size:4 md:size-5' onClick={() => deletecomment(reply.id)} />}
+
                           </div>
                         </div>
+
                       ))}
 
                     </div>

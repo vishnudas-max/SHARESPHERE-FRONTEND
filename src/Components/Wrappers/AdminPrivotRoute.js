@@ -25,22 +25,17 @@ function AdminPrivotRoute({ children }) {
             }
         }
        fetchdata()
-        
-
     },
     [dispatch])
     if(isLoading){
         return <Loading />
     }
     if(!isAuthenticated){
-        return <Navigate to={'/admin/'} />
+        return <Navigate to={'/'} />
     }
     if(!isAdmin){
-        localStorage.clear()
-        dispatch(delAuth())
-        return <Navigate to={'/admin/'} />
+        return <Navigate to={'/home/'} />
     }
-
     return children;
 }
 

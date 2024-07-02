@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { AiOutlineSearch, AiOutlineArrowRight, AiFillPlusCircle, AiFillHeart, AiFillMessage, AiOutlineClose } from 'react-icons/ai'
+import { AiOutlineArrowRight, AiFillPlusCircle, AiFillHeart, AiFillMessage, AiOutlineClose } from 'react-icons/ai'
 import { GiSaveArrow } from "react-icons/gi";
 import messi from '../../../media/images/messi.webp'
 import MobileTop from './HelperComponents/MobileTop'
@@ -18,6 +18,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { fetchStory } from '../../../Redux/StoriesSlice';
 import { FaCircleUser } from "react-icons/fa6";
 import UserStoryView from './UserStoryView';
+import { IoMdMore } from "react-icons/io";
 
 
 function Home() {
@@ -38,13 +39,18 @@ function Home() {
   const imgRef = useRef()
   const [viewStory, setViewStory] = useState(null)
   const currentUserStories = allStories.find(story => story.id == userID)
-
+  const [showMore, toggleShowmore] = useState(null)
+  const [showReports, toggleShowReports] = useState(null)
+  const [report_reason, SetReportOption] = useState('')
+  const [reportError, setReportError] = useState('')
+  const [reportSucces, setReportSucess] = useState('')
 
   const closeStory = useCallback(() => {
     setViewStory(null)
   },
     [viewStory])
 
+  console.log(report_reason)
   // adding story--
   const AddStory = async () => {
     if (!addStoryImg) {
@@ -136,7 +142,7 @@ function Home() {
     [dispatch, status, setLikedPosts, storyStatus])
 
 
-  console.log(userSuggetions)
+
 
   // handling-coment-view--
   const handleView = (index) => {
@@ -204,14 +210,44 @@ function Home() {
     }
   }
 
-
+  const reportPost = async (postID) => {
+    if (!report_reason) {
+      setReportError('You cannnot report a post without a valid reason !')
+      setTimeout(() => {
+        setReportError('')
+      }, 2000);
+      return false
+    }
+    try {
+      let data = {
+        "reported_post": postID,
+        "report_reason": report_reason
+      }
+      const response = await api.post('report/post/', data, {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      })
+      setReportSucess('Reported')
+      setTimeout(() => (
+        setReportSucess('')
+      ), 2000)
+      setTimeout(() => (
+        toggleShowReports(null)
+      ), 1000)
+    } catch (error) {
+      setReportError('Something went wrong ! Try again later..')
+      setTimeout(() => {
+        setReportError('')
+      }, 2000);
+    }
+  }
   return (
     <>
       <Navbar />
-
+      <ToastContainer />
       <div className='text-white md:ml-[320px] max-w-full grid grid-cols-10'>
         <div className='col-span-12 md:col-span-6 border-r border-gray-700  relative'>
-
           {/* continer to add story-- */}
           <div className={`absolute z-20 w-full h-[400px] bg-[#000300] mt-12 md:mt-0 transition-all ease-in-out delay-70000 shadow-lg shadow-gray-900 ${showAddStory ? 'top-0 scale-100 opacity-100' : 'top-[-420px] scale-0 opacity-0'}`}>
             <ToastContainer />
@@ -333,7 +369,88 @@ function Home() {
 
                         </div>
                         {/* postuser profile pic and username end-- */}
-                        {post.is_following === false && <button className='text-[11px] px-5 h-fit py-[2px] rounded-md border border-gray-400' onClick={() => followUser(post.userID.username)}>Follow</button>}
+
+                        {/* post head right side-- */}
+                        <div className='flex gap-x-2 relative px-'>
+                          {post.is_following === false && <button className='text-[11px] px-5 h-fit py-[2px] rounded-md border border-gray-400' onClick={() => followUser(post.userID.username)}>Follow</button>}
+                          <div><IoMdMore className='size-5 cursor-pointer' onClick={() => {
+                            if (showReports) {
+                              toggleShowReports(null)
+                            }
+                            if (showMore) {
+                              if (showMore.postID !== post.id) {
+                                toggleShowmore({ postID: post.id })
+                              }else{
+                                toggleShowmore(null)
+                              }
+                            } else {
+                              toggleShowmore({ postID: post.id })
+                            }
+
+
+                          }} /></div>
+
+                          <div className={`' bg-gray-900  transition-all ease-in-out delay-100
+                           absolute select-none right-5 px-3 py-2 md:py-3 md:px-5 rounded-tl-md rounded-bl-md rounded-br-md'
+                          ${showMore && showMore.postID === post.id ? 'scale-100' : 'scale-0'}`}>
+                            <p className='text-red-600 cursor-pointer text-xs md:text-sm' onClick={() => {
+                              if (showReports) {
+                                toggleShowReports(null)
+                              } else {
+                                toggleShowReports({ postID: post.id })
+                              }
+                            }}
+                            >Report</p>
+
+
+                          </div>
+
+                          <div className={`'absolute absolute transition-all delay-100 ease-in-out  bg-gray-900 right-5 md:top-14 top-10
+                           px-2 md:px-4 py-3 rounded-tl-md rounded-bl-md rounded-br-md w-fit'
+                          ${showReports && showReports.postID === post.id ? 'scale-100' : 'scale-0'}`}>
+
+                            <div className='flex px-2 gap-x-2 items-center'>
+                              <label className='flex items-center gap-x-2'>
+                                <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value="it's a spam" className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                                <p className='whitespace-nowrap font-thin md:text-sm text-xs'>It's a spam</p>
+                              </label>
+                            </div>
+                            <div className='flex gap-x-2 items-center mt-2 px-2'>
+                              <label className='flex items-center gap-x-2'>
+                                <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Hate of speech or symboles' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                                <p className='whitespace-nowrap font-thin text-xs md:text-sm'>Hate of speech or symboles</p>
+                              </label>
+                            </div>
+                            <div className='flex gap-x-2 items-center mt-2 px-2'>
+                              <label className='flex items-center gap-x-2'>
+                                <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='false information' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                                <p className='whitespace-nowrap font-thin md:text-sm text-xs'>False Information</p>
+                              </label>
+                            </div>
+                            <div className='flex gap-x-2 items-center mt-2 px-2'>
+                              <label className='flex items-center gap-x-2'>
+                                <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Nudity or Sexual activity' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                                <p className='whitespace-nowrap font-thin md:text-sm text-xs'>Nudity or sexual activity</p>
+                              </label>
+                            </div>
+                            <div className='flex gap-x-2 items-center mt-2 px-2'>
+                              <label className='flex items-center gap-x-2'>
+                                <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Drugs' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                                <p className='whitespace-nowrap font-thin md:text-sm text-xs'>Drugs</p>
+                              </label>
+                            </div>
+
+                            <div className='flex flex-col items-center'>
+                              {!reportSucces && <button className='bg-red-600 text-sm px-3 py-1 mt-3 rounded-md' onClick={() => reportPost(post.id)}>Report</button>}
+                              {reportError && <p className='text-red-600 text-xs text-center'>{reportError}</p>}
+                              <p className={`' text-black px-4 py-1 mt-2 rounded-sm text-xs text-center transition-all delay-100 ease-in-out'
+                                ${reportSucces ? 'scale-x-100  bg-green-600' : 'scale-x-0'}`}>{reportSucces}</p>
+                            </div>
+                          </div>
+
+                        </div>
+                        {/* post head right side end here-------- */}
+
                       </div>
                       {/* post-header-end-here--- */}
 
@@ -403,9 +520,14 @@ function Home() {
                     </div>
                   </div>
                 </div>
+
               ))
             }
+
           </div>
+
+
+
         </div>
 
 

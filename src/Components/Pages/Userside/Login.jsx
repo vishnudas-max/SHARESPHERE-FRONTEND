@@ -9,7 +9,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../../../Redux/UserdataSlice';
 // import GoogleButton from "react-google-button";
-import {  baseURL } from '../../../Config';
+import { baseURL } from '../../../Config';
 import { FcGoogle } from "react-icons/fc";
 import Loader from './HelperComponents/Loader'
 
@@ -21,7 +21,7 @@ function Login() {
     const navigate = useNavigate()
     const location = useLocation();
     const loadingvalue = localStorage.getItem('loading')
-    const [loading,setIsLoading] = useState(loadingvalue)
+    const [loading, setIsLoading] = useState(loadingvalue)
 
 
     const handleusername = (e) => {
@@ -52,7 +52,8 @@ function Login() {
 
             })
             .catch(err => {
-                toast.error('Invalid credentials !', {
+                console.log(err)
+                toast.error(err.response.data, {
                     position: "top-right",
                     autoClose: 1000,
                     hideProgressBar: true,
@@ -86,6 +87,27 @@ function Login() {
         const urlParams = new URLSearchParams(params).toString();
         window.location = `${GOOGLE_AUTH_URL}?${urlParams}`;
     }
+
+    useEffect(() => {
+        const query = new URLSearchParams(location.search);
+        const message = query.get('message')
+        if (message) {
+            toast.error('You have been blocked to access Sharesphere', {
+                position: "top-right",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                style: { backgroundColor: 'red', color: 'black' },
+            })
+            setTimeout(() => {
+                navigate('/')
+            }, 2000);
+        }
+
+    }, [location])
+
     useEffect(() => {
         const query = new URLSearchParams(location.search);
         const access = query.get('access');
@@ -103,10 +125,10 @@ function Login() {
                 "is_admin": decodeToken.is_admin,
                 "userID": decodeToken.user_id
             }));
-        
+
             navigate('/home/', { replace: true });
-        }else{
-            if(loading){
+        } else {
+            if (loading) {
                 localStorage.removeItem('loading')
                 setIsLoading(null)
             }
@@ -116,7 +138,7 @@ function Login() {
                 localStorage.removeItem('loading');
             }
         }
-    }, [location,loading]);
+    }, [location, loading]);
 
     return (
         <>
