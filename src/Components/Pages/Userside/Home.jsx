@@ -28,7 +28,7 @@ function Home() {
   const storyStatus = useSelector(state => state.stories.status)
   const allStories = useSelector(state => state.stories.stories)
   const error = useSelector((state) => state.posts.error);
-  const user = useSelector(state => state.authInfo.username)
+  const currentUsername = useSelector(state => state.authInfo.username)
   const userID = useSelector(state => state.authInfo.userID)
   const [viewComment, setViewCommet] = useState({ "index": null, "view": false })
   const [likedPosts, setLikedPosts] = useState([])
@@ -75,27 +75,16 @@ function Home() {
           "Content-Type": 'multipart/form-data'
         }
       })
-
       setStoryImg(null)
       dispatch(fetchStory())
-      toast.success('Story Added', {
-        position: "top-right",
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        style: { backgroundColor: 'green', color: 'black' },
-      })
-      setTimeout(() => {
-        ToogleShowAddStory(false);
-      }, 1000);
+      ToogleShowAddStory(false);
+
     }
     catch (error) {
       console.log(error)
     }
   }
-  // addin story closed---
+  // adding story closed---
 
   // fetching suggested users---
   const fetchuserSuggetions = async () => {
@@ -140,9 +129,6 @@ function Home() {
 
   },
     [dispatch, status, setLikedPosts, storyStatus])
-
-
-
 
   // handling-coment-view--
   const handleView = (index) => {
@@ -242,6 +228,17 @@ function Home() {
       }, 2000);
     }
   }
+
+  // Function to check if the current user has viewed all stories of a specific user
+  const hasViewedAllStories = (userID) => {
+    const currentStories = allStories.find(user => user.id === userID);
+    if (!currentStories || !currentStories.stories) return false;
+    console.log(currentStories)
+    let is_viewed = currentStories.stories.every(story => story.viewed_users.some(user => user.username === currentUsername));
+    console.log(`user viwed the ${is_viewed}`)
+    return is_viewed
+  };
+
   return (
     <>
       <Navbar />
@@ -261,6 +258,7 @@ function Home() {
                   <input type="file" hidden ref={imgRef} accept="image/*" onChange={e => setStoryImg(e.target.files[0])} />
                 </div>
                 <button className='border border-gray-300 h-fit px-4 rounded-md md:text-sm md:py-1 md:px-5 hover:bg-gray-200 hover:text-black' onClick={AddStory}>Post</button>
+              
                 <AiOutlineClose className='text-gray-300 cursor-pointer' size={24} onClick={() => ToogleShowAddStory(false)} />
               </div>
             </div>
@@ -276,7 +274,6 @@ function Home() {
             status === 'loading' && <h1 className='text-[30px]' >Loading......</h1>
           }
           <div>
-
             {/* story-- */}
 
             {/* story-view-component-- */}
@@ -308,11 +305,12 @@ function Home() {
                 <div className="flex w-full overflow-x-scroll no-scrollbar py-2 ">
                   {allStories.map((story, index) => {
                     if (story.id !== userID) {
+                      const borderColor = hasViewedAllStories(story.id) ? 'border-white' : 'border-green-500';
                       return (
                         <div key={story.id} className="flex-shrink-0 flex-col ml-7">
                           {story.profile_pic ?
-                            <img src={story.profile_pic} alt="" className="md:size-20 size-16 rounded-full border-[3px]  border-green-500" onClick={() => setViewStory({ 'userID': story.id })} />
-                            : <FaCircleUser className='md:size-20 size-16 border-[3px] border-green-400 rounded-full' onClick={() => setViewStory({ 'userID': story.id })} />
+                            <img src={story.profile_pic} alt="" className={`"md:size-20 size-16 rounded-full border-[4px]" ${borderColor}`} onClick={() => setViewStory({ 'userID': story.id })} />
+                            : <FaCircleUser className={`'md:size-20 size-16 border-[4px]  rounded-full md:size-20 ' ${borderColor}`} onClick={() => setViewStory({ 'userID': story.id })} />
                           }
                           <p className='text-xs w-fit mx-auto'>{story.username}</p>
                         </div>
@@ -363,7 +361,7 @@ function Home() {
                             <FaCircleUser className='md:size-9 size-7' />
                           }
 
-                          <Link to={user !== post.userID.username ? `/home/user/profile/${post.userID.id}` : `/home/profile/`}>
+                          <Link to={currentUsername !== post.userID.username ? `/home/user/profile/${post.userID.id}` : `/home/profile/`}>
                             <p className='md:text-sm text-xs font-normal'>{post.userID.username}</p>
                           </Link>
 
@@ -380,7 +378,7 @@ function Home() {
                             if (showMore) {
                               if (showMore.postID !== post.id) {
                                 toggleShowmore({ postID: post.id })
-                              }else{
+                              } else {
                                 toggleShowmore(null)
                               }
                             } else {
