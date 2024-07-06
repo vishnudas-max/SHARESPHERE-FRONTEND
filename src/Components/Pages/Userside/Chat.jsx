@@ -8,6 +8,9 @@ import api from '../../../Config'
 import { useSelector } from 'react-redux';
 import { useRef } from 'react';
 import Picker from 'emoji-picker-react';
+import { RiArrowLeftWideLine } from "react-icons/ri";
+
+
 
 
 function Chat() {
@@ -26,6 +29,13 @@ function Chat() {
     const currentUsername = useSelector(state => state.authInfo.username)
     const message = useRef('')
     const [users, setUsers] = useState(null)
+
+    useEffect(() => {
+        // Scroll to the bottom of the chat messages div
+        if (chatEndRef.current) {
+            chatEndRef.current.scrollTop = chatEndRef.current.scrollHeight;
+        }
+    }, [chatMessages, currentChatRoom]);
 
     // establishing connection--
     const ConnectRoom = (userID) => {
@@ -104,6 +114,7 @@ function Chat() {
                 'message': message.current.value,
                 'username': currentUsername
             }));
+            message.current.value = ''
 
         }
     }
@@ -231,6 +242,7 @@ function Chat() {
                     </div>
                     {/* friends-end-here-- */}
                 </div>
+
                 {/* left side end here--- */}
 
                 {/* right side---- */}
@@ -239,8 +251,10 @@ function Chat() {
                     <div className='md:col-span-7 h-screen col-span-12 bg-gray-700'>
                         {/* chat head-- */}
                         <div className='flex justify-between bg-gray-800 md:h-20  h-16 sticky top-0'>
+                        
                             {/* left side-- */}
                             <div className='flex gap-x-1 items-center ps-3 justify-between'>
+                                <RiArrowLeftWideLine  className='size-10 cursor-pointer' onClick={()=>setChatRoom(null)}/>
                                 <div className='h-fit'>
                                     <FaCircleUser className='md:size-16 size-12' />
                                 </div>
@@ -267,6 +281,8 @@ function Chat() {
                         </div>
                         {/* chat head end here-- */}
 
+
+
                         {/* chat start here-- */}
                         <div ref={chatEndRef} className="h-[520px] md:h-[590px] bg-gray-700 px-3  grid-cols-2 overflow-y-scroll no-scrollbar pb-3 ">
                             {chatMessages && chatMessages.map((message, index) => (
@@ -275,9 +291,6 @@ function Chat() {
                                     className={`flex ${message.sender_id === currentUser ? 'justify-end col-span-2' : 'justify-start col-span-2'}`}
                                 >
                                     <div className={`bg-gray-900 px-2 mt-2 flex items-start min-h-[40px] gap-x-2 rounded-tr-2xl h-fit rounded-bl-2xl rounded-md max-w-[50%]`}>
-                                        <div className="mt-2">
-                                            <FaCircleUser className="size-3" />
-                                        </div>
                                         <div className="flex-col py-[7px] ">
                                             <p className="row-span-1 text-sm break-all  ">{message.message}</p>
                                             <p className="row-span-1 text-[10px] text-gray-400 w-full text-right">{message.time}</p>
@@ -285,8 +298,11 @@ function Chat() {
                                     </div>
                                 </div>
                             ))}
+                            {typingStatus === currentChatRoom.user &&
+                                <div className=" text-black ">typing...</div>
+                            }
                             {console.log(`${currentChatRoom} usename, ${typingStatus} status`)}
-                            {typingStatus === currentChatRoom.user && <h1>typing....</h1>}
+
                         </div>
 
                         <div className='px-3 pt-1 md:sticky  fixed w-full  md:bottom-0 bottom-12 bg-gray-700'>

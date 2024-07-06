@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route,Navigate } from 'react-router-dom'
 import UserWrapper from './Routes/UserWrapper';
 import AdminWrapper from './Routes/AdminWrapper'
 function App() {
@@ -6,7 +6,7 @@ function App() {
     <>
       <Routes>
         <Route path="/*" element={<UserWrapper/>} />
-        <Route path="admin/*" element={<AdminWrapper />} />
+        <Route path="/admin/*" element={<AdminWrapper />} />
       </Routes>
     </>
   );

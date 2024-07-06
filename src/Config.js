@@ -2,6 +2,8 @@ import axios from 'axios'
 import { delAuth } from './Redux/UserdataSlice';
 import { useDispatch } from 'react-redux';
 
+export const baseURL = 'http://127.0.0.1:8000'
+
 
 
 const axiosInstance = axios.create({
@@ -9,44 +11,47 @@ const axiosInstance = axios.create({
 });
 
 
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-  axiosInstance.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      const originalRequest = error.config;
+    // If the error is 401 (Unauthorized), try to refresh the token
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-      // If the error is 401 (Unauthorized), try to refresh the token
-      if (error.response.status === 401 && !originalRequest._retry) {
-        originalRequest._retry = true;
+      try {
+        const refreshToken = localStorage.getItem('refresh');
+        let url =baseURL+'/api/token/refresh/'
+        console.log(url)
 
-        try {
-          const refreshToken = localStorage.getItem('refresh');
-          const response = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
-            refresh: refreshToken,
-          });
+        const response = await axios.post(url, {
+          refresh: refreshToken,
+        });
 
-          // Store the new access token
-          localStorage.setItem('access', response.data.access);
+        // Store the new access token
+        localStorage.setItem('access', response.data.access);
 
-          // Update the Authorization header in the original request and retry it
-          originalRequest.headers['Authorization'] = `Bearer ${response.data.access}`;
-          return axiosInstance(originalRequest);
+        // Update the Authorization header in the original request and retry it
+        originalRequest.headers['Authorization'] = `Bearer ${response.data.access}`;
+        return axiosInstance(originalRequest);
+      } catch (error) {
 
-        } catch (refreshError) {
-          const dispatch = useDispatch()
-          console.error('Token refresh failed:', refreshError);
-          dispatch(delAuth())
-          localStorage.clear()
-        }
-      }
-
-      return Promise.reject(error);
+        localStorage.clear(); // Clear local storage or perform other logout actions
+        return Promise.reject(error);
+      } 
     }
-  );
 
+    return Promise.reject(error);
+  }
+);
 
-  export default axiosInstance;
+// function handleTokenRefreshFailure() {
 
+//   dispatch(delAuth()); // Dispatch your action to clear authentication state
+//   localStorage.clear(); // Clear local storage or take appropriate logout actions
+// }
 
-export const baseURL = 'http://127.0.0.1:8000'
+export default axiosInstance;
+
 

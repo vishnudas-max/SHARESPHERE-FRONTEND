@@ -20,7 +20,7 @@ function UserProfile() {
     const [report, toggleReport] = useState(false)
     const [reason, setReason] = useState('')
     const [error, setError] = useState(null)
-
+    console.log(userProfile)
     useEffect(() => {
 
         const fetchProfile = async () => {

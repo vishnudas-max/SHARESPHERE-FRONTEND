@@ -18,24 +18,54 @@ function Profile() {
     const [showFollowing, ToggleshowFollowing] = useState(false)
     const [shwoFollowers, TogglShowFollowers] = useState(false)
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const response = await api.get(`user/profile/detailes/${userID}/`, {
-                    headers: {
-                        Authorization: `Bearer ${access}`
-                    }
-                })
-                setUserProfile(response.data)
-                console.log(response.data)
-            }
-            catch (error) {
-                console.log(error)
-            }
+    const fetchProfile = async () => {
+        try {
+            const response = await api.get(`user/profile/detailes/${userID}/`, {
+                headers: {
+                    Authorization: `Bearer ${access}`
+                }
+            })
+            setUserProfile(response.data)
+            console.log(response.data)
         }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
         fetchProfile()
     },
         [access])
+
+    useEffect(() => {
+        const followwebsocket = new WebSocket(`ws://127.0.0.1:8000/ws/follow/?token=${access}`);
+        console.log(followwebsocket)
+        followwebsocket.onopen = () => {
+            console.log('WebSocket connection established.');
+        };
+
+        followwebsocket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        followwebsocket.onmessage = (event) => {
+            console.log('WebSocket message received:', event.data);
+            try {
+                const data = JSON.parse(event.data);
+                console.log('Parsed message:', data);
+                if (data.type === 'follow_message') {
+                    console.log('Follow message:', data.message);
+                    fetchProfile()
+                }
+            } catch (error) {
+                console.error('Error parsing message:', error);
+            }
+        };
+
+        return () => followwebsocket.close()
+    },
+        [])
 
 
     return (
@@ -50,7 +80,7 @@ function Profile() {
                         </div>
                         <h1 className='md:text-3xl font-bold h-fit'>{username}</h1>
                         {userProfile && userProfile.is_verified && <MdVerified className='md:size-8 size-5 text-blue-500' />}
-                        <FaUserEdit className='md:size-9 ml-1 size-5'/>
+                        <FaUserEdit className='md:size-9 ml-1 size-5' />
                     </div>
                     {userProfile && (
                         <div className='md:col-span-8 col-span-12 px-6 justify-evenly flex flex-col items-star'>
@@ -121,10 +151,11 @@ function Profile() {
 
             <div className='col-span-12 md:ml-[320px] px-6 py-2 md:mt-14'>
                 {userProfile ? (
-                    <div className="grid md:grid-cols-3 grid-cols-2 gap-2">
+
+                    <div className="grid grid-cols-3 gap-2">
                         {userProfile.posts.length > 0 ? (
                             userProfile.posts.map((post, index) => (
-                                <div className="col-span-1 flex justify-center items-center max-h-32    " key={index}>
+                                <div className="col-span-1 flex justify-center border-1 border-gray-600" key={index}>
                                     <Link to={`/home/post/${post.id}`}>
                                         <img src={baseURL + post.contend} alt="post" className='max-h-52' />
                                     </Link>
@@ -136,10 +167,10 @@ function Profile() {
                             </div>
                         )}
                     </div>
-
-                ) : (
+                )
+                    :
                     <div>Loading...</div>
-                )}
+                }
             </div>
 
         </>
