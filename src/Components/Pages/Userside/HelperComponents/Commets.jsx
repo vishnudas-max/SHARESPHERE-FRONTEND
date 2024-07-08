@@ -234,7 +234,7 @@ function Commets({ view, postID }) {
                                                             <p className="text-xs ">{reply.userID.username}</p>
                                                             <p className="text-[10px] ml-1 font-thin text-gray-400">{reply.time_ago}</p>
                                                         </div>
-                                                        <p className="text-xs font-thin cursor-pointer md:text-sm">{reply.comment}</p>
+                                                        <p className="text-xs font-thin cursor-pointer md:text-sm flex gap-x-1"><p className='text-blue-700'>@{reply.reply_to}</p>{reply.comment}</p>
                                                     </div>
                                                 </div>
                                                 <div className='h-full flex align-middle'>

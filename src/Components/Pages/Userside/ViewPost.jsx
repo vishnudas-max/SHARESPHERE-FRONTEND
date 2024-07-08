@@ -13,6 +13,8 @@ import { addComment_count } from '../../../Redux/PostSlice'
 import { MdDelete } from "react-icons/md";
 import { MdReport } from "react-icons/md";
 import Navbar from './HelperComponents/Navbar'
+import { MdEdit, MdMoreVert } from "react-icons/md";
+import { IoClose } from "react-icons/io5";
 
 
 function ViewPost() {
@@ -32,7 +34,11 @@ function ViewPost() {
   const [showreport, toggleshowreport] = useState(false)
   const [reportError, setReportError] = useState('')
   const [reportSucces, setReportSucess] = useState('')
+  const [commentOptionIsOpen, toogleCommentoption] = useState(null)
+  const [editcomment, setEditcomment] = useState(null)
+  const [editreply, seteditReply] = useState(null)
 
+  console.log(comments)
   const fetchComment = async () => {
     try {
       const response = await api.get(`post/comment/${id}/`, {
@@ -102,14 +108,53 @@ function ViewPost() {
     }
   }
 
+  const edituserComment = async e => {
+    e.preventDefault()
+    let data = {
+      "comment": editcomment.comment
+    }
+    try {
+      const response = await api.patch(`post/comment/${editcomment.id}/`, data, {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      })
+      // dispatch(addComment_count(id))
+      setEditcomment(null)
+      fetchComment()
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+  const editCommentReply = async e => {
+    e.preventDefault()
+    let data = {
+      "comment": editreply.comment
+    }
+    try {
+      const response = await api.patch(`post/comment/${editreply.id}/`, data, {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      })
+      // dispatch(addComment_count(id))
+      seteditReply(null)
+      fetchComment()
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+
   const postCommentReply = async () => {
     // Ensure replycomment is a string
 
-    let comment = `@${showReply.username} ${replycomment}`;
+
     let data = {
       "userID": userID, // Ensure userID is a valid string or number
       "postID": id, // Ensure id is a valid string or number
-      "comment": comment,
+      "comment": replycomment,
       "parent_comment": showReply.id // Ensure commentID is a valid string or number
     };
 
@@ -204,6 +249,15 @@ function ViewPost() {
     }
   }
 
+  const handleEditcomment = e => {
+    let data = { ...editcomment, comment: e.target.value }
+    setEditcomment(data)
+  }
+  const handleEditReply = e => {
+    let data = { ...editreply, comment: e.target.value }
+    seteditReply(data)
+  }
+
   return (
     <div className='select-none'>
 
@@ -293,16 +347,36 @@ function ViewPost() {
               </div>
 
             </div>
-            {/* reprot container end here---- */}
 
-            <div className='mt-3 grid grid-cols-5 py-3 border-b border-gray-400'>
-              <div className='col-span-3 py-3 flex items-center'>
-                <input type="text" placeholder='Add comment..' className='px-1 text-[14px] bg-transparent outline-none border-b border-gray-600' value={comment} onChange={e => AddComment(e.target.value)} />
+
+            {/* reprot container end here---- */}
+            {editcomment === null ?
+              // add comment--
+              <div className='mt-3 grid grid-cols-5 py-3 border-b border-gray-400'>
+                <div className='col-span-3 py-3 flex items-center'>
+                  <input type="text" placeholder='Add comment..' className='px-1 text-[14px] bg-transparent outline-none border-b border-gray-600' value={comment} onChange={e => AddComment(e.target.value)} />
+                </div>
+                <button onClick={postComment} className='cursor-pointer px-3 h-fit py-1 rounded-md ml-5 bg-blue-600 text-black' >Post</button>
+                <div>
+                </div>
               </div>
-              <IoSend onClick={postComment} className='cursor-pointer size-5 ml-5 text-blue-500' />
-              <div>
+              :
+              //  editcomment--
+              <div className='mt-3 grid grid-cols-5 py-3 border-b border-gray-400'>
+                <div className='col-span-3 py-3 flex items-center'>
+                  <input type="text" placeholder='Add comment..' className='px-1 text-[14px] bg-transparent outline-none border-b border-gray-600' value={editcomment.comment} onChange={e => handleEditcomment(e)} />
+                </div>
+                <div>
+                  <div className='flex gap-x-2 items-center'>
+                    <button onClick={edituserComment} className='cursor-pointer px-3 h-fit py-1 rounded-md ml-5 bg-blue-600 text-black'>Edit </button>
+                    <IoClose className='size-8 cursor-pointer' onClick={() => setEditcomment(null)} />
+                  </div>
+                </div>
+
+                <div>
+                </div>
               </div>
-            </div>
+            }
 
             {/* conmments-- */}
             <div className='h-full'>
@@ -329,26 +403,57 @@ function ViewPost() {
                           </div>
 
                         </div>
-                        <div>
-                          {comment.userID.id === userID && <MdDelete className='size:4 md:size-5' onClick={() => deletecomment(comment.id)} />}
-                        </div>
+                        {
+                          comment.userID.id === userID && <div className='relative cursor-pointer'>
+                            <MdMoreVert onClick={() => {
+                              if (commentOptionIsOpen) {
+                                if (commentOptionIsOpen.id !== comment.id) {
+                                  toogleCommentoption({ id: comment.id })
+                                } else {
+                                  toogleCommentoption(null)
+                                }
+                              } else {
+                                toogleCommentoption({ id: comment.id })
+                              }
+                            }} />
+
+                            {commentOptionIsOpen && commentOptionIsOpen.id === comment.id && <div className='absolute right-4 bg-gray-700 rounded-sm px-3 py-[1px]'>
+                              <p className='text-xs font-thin text-gray-200 cursor-pointer' onClick={() => setEditcomment({ id: comment.id, comment: comment.comment })} >edit</p>
+                              <p className='text-xs font-thin text-gray-200 cursor-pointer' onClick={() => deletecomment(comment.id)} >delete</p>
+                            </div>}
+                          </div>}
 
                       </div>
 
                       {/* input field for adding reply-- */}
                       {showReply['id'] === comment.id &&
 
-                        <div className='flex gap-x-3 mt-2'>
-                          <div className='flex border-b border-gray-600 gap-x-1'>
-                            <span>@{showReply['username']}</span>
-                            <input type="text" placeholder='Add reply....' className='w-full h-fit bg-transparent outline-none ' value={replycomment}
-                              onChange={e => setreplycomment(e.target.value)} />
-                            <IoSend onClick={postCommentReply} className='cursor-pointer size-9 ml-5 text-blue-500' />
+                        (editreply ?
+                          <div className='flex gap-x-3 mt-2'>
+                            <div className='flex border-b border-gray-600 gap-x-1'>
+                              <span>@{showReply['username']}</span>
+                              <input type="text" placeholder='Edit reply....' className='w-full h-fit bg-transparent outline-none ' value={editreply.comment}
+                                onChange={e => handleEditReply(e)} />
+                              <div className='flex gap-x-1'>
+                              <button onClick={editCommentReply} className='cursor-pointer h-fit px-3  text-black bg-blue-700 rounded-md' >Edit</button>
+                              <div>
+                                <IoClose className='size-6 cursor-pointer' onClick={()=>seteditReply(null)}/>
+                              </div>
+                              </div>
+                            </div>
                           </div>
-
-                        </div>
-
+                          :
+                          <div className='flex gap-x-3 mt-2'>
+                            <div className='flex border-b border-gray-600 gap-x-1'>
+                              <span>@{showReply['username']}</span>
+                              <input type="text" placeholder='Add reply....' className='w-full h-fit bg-transparent outline-none ' value={replycomment}
+                                onChange={e => setreplycomment(e.target.value)} />
+                              <IoSend onClick={postCommentReply} className='cursor-pointer size-9 ml-5 text-blue-500' />
+                            </div>
+                          </div>
+                        )
                       }
+
                       {/* input field for adding reply end here-- */}
 
                       {/* Mapping through replies */}
@@ -365,13 +470,28 @@ function ViewPost() {
                                 <p className='font-semibold text-gray-300 ml-2'>{reply.userID.username}</p>
                                 <p className='text-[11px] ml-1 text-gray-400'>{reply.time_ago}</p>
                               </div>
-                              <p className='ml-2 font-thin md:text-[14px] text-[13px]'>{reply.comment}</p>
+                              <p className='ml-2 font-thin md:text-[14px] text-[13px] flex gap-1'><p className='text-blue-700'>@{reply.reply_to}</p>{reply.comment}</p>
                             </div>
                           </div>
-                          <div>
-                            {reply.userID.id === userID && <MdDelete className='size:4 md:size-5' onClick={() => deletecomment(reply.id)} />}
+                          {
+                            reply.userID.id === userID && <div className='relative cursor-pointer'>
+                              <MdMoreVert onClick={() => {
+                                if (commentOptionIsOpen) {
+                                  if (commentOptionIsOpen.id !== reply.id) {
+                                    toogleCommentoption({ id: reply.id })
+                                  } else {
+                                    toogleCommentoption(null)
+                                  }
+                                } else {
+                                  toogleCommentoption({ id: reply.id })
+                                }
+                              }} />
 
-                          </div>
+                              {commentOptionIsOpen && commentOptionIsOpen.id === reply.id && <div className='absolute right-4 bg-gray-700 rounded-sm px-3 py-[1px]'>
+                                <p className='text-xs font-thin text-gray-200 cursor-pointer' onClick={() => seteditReply({ id: reply.id, comment: reply.comment })} >edit</p>
+                                <p className='text-xs font-thin text-gray-200 cursor-pointer' onClick={() => deletecomment(reply.id)} >delete</p>
+                              </div>}
+                            </div>}
                         </div>
 
                       ))}
