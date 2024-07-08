@@ -1,96 +1,54 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Navbar from './HelperComponents/Navbar'
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchNotifications, followback } from '../../../Redux/NotificationSlice'
+import { baseURL } from '../../../Config';
+import { Link } from 'react-router-dom';
+import api from '../../../Config'
+import { FaCircleUser } from "react-icons/fa6";
+
 
 function Notification() {
+    const status = useSelector(state => state.notifications.status)
+    const notifications = useSelector(state => state.notifications.notifications)
+    const errors = useSelector(state => state.notifications.error)
+    const dispatch = useDispatch()
+    const access = localStorage.getItem('access')
 
-
-    const notifications = [
-        {
-            date: "06/26/2024",
-            notifications: [
-                {
-                    "invokedUser": "User5",
-                    "targetUser": "User6",
-                    "type": "follow",
-                    "time": "06/26/2024, 01:00 PM",
-                    "notification": "User5 followed User6"
-                },
-                {
-                    "invokedUser": "User6",
-                    "targetUser": "User5",
-                    "type": "comment",
-                    "time": "06/26/2024, 01:10 PM",
-                    "notification": "User6 commented on User5's post"
+    const readnotifications = async () => {
+        try {
+            const response = await api.post(`user/notifications/`, {}, {
+                headers: {
+                    Authorization: `Bearer ${access}`
                 }
-            ]
-        },
-        {
-            date: "06/25/2024",
-            notifications: [
-                {
-                    "invokedUser": "User1",
-                    "targetUser": "User2",
-                    "type": "follow",
-                    "time": "06/25/2024, 12:00 PM",
-                    "notification": "User1 followed User2"
-                },
-                {
-                    "invokedUser": "User3",
-                    "targetUser": "User2",
-                    "type": "like",
-                    "time": "06/25/2024, 12:05 PM",
-                    "notification": "User3 liked User2's post"
-                },
-                {
-                    "invokedUser": "User1",
-                    "targetUser": "User3",
-                    "type": "comment",
-                    "time": "06/25/2024, 12:10 PM",
-                    "notification": "User1 commented on User3's post"
-                },
-                {
-                    "invokedUser": "User2",
-                    "targetUser": "User1",
-                    "type": "follow",
-                    "time": "06/25/2024, 12:15 PM",
-                    "notification": "User2 followed User1"
-                },
-                {
-                    "invokedUser": "User4",
-                    "targetUser": "User2",
-                    "type": "like",
-                    "time": "06/25/2024, 12:20 PM",
-                    "notification": "User4 liked User2's post"
-                },
-                {
-                    "invokedUser": "User2",
-                    "targetUser": "User4",
-                    "type": "comment",
-                    "time": "06/25/2024, 12:25 PM",
-                    "notification": "User2 commented on User4's post"
-                }
-            ]
-        },
-        {
-            date: "06/27/2024",
-            notifications: [
-                {
-                    "invokedUser": "User7",
-                    "targetUser": "User8",
-                    "type": "like",
-                    "time": "06/27/2024, 02:00 PM",
-                    "notification": "User7 liked User8's post"
-                },
-                {
-                    "invokedUser": "User8",
-                    "targetUser": "User7",
-                    "type": "follow",
-                    "time": "06/27/2024, 02:30 PM",
-                    "notification": "User8 followed User7"
-                }
-            ]
+            })
+        } catch (error) {
+            console.log(error)
         }
-    ]
+    }
+
+    useEffect(() => {
+        if (status === 'idle') {
+            dispatch(fetchNotifications())
+        }
+        readnotifications()
+    },
+    [status])
+
+    const followuser = async (username, date, idx) => {
+        
+        try {
+            const response = await api.post(`follow/${username}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${access}`
+                }
+            });
+            dispatch(followback({ date, idx }))
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
 
     const currentDate = new Date();
 
@@ -109,15 +67,59 @@ function Notification() {
                     <h1 className='text-xl font-semibold md:text-3xl md:font-bold'>Notificaion</h1>
                 </div>
                 <div className=' max-w-[800px] pl-2 max-h-[600px] overflow-y-scroll no-scrollbar  '>
-                    {
-                        notifications.map((obj, index) => (
-                            <div className='mt-5 w-full'>
-                                <h1 className='text-xl md:text-2xl font-semibold '>{formattedDate === obj.date ? 'Today' : obj.date}</h1>
-                                {obj.notifications.map((not, idx) => (
-                                    <div className='flex justify-between bg-gray-800 mt-3 h-14 mr-3 rounded-md px-2 items-center'>
-                                        <p className='max-w-[400px] md:text-[17px] text-sm'>{not.notification}</p>
-                                        {not.type === 'follow' && <button className='border md:text-sm text-xs border-gray-200
-                                        rounded-md py-1 px-3'>Follow back</button>}
+                    {status !== 'loading' ? (
+                        Object.keys(notifications).length < 1 ? (
+                            <div className='w-full flex justify-center pt-20 text-3xl font-semibold text-gray-400'>No Notifications</div>
+                        ) : (
+                            Object.keys(notifications).map((date, index) => (
+                                <div className='mt-5 w-full' key={index}>
+                                    <h1 className='text-xl md:text-2xl font-semibold'>
+                                        {formattedDate === date ? 'Today' : date}
+                                    </h1>
+                                    {notifications[date].map((not, idx) => (
+
+
+                                        <div className='flex justify-between bg-gray-900 mt-3 h-14 mr-3 rounded-md px-2 items-center' key={idx}>
+                                            <Link to={not.notification_type === 'follow' ? `/home/user/profile/${not.invoked_user.id}` : `/home/post/${not.postID ? not.postID.id : ''}`}>
+                                                <div className='max-w-[400px] flex gap-x-2 items-center'>
+                                                    <div>
+                                                        {not.invoked_user.profile_pic ?
+                                                            <img src={not.invoked_user.profile_pic} alt="" className='size-9' />
+                                                            :
+                                                            <FaCircleUser className='size-9' />
+                                                        }
+                                                    </div>
+                                                    <p className='max-w-[400px] md:text-[17px] text-sm'>{not.message}</p>
+                                                </div>
+                                            </Link>
+                                            {
+                                                (not.notification_type === 'follow' && !not.is_following) ? (
+                                                    <button className='border md:text-sm text-xs border-gray-200 rounded-md py-1 px-3' onClick={() => followuser(not.invoked_user.username, date, idx)}>
+                                                        Follow back
+                                                    </button>
+                                                ) : (
+                                                    not.postID && not.postID.contend &&
+
+                                                    <img src={baseURL + not.postID.contend} alt="post" className='max-w-16 my-2 rounded-md' />
+
+                                                )
+                                            }
+                                        </div>
+
+                                    ))}
+                                </div>
+                            ))
+                        )
+
+                    )
+                        :
+                        Array(3).fill().map((_, index) => (
+                            <div className='mt-5 w-full' key={index}>
+                                <div className='w-32 rounded-md animate-pulse h-10 bg-gray-600'></div>
+                                {Array(2).fill().map((_, idx) => (
+                                    <div className='flex animate-pulse justify-between bg-gray-800 mt-3 h-14 mr-3 rounded-md px-2 items-center'>
+                                        <div className='w-80 h-5 animate-pulse rounded-md  bg-gray-600'></div>
+                                        <div className='w-14 h-3 rounded-md animate-pulse bg-gray-600'></div>
                                     </div>
                                 ))}
                             </div>

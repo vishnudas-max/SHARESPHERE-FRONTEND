@@ -75,18 +75,12 @@ function Chat() {
         }
     }
 
-    const scrollToBottom = () => {
-        if (chatEndRef.current) {
-            chatEndRef.current.style.background = chatEndRef;
-        }
-    };
-
     // fetching users for chat--
     useEffect(() => {
         if (users === null) {
             fetchUsers()
         }
-        scrollToBottom()
+        // scrollToBottom()
 
     }, [])
 
