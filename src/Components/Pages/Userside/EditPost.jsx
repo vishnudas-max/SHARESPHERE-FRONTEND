@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import {delPost } from '../../../Redux/PostSlice'
 import api from '../../../Config'
 import { useParams, useNavigate } from 'react-router-dom'
+import { edit_post } from '../../../Redux/PostSlice'
 
 
 function EditPost() {
@@ -17,6 +18,8 @@ function EditPost() {
     const { id } = useParams()
     const access = localStorage.getItem('access')
     const imgref = useRef()
+    const { nextPage} = useSelector(state => state.posts);
+
     const handelPost = async (e) => {
         e.preventDefault()
         const formData = new FormData()
@@ -36,8 +39,12 @@ function EditPost() {
                     Authorization: `Bearer ${access}`,
                 },
             })
-            dispatch(delPost())
-            navigate(`/home/post/${id}`)
+            console.log(res.data)
+            let id = res.data.id
+            let caption =res.data.caption
+            let contend = res.data.contend
+            dispatch(edit_post({id,caption,contend}))
+            navigate('/home/')
         }
         catch (error) {
             console.log('something went wrong')

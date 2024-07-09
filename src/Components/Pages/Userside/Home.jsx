@@ -20,12 +20,12 @@ import { FaCircleUser } from "react-icons/fa6";
 import UserStoryView from './UserStoryView';
 import { IoMdMore } from "react-icons/io";
 import { BASE_URL } from '../../../secrets';
-
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Loader from './HelperComponents/Loader';
 
 function Home() {
   const dispatch = useDispatch()
-  const posts = useSelector((state) => state.posts.posts);
-  const status = useSelector((state) => state.posts.status);
+  const { posts, status, nextPage, hasMore } = useSelector(state => state.posts);
   const storyStatus = useSelector(state => state.stories.status)
   const allStories = useSelector(state => state.stories.stories)
   const error = useSelector((state) => state.posts.error);
@@ -122,7 +122,7 @@ function Home() {
     })
 
     if (status === 'idle') {
-      dispatch(fetchPosts())
+      dispatch(fetchPosts(1))
     }
     if (storyStatus === 'idle') {
       dispatch(fetchStory())
@@ -130,6 +130,12 @@ function Home() {
 
   },
     [dispatch, status, setLikedPosts, storyStatus])
+
+  const fetchMoreData = () => {
+    if (hasMore) {
+      dispatch(fetchPosts(nextPage));
+    }
+  };
 
   // handling-coment-view--
   const handleView = (index) => {
@@ -271,9 +277,9 @@ function Home() {
 
 
           <MobileTop />
-          {
-            status === 'loading' && <h1 className='text-[30px]' >Loading......</h1>
-          }
+          {/* {
+            status === 'loading' && <Loader />
+          } */}
           <div>
             {/* story-- */}
 
@@ -343,161 +349,173 @@ function Home() {
 
 
             {/* feed-start-here--- */}
-            {status === 'success' &&
+            {status === 'success' ? (
 
-              posts.map((post, index) => {
-                return (
-                  <div className='px-2 pt-3' key={index}>
+              <InfiniteScroll
+                dataLength={posts.length}
+                next={fetchMoreData}
+                hasMore={hasMore}
+                loader={<Loader />}
+                endMessage={<div className='w-full text-xl text-gray-500 text-center'>No more Posts</div>}
+              >
+                {
+                  posts.map((post, index) => {
+                    return (
+                      <div className='px-2 pt-3' key={index}>
 
-                    {/* post-start-here-- */}
+                        {/* post-start-here-- */}
 
-                    <div className='mt-4 relative' key={index}>
-                      {/* post-header-- */}
-                      <div className='flex justify-between px-3 items-center'>
-                        {/* postuserprofile_pic and usernme-- */}
-                        <div className='flex gap-x-1 items-center w-fit'>
-                          {post.userID.profile_pic ?
-                            <img src={post.userID.profile_pic} alt="user" className='size-8 rounded-full' />
-                            :
-                            <FaCircleUser className='md:size-9 size-7' />
-                          }
-
-                          <Link to={currentUsername !== post.userID.username ? `/home/user/profile/${post.userID.id}` : `/home/profile/`}>
-                            <p className='md:text-sm text-xs font-normal'>{post.userID.username}</p>
-                          </Link>
-
-                        </div>
-                        {/* postuser profile pic and username end-- */}
-
-                        {/* post head right side-- */}
-                        <div className='flex gap-x-2 relative px-'>
-                          {post.is_following === false && <button className='text-[11px] px-5 h-fit py-[2px] rounded-md border border-gray-400' onClick={() => followUser(post.userID.username)}>Follow</button>}
-                          <div><IoMdMore className='size-5 cursor-pointer' onClick={() => {
-                            if (showReports) {
-                              toggleShowReports(null)
-                            }
-                            if (showMore) {
-                              if (showMore.postID !== post.id) {
-                                toggleShowmore({ postID: post.id })
-                              } else {
-                                toggleShowmore(null)
+                        <div className='mt-4 relative' key={index}>
+                          {/* post-header-- */}
+                          <div className='flex justify-between px-3 items-center'>
+                            {/* postuserprofile_pic and usernme-- */}
+                            <div className='flex gap-x-1 items-center w-fit'>
+                              {post.userID.profile_pic ?
+                                <img src={post.userID.profile_pic} alt="user" className='size-8 rounded-full' />
+                                :
+                                <FaCircleUser className='md:size-9 size-7' />
                               }
-                            } else {
-                              toggleShowmore({ postID: post.id })
-                            }
+
+                              <Link to={currentUsername !== post.userID.username ? `/home/user/profile/${post.userID.id}` : `/home/profile/`}>
+                                <p className='md:text-sm text-xs font-normal'>{post.userID.username}</p>
+                              </Link>
+
+                            </div>
+                            {/* postuser profile pic and username end-- */}
+
+                            {/* post head right side-- */}
+                            <div className='flex gap-x-2 relative px-'>
+                              {post.is_following === false && <button className='text-[11px] px-5 h-fit py-[2px] rounded-md border border-gray-400' onClick={() => followUser(post.userID.username)}>Follow</button>}
+                              <div><IoMdMore className='size-5 cursor-pointer' onClick={() => {
+                                if (showReports) {
+                                  toggleShowReports(null)
+                                }
+                                if (showMore) {
+                                  if (showMore.postID !== post.id) {
+                                    toggleShowmore({ postID: post.id })
+                                  } else {
+                                    toggleShowmore(null)
+                                  }
+                                } else {
+                                  toggleShowmore({ postID: post.id })
+                                }
 
 
-                          }} /></div>
+                              }} /></div>
 
-                          <div className={`' bg-gray-900  transition-all ease-in-out delay-100
+                              <div className={`' bg-gray-900  transition-all ease-in-out delay-100
                            absolute select-none right-5 px-3 py-2 md:py-3 md:px-5 rounded-tl-md rounded-bl-md rounded-br-md'
                           ${showMore && showMore.postID === post.id ? 'scale-100' : 'scale-0'}`}>
-                            <p className='text-red-600 cursor-pointer text-xs md:text-sm' onClick={() => {
-                              if (showReports) {
-                                toggleShowReports(null)
-                              } else {
-                                toggleShowReports({ postID: post.id })
-                              }
-                            }}
-                            >Report</p>
+                                <p className='text-red-600 cursor-pointer text-xs md:text-sm' onClick={() => {
+                                  if (showReports) {
+                                    toggleShowReports(null)
+                                  } else {
+                                    toggleShowReports({ postID: post.id })
+                                  }
+                                }}
+                                >Report</p>
 
 
-                          </div>
+                              </div>
 
-                          <div className={`'absolute absolute transition-all delay-100 ease-in-out  bg-gray-900 right-5 md:top-14 top-10
+                              <div className={`'absolute absolute transition-all delay-100 ease-in-out  bg-gray-900 right-5 md:top-14 top-10
                            px-2 md:px-4 py-3 rounded-tl-md rounded-bl-md rounded-br-md w-fit'
                           ${showReports && showReports.postID === post.id ? 'scale-100' : 'scale-0'}`}>
 
-                            <div className='flex px-2 gap-x-2 items-center'>
-                              <label className='flex items-center gap-x-2'>
-                                <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value="it's a spam" className='w-2.5 h-2.5 md:w-3 md:h-3' />
-                                <p className='whitespace-nowrap font-thin md:text-sm text-xs'>It's a spam</p>
-                              </label>
-                            </div>
-                            <div className='flex gap-x-2 items-center mt-2 px-2'>
-                              <label className='flex items-center gap-x-2'>
-                                <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Hate of speech or symboles' className='w-2.5 h-2.5 md:w-3 md:h-3' />
-                                <p className='whitespace-nowrap font-thin text-xs md:text-sm'>Hate of speech or symboles</p>
-                              </label>
-                            </div>
-                            <div className='flex gap-x-2 items-center mt-2 px-2'>
-                              <label className='flex items-center gap-x-2'>
-                                <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='false information' className='w-2.5 h-2.5 md:w-3 md:h-3' />
-                                <p className='whitespace-nowrap font-thin md:text-sm text-xs'>False Information</p>
-                              </label>
-                            </div>
-                            <div className='flex gap-x-2 items-center mt-2 px-2'>
-                              <label className='flex items-center gap-x-2'>
-                                <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Nudity or Sexual activity' className='w-2.5 h-2.5 md:w-3 md:h-3' />
-                                <p className='whitespace-nowrap font-thin md:text-sm text-xs'>Nudity or sexual activity</p>
-                              </label>
-                            </div>
-                            <div className='flex gap-x-2 items-center mt-2 px-2'>
-                              <label className='flex items-center gap-x-2'>
-                                <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Drugs' className='w-2.5 h-2.5 md:w-3 md:h-3' />
-                                <p className='whitespace-nowrap font-thin md:text-sm text-xs'>Drugs</p>
-                              </label>
-                            </div>
+                                <div className='flex px-2 gap-x-2 items-center'>
+                                  <label className='flex items-center gap-x-2'>
+                                    <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value="it's a spam" className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                                    <p className='whitespace-nowrap font-thin md:text-sm text-xs'>It's a spam</p>
+                                  </label>
+                                </div>
+                                <div className='flex gap-x-2 items-center mt-2 px-2'>
+                                  <label className='flex items-center gap-x-2'>
+                                    <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Hate of speech or symboles' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                                    <p className='whitespace-nowrap font-thin text-xs md:text-sm'>Hate of speech or symboles</p>
+                                  </label>
+                                </div>
+                                <div className='flex gap-x-2 items-center mt-2 px-2'>
+                                  <label className='flex items-center gap-x-2'>
+                                    <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='false information' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                                    <p className='whitespace-nowrap font-thin md:text-sm text-xs'>False Information</p>
+                                  </label>
+                                </div>
+                                <div className='flex gap-x-2 items-center mt-2 px-2'>
+                                  <label className='flex items-center gap-x-2'>
+                                    <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Nudity or Sexual activity' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                                    <p className='whitespace-nowrap font-thin md:text-sm text-xs'>Nudity or sexual activity</p>
+                                  </label>
+                                </div>
+                                <div className='flex gap-x-2 items-center mt-2 px-2'>
+                                  <label className='flex items-center gap-x-2'>
+                                    <input onChange={(e) => SetReportOption(e.target.value)} type='radio' name='post-report' value='Drugs' className='w-2.5 h-2.5 md:w-3 md:h-3' />
+                                    <p className='whitespace-nowrap font-thin md:text-sm text-xs'>Drugs</p>
+                                  </label>
+                                </div>
 
-                            <div className='flex flex-col items-center'>
-                              {!reportSucces && <button className='bg-red-600 text-sm px-3 py-1 mt-3 rounded-md' onClick={() => reportPost(post.id)}>Report</button>}
-                              {reportError && <p className='text-red-600 text-xs text-center'>{reportError}</p>}
-                              <p className={`' text-black px-4 py-1 mt-2 rounded-sm text-xs text-center transition-all delay-100 ease-in-out'
+                                <div className='flex flex-col items-center'>
+                                  {!reportSucces && <button className='bg-red-600 text-sm px-3 py-1 mt-3 rounded-md' onClick={() => reportPost(post.id)}>Report</button>}
+                                  {reportError && <p className='text-red-600 text-xs text-center'>{reportError}</p>}
+                                  <p className={`' text-black px-4 py-1 mt-2 rounded-sm text-xs text-center transition-all delay-100 ease-in-out'
                                 ${reportSucces ? 'scale-x-100  bg-green-600' : 'scale-x-0'}`}>{reportSucces}</p>
+                                </div>
+                              </div>
+
                             </div>
+                            {/* post head right side end here-------- */}
+
+                          </div>
+                          {/* post-header-end-here--- */}
+
+                          {/* post-conted-start-here-- */}
+                          <Link to={`/home/post/${post.id}`}>
+                            <div className='px-4 py-3 flex justify-center select-none'>
+                              <Image src={post.contend} className='border border-gray-400 mx-auto select-none'
+                                fallback={<Shimmer width={660} height={300} />}
+                              />
+                            </div>
+                          </Link>
+                          {/* post-cotent-end-here--- */}
+                          {/* post bottom-- */}
+                          <div className='flex justify-between px-4'>
+                            <div className='flex gap-x-2'>
+                              <AiFillHeart onClick={() => handlelike(post.id)} className='cursor-pointer md:size-6 size-4' style={{ color: likedPosts.includes(post.id) ? 'red' : 'white' }} />
+                              <AiFillMessage onClick={() => handleView(index)} className='cursor-pointer md:size-6 size-4' />
+                            </div>
+                            <GiSaveArrow />
                           </div>
 
+                          <p className='md:text-xs text-[11px] px-3 text-gray-400'>
+                            {post.likes_count} Likes
+                          </p>
+
+                          <TextToggle
+                            text={post.caption} />
+                          <p className='md:text-xs text-[11px] mx-3 text-gray-500 cursor-pointer select-none' onClick={() => handleView(index)}>{post.comment_count > 0 ? `View ${post.comment_count} Comments` : 'No Comments'}</p>
+                          {/* comments--- */}
+                          {index === viewComment.index &&
+                            <div className={`${viewComment.index === index ? 'max-h-[160px]' : 'h-[0px]'} 'mb-0'`}>
+                              <PrivetRoute>
+                                <Commets view={viewComment.view} postID={post.id} />
+                              </PrivetRoute>
+                            </div>
+
+                          }
+                          {/* commens-end-here-- */}
+
+                          {/* post-bottom-end-here-- */}
                         </div>
-                        {/* post head right side end here-------- */}
+                        {/* post-end-here-- */}
 
                       </div>
-                      {/* post-header-end-here--- */}
+                    )
+                  })
 
-                      {/* post-conted-start-here-- */}
-                      <Link to={`/home/post/${post.id}`}>
-                        <div className='px-4 py-3 flex justify-center select-none'>
-                          <Image src={post.contend} className='border border-gray-400 mx-auto select-none'
-                            fallback={<Shimmer width={660} height={300} />}
-                          />
-                        </div>
-                      </Link>
-                      {/* post-cotent-end-here--- */}
-                      {/* post bottom-- */}
-                      <div className='flex justify-between px-4'>
-                        <div className='flex gap-x-2'>
-                          <AiFillHeart onClick={() => handlelike(post.id)} className='cursor-pointer md:size-6 size-4' style={{ color: likedPosts.includes(post.id) ? 'red' : 'white' }} />
-                          <AiFillMessage onClick={() => handleView(index)} className='cursor-pointer md:size-6 size-4' />
-                        </div>
-                        <GiSaveArrow />
-                      </div>
+                }
 
-                      <p className='md:text-xs text-[11px] px-3 text-gray-400'>
-                        {post.likes_count} Likes
-                      </p>
+              </InfiniteScroll>
+            ) :
 
-                      <TextToggle
-                        text={post.caption} />
-                      <p className='md:text-xs text-[11px] mx-3 text-gray-500 cursor-pointer select-none' onClick={() => handleView(index)}>{post.comment_count > 0 ? `View ${post.comment_count} Comments` : 'No Comments'}</p>
-                      {/* comments--- */}
-                      {index === viewComment.index &&
-                        <div className={`${viewComment.index === index ? 'max-h-[160px]' : 'h-[0px]'} 'mb-0'`}>
-                          <PrivetRoute>
-                            <Commets view={viewComment.view} postID={post.id} />
-                          </PrivetRoute>
-                        </div>
-
-                      }
-                      {/* commens-end-here-- */}
-
-                      {/* post-bottom-end-here-- */}
-                    </div>
-                    {/* post-end-here-- */}
-
-                  </div>
-                )
-              })
-            }
-            {status === 'laoding' | status === 'failed' &&
               Array(3).fill().map((_, index) => (
                 <div className='grid grid-cols-10 z-50 px-2 py-0 mt-2' key={index}>
                   <div className='col-span-10  rounded-sm h-fit grid grid-cols-2 p-3 gap-3'>
@@ -547,10 +565,10 @@ function Home() {
 
                     <div className='flex items-center justify-between mb-3 select-none' key={user.id}>
                       <Link to={`/home/user/profile/${user.id}`}><div className='flex items-center gap-x-2'>
-                        {user.profile_pic?
-                         <img src={user.profile_pic} alt="" className='size-8 rounded-full border-gray-500 border-[1px]' />
-                        :
-                        <FaCircleUser className='size-8 rounded-full' />
+                        {user.profile_pic ?
+                          <img src={user.profile_pic} alt="" className='size-8 rounded-full border-gray-500 border-[1px]' />
+                          :
+                          <FaCircleUser className='size-8 rounded-full' />
                         }
                         <h3 className='font-sans text-[13px]'>{user.username}</h3>
                       </div>
