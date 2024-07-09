@@ -19,6 +19,7 @@ import { fetchStory } from '../../../Redux/StoriesSlice';
 import { FaCircleUser } from "react-icons/fa6";
 import UserStoryView from './UserStoryView';
 import { IoMdMore } from "react-icons/io";
+import { BASE_URL } from '../../../secrets';
 
 
 function Home() {
@@ -258,7 +259,7 @@ function Home() {
                   <input type="file" hidden ref={imgRef} accept="image/*" onChange={e => setStoryImg(e.target.files[0])} />
                 </div>
                 <button className='border border-gray-300 h-fit px-4 rounded-md md:text-sm md:py-1 md:px-5 hover:bg-gray-200 hover:text-black' onClick={AddStory}>Post</button>
-              
+
                 <AiOutlineClose className='text-gray-300 cursor-pointer' size={24} onClick={() => ToogleShowAddStory(false)} />
               </div>
             </div>
@@ -287,9 +288,9 @@ function Home() {
               <div className="flex-shrink-0 py-2 flex-col pl-4">
                 {storyStatus === 'success' && currentUserStories.profile_pic ?
                   <img
-                    src={currentUserStories.profile_pic}
+                    src={BASE_URL + currentUserStories.profile_pic}
                     alt=""
-                    className="md:size-20 size-16 rounded-full border-[3px] border-green-500"
+                    className="md:size-20 size-16 rounded-full border-[3px] border-gray-500"
                     onClick={currentUserStories && currentUserStories.stories.length > 0 ? () => setViewStory({ 'userID': currentUserStories.id }) : undefined}
                   />
                   :
@@ -305,12 +306,12 @@ function Home() {
                 <div className="flex w-full overflow-x-scroll no-scrollbar py-2 ">
                   {allStories.map((story, index) => {
                     if (story.id !== userID) {
-                      const borderColor = hasViewedAllStories(story.id) ? 'border-white' : 'border-green-500';
+                      const borderColor = hasViewedAllStories(story.id) ? 'border-gray-500' : 'border-green-500';
                       return (
                         <div key={story.id} className="flex-shrink-0 flex-col ml-7">
                           {story.profile_pic ?
-                            <img src={story.profile_pic} alt="" className={`"md:size-20 size-16 rounded-full border-[4px]" ${borderColor}`} onClick={() => setViewStory({ 'userID': story.id })} />
-                            : <FaCircleUser className={`'md:size-20 size-16 border-[4px]  rounded-full md:size-20 ' ${borderColor}`} onClick={() => setViewStory({ 'userID': story.id })} />
+                            <img src={BASE_URL + story.profile_pic} alt="" className={`'md:size-20 size-16 border-[3px]  rounded-full md:size-20 ' ${borderColor}`} onClick={() => setViewStory({ 'userID': story.id })} />
+                            : <FaCircleUser className={`'md:size-20 size-16 border-[3px]  rounded-full md:size-20 ' ${borderColor}`} onClick={() => setViewStory({ 'userID': story.id })} />
                           }
                           <p className='text-xs w-fit mx-auto'>{story.username}</p>
                         </div>
@@ -546,7 +547,11 @@ function Home() {
 
                     <div className='flex items-center justify-between mb-3 select-none' key={user.id}>
                       <Link to={`/home/user/profile/${user.id}`}><div className='flex items-center gap-x-2'>
-                        <img src={messi} alt="" className='size-8 rounded-full' />
+                        {user.profile_pic?
+                         <img src={user.profile_pic} alt="" className='size-8 rounded-full border-gray-500 border-[1px]' />
+                        :
+                        <FaCircleUser className='size-8 rounded-full' />
+                        }
                         <h3 className='font-sans text-[13px]'>{user.username}</h3>
                       </div>
                       </Link>

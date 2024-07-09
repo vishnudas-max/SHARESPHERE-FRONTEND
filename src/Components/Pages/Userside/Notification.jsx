@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import Navbar from './HelperComponents/Navbar'
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNotifications, followback } from '../../../Redux/NotificationSlice'
-import { baseURL } from '../../../Config';
+import { BASE_URL } from '../../../secrets';
 import { Link } from 'react-router-dom';
 import api from '../../../Config'
 import { FaCircleUser } from "react-icons/fa6";
@@ -84,7 +84,7 @@ function Notification() {
                                                 <div className='max-w-[400px] flex gap-x-2 items-center'>
                                                     <div>
                                                         {not.invoked_user.profile_pic ?
-                                                            <img src={not.invoked_user.profile_pic} alt="" className='size-9' />
+                                                            <img src={BASE_URL+not.invoked_user.profile_pic} alt="" className='size-9 rounded-full border-[1px] border-gray-500' />
                                                             :
                                                             <FaCircleUser className='size-9' />
                                                         }
@@ -100,7 +100,7 @@ function Notification() {
                                                 ) : (
                                                     not.postID && not.postID.contend &&
 
-                                                    <img src={baseURL + not.postID.contend} alt="post" className='max-w-16 my-2 rounded-md' />
+                                                    <img src={BASE_URL + not.postID.contend} alt="post" className='max-w-16 my-2 rounded-md' />
 
                                                 )
                                             }

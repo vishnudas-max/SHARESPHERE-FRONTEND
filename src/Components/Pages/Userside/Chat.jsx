@@ -9,6 +9,8 @@ import { useSelector } from 'react-redux';
 import { useRef } from 'react';
 import Picker from 'emoji-picker-react';
 import { RiArrowLeftWideLine } from "react-icons/ri";
+import { Link } from 'react-router-dom';
+import { BASE_URL } from '../../../secrets';
 
 
 
@@ -75,6 +77,12 @@ function Chat() {
         }
     }
 
+    // const scrollToBottom = () => {
+    //     if (chatEndRef.current) {
+    //         chatEndRef.current.style.background = chatEndRef;
+    //     }
+    // };
+
     // fetching users for chat--
     useEffect(() => {
         if (users === null) {
@@ -85,13 +93,13 @@ function Chat() {
     }, [])
 
 
-    const handleChat = async (index, username, userID) => {
+    const handleChat = async (index, username, userID, profile_pic) => {
         ConnectRoom(userID);
         if (currentChatRoom === null) {
-            setChatRoom({ 'id': index, 'user': username, 'userID': userID })
+            setChatRoom({ 'id': index, 'user': username, 'userID': userID, 'profile_pic': profile_pic })
         }
         else if (currentChatRoom !== null && currentChatRoom.username !== username) {
-            setChatRoom({ 'id': index, 'user': username, 'userID': userID })
+            setChatRoom({ 'id': index, 'user': username, 'userID': userID, 'profile_pic': profile_pic })
         } else {
             setChatRoom(currentChatRoom)
         }
@@ -199,10 +207,16 @@ function Chat() {
                     <div className=' h-[650px] overflow-y-scroll no-scrollbar mx-auto'>
                         {users ?
                             users.map((user, index) => (
-                                <div className='px-2 border-b border-gray-800 h-16 flex' key={index} onClick={() => handleChat(index, user.username, user.id)}>
-                                    <div className='h-full flex items-center'>
-                                        <FaCircleUser className='md:size-10 size-7' />
-                                    </div>
+                                <div className='px-2 border-b border-gray-800 h-16 flex' key={index} onClick={() => handleChat(index, user.username, user.id, user.profile_pic)}>
+                                    {user.profile_pic ?
+                                        <div className='h-full flex items-center shrink-0'>
+                                            <img src={BASE_URL + user.profile_pic} className='md:size-10 size-7 rounded-full border-[1px]' />
+                                        </div>
+                                        :
+                                        <div className='h-full flex items-center'>
+                                            <FaCircleUser className='md:size-10 size-7' />
+                                        </div>
+                                    }
                                     <div className=' px-2 w-full grid grid-rows-2 py-2'>
                                         <h3 className='text-md font-normal w-fit row-span-1 '>{user.username}</h3>
                                         <div className='flex justify-between'>
@@ -245,13 +259,19 @@ function Chat() {
                     <div className='md:col-span-7 h-screen col-span-12 bg-gray-700'>
                         {/* chat head-- */}
                         <div className='flex justify-between bg-gray-800 md:h-20  h-16 sticky top-0'>
-                        
+
                             {/* left side-- */}
                             <div className='flex gap-x-1 items-center ps-3 justify-between'>
-                                <RiArrowLeftWideLine  className='size-10 cursor-pointer' onClick={()=>setChatRoom(null)}/>
-                                <div className='h-fit'>
-                                    <FaCircleUser className='md:size-16 size-12' />
-                                </div>
+                                <RiArrowLeftWideLine className='size-10 cursor-pointer' onClick={() => setChatRoom(null)} />
+                                {currentChatRoom.profile_pic ?
+                                    <div className='h-fit shrink-0'>
+                                        <img src={BASE_URL+currentChatRoom.profile_pic} className='md:size-16 size-12 rounded-full' />
+                                    </div>
+                                    :
+                                    <div className='h-fit'>
+                                        <FaCircleUser className='md:size-16 size-12' />
+                                    </div>
+                                }
                                 <div className='grid grid-rows-2'>
                                     <div className='flex'>
                                         <h1 className='row-span-1 md:text-xl text-md h-fit font-semibold'>{currentChatRoom.user}</h1>
@@ -265,7 +285,7 @@ function Chat() {
                             {/* right side start-- */}
                             <div className='flex gap-2 items-center'>
                                 <div>
-                                    <FaVideo className='md:size-8 size-7' />
+                                    <Link to={'/home/chat/videocall/'}><FaVideo className='md:size-8 size-7' /></Link>
                                 </div>
                                 <div>
                                     <IoMdMore className='md:size-8 size-7' />

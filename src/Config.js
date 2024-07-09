@@ -1,8 +1,9 @@
 import axios from 'axios'
-import { delAuth } from './Redux/UserdataSlice';
-import { useDispatch } from 'react-redux';
+// import { delAuth } from './Redux/UserdataSlice';
+// import { useDispatch } from 'react-redux';
+import { BASE_URL } from './secrets';
 
-export const baseURL = 'http://127.0.0.1:8000'
+
 
 
 
@@ -22,7 +23,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refresh');
-        let url =baseURL+'/api/token/refresh/'
+        let url =BASE_URL+'/api/token/refresh/'
         console.log(url)
 
         const response = await axios.post(url, {

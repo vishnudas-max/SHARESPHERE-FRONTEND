@@ -5,11 +5,12 @@ import { MdVerified } from "react-icons/md";
 import api from '../../../Config'
 import { Link, useParams } from 'react-router-dom';
 import { MdOutlineLockReset } from "react-icons/md";
-import { baseURL } from '../../../Config';
+import { BASE_URL } from '../../../secrets';
 import { useDispatch } from 'react-redux';
 import { Toggle_is_following } from '../../../Redux/PostSlice';
 import { IoMdMore } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
+import { FaCircleUser } from "react-icons/fa6";
 
 function UserProfile() {
     const { id } = useParams()
@@ -175,27 +176,42 @@ function UserProfile() {
 
                 </div>
 
-                <div className='col-span-12 h-fit grid grid-cols-12 border-b border-gray-700 py-4'>
-                    <div className='col-span-4 flex'>
-                        <div className='md:p-5 p-2'>
-                            <CgProfile className='md:size-32 size-20' />
-                        </div>
+                <div className='col-span-12 h-fit grid grid-cols-12 border-b border-gray-700 py-4 '>
+                    <div className='col-span-4 flex md:mb-10 mb:5'>
+                        {userProfile && userProfile.profile_pic ?
+
+                            <div className='md:p-5 p-2 shrink-0'>
+                                <img src={userProfile.profile_pic} className='md:size-28 border-[2px] border-gray-500 size-20 rounded-full' />
+                            </div> :
+                            <div className='md:p-5 p-2'>
+                                <FaCircleUser className='md:size-32 size-20' />
+                            </div>
+                        }
 
                         {userProfile && <div className='flex gap-x-1 py-3 items-start px-2 pt-8'>
-                            <h1 className='md:text-3xl font-bold h-fit'>{userProfile.username}</h1>
-                            {userProfile.is_verified && <MdVerified className='size-8 text-blue-500' />}
-                            {userProfile.is_following ?
+                            <div className='flex flex-col'>
+                                <div className='flex gap-x-2'>
+                                    <h1 className='md:text-3xl font-bold h-fit'>{userProfile.username}</h1>
+                                    {userProfile.is_verified && <MdVerified className='size-8 text-blue-500' />}
+                                    {userProfile.is_following ?
 
-                                <button className='h-fit md:px-6 px-4 border border-gray-400 md:py-2 py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 z-10'
-                                    onClick={() => followUser(userProfile.username)}>UnFollow</button>
+                                        <button className='h-fit md:px-6 px-4 border border-gray-400 md:py-2 py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 z-10'
+                                            onClick={() => followUser(userProfile.username)}>UnFollow</button>
 
-                                : <button className={`'h-fit md:px-6 px-4 border border-gray-400 md:py-2 py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 '${more ? 'md:z-10 -z-20' : 'z-10'}`}
-                                    onClick={() => followUser(userProfile.username)}>Follow</button>
-                            }
+                                        : <button className={`'h-fit md:px-6 px-4 border border-gray-400 md:py-2  py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 '${more ? 'md:z-10 -z-20' : 'z-10'}`}
+                                            onClick={() => followUser(userProfile.username)}>Follow</button>
+                                    }
+                                </div>
+
+                                <div className='max-h-20 mt-2 max-w-60'>
+                                    {userProfile && userProfile.bio && <p className='font-thin md:text-sm text-xs whitespace-pre-line break-words'>{userProfile.bio}</p>}
+                                </div>
+                            </div>
+
                         </div>
                         }
                     </div>
-                    {userProfile && <div className='md:col-span-8 col-span-12 px-6 justify-evenly flex items-end '>
+                    {userProfile && <div className='md:col-span-8 col-span-12 px-6 justify-evenly flex items-end'>
                         <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.post_count} Posts</h1>
                         <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.followers_count} Followers</h1>
                         <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.following_count} Following</h1>
@@ -210,7 +226,7 @@ function UserProfile() {
                                     userProfile.posts.map((post, index) => (
                                         <div className="col-span-1 flex justify-center border-1 border-gray-600" key={index}>
                                             <Link to={`/home/post/${post.id}`}>
-                                                <img src={baseURL + post.contend} alt="post" className='max-h-52' />
+                                                <img src={BASE_URL + post.contend} alt="post" className='max-h-52' />
                                             </Link>
                                         </div>
                                     ))

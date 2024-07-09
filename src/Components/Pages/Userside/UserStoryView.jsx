@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { baseURL } from '../../../Config'
+import { BASE_URL } from '../../../secrets';
 import { FaCircleUser } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import api from '../../../Config'
 import { addUsertoViewdUser } from '../../../Redux/StoriesSlice';
 import { useDispatch } from 'react-redux';
 import ProgressBar from './HelperComponents/StoryProgressBar';
+
 
 function UserStoryView({ userID, closeStory }) {
     const UserWithStories = useSelector(state => state.stories.stories)
@@ -65,7 +66,7 @@ function UserStoryView({ userID, closeStory }) {
             <div className='px-3 py-5 flex gap-x-2'>
                 <div>
                     {currentUserStories.profile_pic ?
-                        <img src={currentUserStories.profile_pic} alt='Profile' />
+                        <img src={BASE_URL+currentUserStories.profile_pic} alt='Profile' className='md:size-9 size-8 border-[1px] border-gray-500 rounded-full' />
                         :
                         <FaCircleUser className='size-8 md:size-9' />
                     }
@@ -93,7 +94,7 @@ function UserStoryView({ userID, closeStory }) {
                         return prevStory + 1
                     })
                 }}>
-                    <img src={baseURL + currentUserStories.stories[currentStory].content} alt="story" className='max-h-[600px]' />
+                    <img src={BASE_URL + currentUserStories.stories[currentStory].content} alt="story" className='max-h-[600px]' />
                 </div>
             </div>
         </div>
