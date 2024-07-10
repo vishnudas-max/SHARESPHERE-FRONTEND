@@ -22,6 +22,9 @@ import { IoMdMore } from "react-icons/io";
 import { BASE_URL } from '../../../secrets';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Loader from './HelperComponents/Loader';
+import IncomingCall from './HelperComponents/IncomingCall';
+import CallSocketProvider from '../../../Contexts/CallSocketProvider';
+
 
 function Home() {
   const dispatch = useDispatch()
@@ -250,7 +253,12 @@ function Home() {
     <>
       <Navbar />
       <ToastContainer />
+      <CallSocketProvider>
+        <IncomingCall />
+      </CallSocketProvider>
+
       <div className='text-white md:ml-[320px] max-w-full grid grid-cols-10'>
+
         <div className='col-span-12 md:col-span-6 border-r border-gray-700  relative'>
           {/* continer to add story-- */}
           <div className={`absolute z-20 w-full h-[400px] bg-[#000300] mt-12 md:mt-0 transition-all ease-in-out delay-70000 shadow-lg shadow-gray-900 ${showAddStory ? 'top-0 scale-100 opacity-100' : 'top-[-420px] scale-0 opacity-0'}`}>

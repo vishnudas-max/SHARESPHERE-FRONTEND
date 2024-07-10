@@ -14,8 +14,9 @@ import Profile from '../Components/Pages/Userside/Profile';
 import Chat from '../Components/Pages/Userside/Chat';
 import Notification from '../Components/Pages/Userside/Notification';
 import VideoCall from '../Components/Pages/Userside/VideoCall';
-import { RoomProvider } from '../Contexts/RoomContext';
+
 import ProfileEdit from '../Components/Pages/Userside/ProfileEdit';
+import CallSocketProvider from '../Contexts/CallSocketProvider';
 
 function UserWrapper() {
   return (
@@ -44,7 +45,9 @@ function UserWrapper() {
 
       <Route path='home/' element={
         <PrivetRoute>
+          <CallSocketProvider>
           <Home />
+          </CallSocketProvider>
         </PrivetRoute>
       } />
 
@@ -75,9 +78,9 @@ function UserWrapper() {
 
       <Route path='home/message/' element={
         <PrivetRoute>
-          <RoomProvider>
+          <CallSocketProvider>
             <Chat />
-          </RoomProvider>
+          </CallSocketProvider>
         </PrivetRoute>
       } />
 
@@ -87,11 +90,11 @@ function UserWrapper() {
         </PrivetRoute>
       } />
 
-      <Route path='home/chat/videocall/' element={
+      <Route path='home/chat/videocall/:username' element={
         <PrivetRoute>
-          <RoomProvider>
+          <CallSocketProvider>
             <VideoCall />
-          </RoomProvider>
+          </CallSocketProvider>
 
         </PrivetRoute>
       } />

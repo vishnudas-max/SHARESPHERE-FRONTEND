@@ -11,7 +11,9 @@ import Picker from 'emoji-picker-react';
 import { RiArrowLeftWideLine } from "react-icons/ri";
 import { Link } from 'react-router-dom';
 import { BASE_URL } from '../../../secrets';
-
+import Loader from './HelperComponents/Loader'
+import IncomingCall from './HelperComponents/IncomingCall';
+import CallSocketProvider from '../../../Contexts/CallSocketProvider';
 
 
 
@@ -77,21 +79,12 @@ function Chat() {
         }
     }
 
-    // const scrollToBottom = () => {
-    //     if (chatEndRef.current) {
-    //         chatEndRef.current.style.background = chatEndRef;
-    //     }
-    // };
-
     // fetching users for chat--
     useEffect(() => {
         if (users === null) {
             fetchUsers()
         }
-        // scrollToBottom()
-
     }, [])
-
 
     const handleChat = async (index, username, userID, profile_pic) => {
         ConnectRoom(userID);
@@ -99,13 +92,26 @@ function Chat() {
             setChatRoom({ 'id': index, 'user': username, 'userID': userID, 'profile_pic': profile_pic })
         }
         else if (currentChatRoom !== null && currentChatRoom.username !== username) {
+            setChatMessages(null)
             setChatRoom({ 'id': index, 'user': username, 'userID': userID, 'profile_pic': profile_pic })
         } else {
             setChatRoom(currentChatRoom)
         }
     };
 
-
+    const fetchRommChats = async (roomID) => {
+        let access = localStorage.getItem('access')
+        try {
+            const response = await api.get(`get/all/chats/${roomID}/`, {
+                headers: {
+                    Authorization: `Bearer ${access}`
+                }
+            })
+            setChatMessages(response.data.chats);
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     // sending message --
     const sendMessage = () => {
@@ -144,6 +150,9 @@ function Chat() {
                     });
                 } else if (data.type === 'user_offline') {
                     setOnlineUsers(prevUsers => prevUsers.filter(user => user !== data.username));
+                }
+                else if (data.type === 'send_room_id') {
+                    fetchRommChats(data.roomID)
                 }
             };
 
@@ -187,6 +196,9 @@ function Chat() {
     return (
         <div>
             <Navbar />
+            <CallSocketProvider>
+                <IncomingCall />
+            </CallSocketProvider>
             <div className='text-white grid grid-cols-12 md:ml-[320px] h-screen'>
                 {/* left side--- */}
                 <div className={`border-r
@@ -265,7 +277,7 @@ function Chat() {
                                 <RiArrowLeftWideLine className='size-10 cursor-pointer' onClick={() => setChatRoom(null)} />
                                 {currentChatRoom.profile_pic ?
                                     <div className='h-fit shrink-0'>
-                                        <img src={BASE_URL+currentChatRoom.profile_pic} className='md:size-16 size-12 rounded-full' />
+                                        <img src={BASE_URL + currentChatRoom.profile_pic} className='md:size-16 size-12 rounded-full' />
                                     </div>
                                     :
                                     <div className='h-fit'>
@@ -285,7 +297,7 @@ function Chat() {
                             {/* right side start-- */}
                             <div className='flex gap-2 items-center'>
                                 <div>
-                                    <Link to={'/home/chat/videocall/'}><FaVideo className='md:size-8 size-7' /></Link>
+                                    <Link to={`/home/chat/videocall/${currentChatRoom.user}`}><FaVideo className='md:size-8 size-7' /></Link>
                                 </div>
                                 <div>
                                     <IoMdMore className='md:size-8 size-7' />
@@ -299,7 +311,7 @@ function Chat() {
 
                         {/* chat start here-- */}
                         <div ref={chatEndRef} className="h-[520px] md:h-[590px] bg-gray-700 px-3  grid-cols-2 overflow-y-scroll no-scrollbar pb-3 ">
-                            {chatMessages && chatMessages.map((message, index) => (
+                            {chatMessages ? chatMessages.map((message, index) => (
                                 <div
                                     key={index}
                                     className={`flex ${message.sender_id === currentUser ? 'justify-end col-span-2' : 'justify-start col-span-2'}`}
@@ -311,7 +323,15 @@ function Chat() {
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+                            )) :
+                                <div className='w-full h-full relative flex justify-center'>
+                                    <div className='absolute bottom-56 w-fit'>
+                                        <Loader />
+                                    </div>
+
+                                </div>
+
+                            }
                             {typingStatus === currentChatRoom.user &&
                                 <div className=" text-black ">typing...</div>
                             }

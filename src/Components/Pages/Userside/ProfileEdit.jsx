@@ -6,6 +6,8 @@ import Loader from './HelperComponents/Loader'
 import { FaCircleUser } from "react-icons/fa6";
 import { PiImageFill } from "react-icons/pi";
 import { useNavigate } from 'react-router-dom'
+import CallSocketProvider from '../../../Contexts/CallSocketProvider'
+import IncomingCall from './HelperComponents/IncomingCall'
 
 function ProfileEdit() {
 
@@ -52,17 +54,17 @@ function ProfileEdit() {
     const updateProfile = async () => {
         try {
             const formData = new FormData();
-            if(profile_pic){
+            if (profile_pic) {
                 formData.append('profile_pic', profile_pic);
             }
             formData.append('username', username);
-            
+
             formData.append('bio', bio);
 
             const response = await api.patch(`user/profile/detailes/${userID}/`, formData, {
                 headers: {
                     Authorization: `Bearer ${access}`,
-                    "Content-Type":'multipart/form-data'
+                    "Content-Type": 'multipart/form-data'
                 }
             })
             navigate('/home/profile/')
@@ -77,6 +79,9 @@ function ProfileEdit() {
     return (
         <>
             <Navbar />
+            <CallSocketProvider>
+                <IncomingCall />
+            </CallSocketProvider>
             <div className='md:ml-[320px] grid grid-cols-12 text-white'>
                 {
                     userProfile ?
@@ -136,7 +141,7 @@ function ProfileEdit() {
                                             accept='image/*'
                                             className='hidden'
                                             onChange={handleFileUpload}
-                                            
+
                                         />
                                         <button
                                             type='button'

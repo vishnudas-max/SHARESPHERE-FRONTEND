@@ -6,7 +6,8 @@ import { BASE_URL } from '../../../secrets';
 import { Link } from 'react-router-dom';
 import api from '../../../Config'
 import { FaCircleUser } from "react-icons/fa6";
-
+import IncomingCall from './HelperComponents/IncomingCall';
+import CallSocketProvider from '../../../Contexts/CallSocketProvider';
 
 function Notification() {
     const status = useSelector(state => state.notifications.status)
@@ -33,10 +34,10 @@ function Notification() {
         }
         readnotifications()
     },
-    [status])
+        [status])
 
     const followuser = async (username, date, idx) => {
-        
+
         try {
             const response = await api.post(`follow/${username}`, {}, {
                 headers: {
@@ -62,6 +63,9 @@ function Notification() {
     return (
         <>
             <Navbar />
+            <CallSocketProvider>
+                <IncomingCall />
+            </CallSocketProvider>
             <div className='text-white md:ml-[320px] max-w-full  h-screen'>
                 <div className='w-full h-25  py-3 md:py-5  pl-3 border-b border-gray-600 sticky top-0 bg-black'>
                     <h1 className='text-xl font-semibold md:text-3xl md:font-bold'>Notificaion</h1>
@@ -84,7 +88,7 @@ function Notification() {
                                                 <div className='max-w-[400px] flex gap-x-2 items-center'>
                                                     <div>
                                                         {not.invoked_user.profile_pic ?
-                                                            <img src={BASE_URL+not.invoked_user.profile_pic} alt="" className='size-9 rounded-full border-[1px] border-gray-500' />
+                                                            <img src={BASE_URL + not.invoked_user.profile_pic} alt="" className='size-9 rounded-full border-[1px] border-gray-500' />
                                                             :
                                                             <FaCircleUser className='size-9' />
                                                         }

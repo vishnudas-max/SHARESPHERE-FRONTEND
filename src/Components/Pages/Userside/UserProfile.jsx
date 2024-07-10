@@ -11,6 +11,8 @@ import { Toggle_is_following } from '../../../Redux/PostSlice';
 import { IoMdMore } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
 import { FaCircleUser } from "react-icons/fa6";
+import IncomingCall from './HelperComponents/IncomingCall';
+import CallSocketProvider from '../../../Contexts/CallSocketProvider';
 
 function UserProfile() {
     const { id } = useParams()
@@ -113,6 +115,9 @@ function UserProfile() {
     return (
         <>
             <Navbar />
+            <CallSocketProvider>
+                <IncomingCall />
+            </CallSocketProvider>
             <div className='md:ml-[320px] grid grid-cols-12 text-white'>
 
                 <ToastContainer />

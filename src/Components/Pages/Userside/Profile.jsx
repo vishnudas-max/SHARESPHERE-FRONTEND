@@ -8,7 +8,8 @@ import { MdVerified } from "react-icons/md";
 import { FaCircleUser } from "react-icons/fa6";
 import { FaUserEdit } from "react-icons/fa";
 import Loader from './HelperComponents/Loader'
-
+import CallSocketProvider from '../../../Contexts/CallSocketProvider'
+import IncomingCall from './HelperComponents/IncomingCall'
 
 function Profile() {
 
@@ -72,6 +73,9 @@ function Profile() {
     return (
         <>
             <Navbar />
+            <CallSocketProvider>
+                <IncomingCall />
+            </CallSocketProvider>
             <div className='md:ml-[320px] grid grid-cols-12 text-white'>
 
                 {
@@ -128,7 +132,7 @@ function Profile() {
                                                             <li key={user.id} className="mt-3">
                                                                 <div className='flex items-center gap-x-2 '>
                                                                     {user.profile_pic ?
-                                                                        <img src={BASE_URL+user.profile_pic} className='md:size-5 size-4 rounded-full' />
+                                                                        <img src={BASE_URL + user.profile_pic} className='md:size-5 size-4 rounded-full' />
                                                                         :
                                                                         <FaCircleUser className='md:size-5 size-4' />}
                                                                     <Link to={`/home/user/profile/${user.id}`}><p className='text-xs md:text-sm'>{user.username}</p></Link>
@@ -155,7 +159,7 @@ function Profile() {
                                                             <li key={user.id} className="mt-3">
                                                                 <div className='flex items-center gap-x-2 '>
                                                                     {user.profile_pic ?
-                                                                        <img src={BASE_URL+user.profile_pic} className='md:size-5 size-4 rounded-full' />
+                                                                        <img src={BASE_URL + user.profile_pic} className='md:size-5 size-4 rounded-full' />
                                                                         :
                                                                         <FaCircleUser className='md:size-5 size-4' />}
                                                                     <Link to={`/home/user/profile/${user.id}`}><p className='text-xs md:text-sm'>{user.username}</p></Link>
