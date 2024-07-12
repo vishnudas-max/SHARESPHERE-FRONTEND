@@ -308,7 +308,7 @@ function Home() {
                     onClick={currentUserStories && currentUserStories.stories.length > 0 ? () => setViewStory({ 'userID': currentUserStories.id }) : undefined}
                   />
                   :
-                  <FaCircleUser className='md:size-20 size-16 border-[3px] border-green-400 rounded-full' onClick={currentUserStories && currentUserStories.stories.length > 0 ? () => setViewStory({ 'userID': currentUserStories.id }) : undefined} />
+                  <FaCircleUser className='md:size-20 size-16 border-[3px] border-gray-400 rounded-full' onClick={currentUserStories && currentUserStories.stories.length > 0 ? () => setViewStory({ 'userID': currentUserStories.id }) : undefined} />
                 }
                 <p className='text-xs w-fit mx-auto flex items-center gap-x-2'>Your story<AiFillPlusCircle className='md:size-4' onClick={() => ToogleShowAddStory(!showAddStory)} /></p>
               </div>

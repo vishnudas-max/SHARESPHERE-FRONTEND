@@ -3,7 +3,7 @@ import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
 import { REACT_APP_APP_ID, REACT_APP_SERVER_SECRET } from '../../../secrets';
 import { useNavigate } from 'react-router-dom';
 import { CallContext } from '../../../Contexts/CallSocketProvider';
-// import { useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 const generateRandomRoomID = () => {
@@ -16,13 +16,13 @@ function VideoCall() {
     const navigate = useNavigate();
     const { ws } = useContext(CallContext)
     const { username } = useParams()
-
+    const currentUsername = useSelector(state => state.authInfo.username)
     const appID = REACT_APP_APP_ID;
     const serverSecret = REACT_APP_SERVER_SECRET;
 
     useEffect(() => {
         if (!videoContainerRef.current) return;
-        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, Date.now().toString(), "vishnu");
+        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, Date.now().toString(), currentUsername);
         const zp = ZegoUIKitPrebuilt.create(kitToken);
 
         // Start the call

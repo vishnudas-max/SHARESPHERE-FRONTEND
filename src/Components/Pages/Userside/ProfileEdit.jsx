@@ -18,6 +18,7 @@ function ProfileEdit() {
     const [username, setUsername] = useState('')
     const [bio, setBio] = useState('')
     const navigate = useNavigate()
+    const [error,setError] = useState('')
 
     const fetchProfile = async () => {
         try {
@@ -57,9 +58,19 @@ function ProfileEdit() {
             if (profile_pic) {
                 formData.append('profile_pic', profile_pic);
             }
+            if(bio){
+                formData.append('bio', bio);
+            }
+            if(username === ''){
+                setError({username:'Username cannot be empty'})
+                setTimeout(() => {
+                    setError('')
+                }, 2000);
+                return false
+            }
             formData.append('username', username);
 
-            formData.append('bio', bio);
+            
 
             const response = await api.patch(`user/profile/detailes/${userID}/`, formData, {
                 headers: {
@@ -71,8 +82,14 @@ function ProfileEdit() {
 
         }
         catch (error) {
-            alert('something went wrong!')
             console.log(error)
+            setError({username:error.response.data})
+            // setError({username:'Username cannot be empty'})
+            setTimeout(() => {
+                setError('')
+            }, 2000);
+
+
         }
     }
 
@@ -113,6 +130,7 @@ function ProfileEdit() {
                             </div>
                             <div className='flex flex-col col-span-12 mt-2'>
                                 <div className='flex flex-col px-10'>
+                                    {error.username && <p className='text-xs text-red-600 ml-2'>{error.username}</p>}
                                     <label htmlFor="username" className='text-[15px] font-semibold ml-2 mb-2'>Username</label>
                                     <input type='text' placeholder='Username' name='username' className='bg-zinc-900 
                                     rounded-full pt-4 pb-2 pl-3 outline-none' value={username}

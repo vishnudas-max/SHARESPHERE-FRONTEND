@@ -8,7 +8,6 @@ import { addUsertoViewdUser } from '../../../Redux/StoriesSlice';
 import { useDispatch } from 'react-redux';
 import ProgressBar from './HelperComponents/StoryProgressBar';
 
-
 function UserStoryView({ userID, closeStory }) {
     const UserWithStories = useSelector(state => state.stories.stories)
     const currentUserStories = UserWithStories.find(user => user.id === Number(userID))
@@ -21,7 +20,7 @@ function UserStoryView({ userID, closeStory }) {
 
     const AddViewedUser = async (storyID) => {
         try {
-            const response = api.post(`add/user/tostory/view/${storyID}/`, {}, {
+            const response =await api.post(`add/user/tostory/view/${storyID}/`, {}, {
                 headers: {
                     Authorization: `Bearer ${access}`
                 }
@@ -66,7 +65,7 @@ function UserStoryView({ userID, closeStory }) {
             <div className='px-3 py-5 flex gap-x-2'>
                 <div>
                     {currentUserStories.profile_pic ?
-                        <img src={BASE_URL+currentUserStories.profile_pic} alt='Profile' className='md:size-9 size-8 border-[1px] border-gray-500 rounded-full' />
+                        <img src={BASE_URL+currentUserStories.profile_pic} alt='Profile' className='rounded-full size-9' />
                         :
                         <FaCircleUser className='size-8 md:size-9' />
                     }

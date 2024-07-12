@@ -23,13 +23,13 @@ function Navbar() {
     setAddPost(prevState => !prevState);
   }, [addPost]);
 
-  const handleLogout = () => {
-    localStorage.clear()
-    dispatch(delAuth())
-    dispatch(delStories())
-    dispatch(delPost())
+  // const handleLogout = () => {
+  //   localStorage.clear()
+  //   dispatch(delAuth())
+  //   dispatch(delStories())
+  //   dispatch(delPost())
 
-  }
+  // }
 
   const fetchUnreadNotificationCount = async () => {
     try {
@@ -106,11 +106,10 @@ function Navbar() {
 
             <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl' onClick={() => setAddPost(c => !c)}><span><AiFillPlusCircle size={24} /></span>Create Post</li>
             <Link to={`/home/profile/`}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><FaUser size={24} /></span>Profile</li></Link>
-            <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span className='flex items-center'><AiOutlineMore size={23} className='rotate-90' /></span>More</li>
+            <Link to={`/home/profile/more/`}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span className='flex items-center'><AiOutlineMore size={23} className='rotate-90' /></span>More</li></Link>
           </ul>
 
         </div>
-        <p className='text-red-600 font-semibold absolute bottom-10 left-14 cursor-pointer' onClick={handleLogout}>LOGOUT</p>
       </nav>
 
       <nav className='border-t border-gray-700 fixed  flex p-1 w-screen bottom-0 md:bottom-[-100%] transition-all ease-in-out delay-700 bg-[#000300] z-40 select-none'>
@@ -125,7 +124,7 @@ function Navbar() {
 
           <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillPlusCircle size={20} onClick={() => setAddPost(c => !c)} /></span></li>
           <Link to={`/home/profile/`}><li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><FaUser size={20} /></span></li></Link>
-          <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span className='flex items-center'><AiOutlineMore size={20} className='rotate-90' /></span></li>
+          <Link to={`/home/profile/more/`}><li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span className='flex items-center'><AiOutlineMore size={20} className='rotate-90' /></span></li></Link>
         </ul>
       </nav>
     </div>

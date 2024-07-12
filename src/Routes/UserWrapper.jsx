@@ -14,6 +14,7 @@ import Profile from '../Components/Pages/Userside/Profile';
 import Chat from '../Components/Pages/Userside/Chat';
 import Notification from '../Components/Pages/Userside/Notification';
 import VideoCall from '../Components/Pages/Userside/VideoCall';
+import More from '../Components/Pages/Userside/More';
 
 import ProfileEdit from '../Components/Pages/Userside/ProfileEdit';
 import CallSocketProvider from '../Contexts/CallSocketProvider';
@@ -102,6 +103,12 @@ function UserWrapper() {
       <Route path='home/profile/edit/' element={
         <PrivetRoute>
           <ProfileEdit />
+        </PrivetRoute>
+      } />
+
+      <Route path='home/profile/more/' element={
+        <PrivetRoute>
+          <More />
         </PrivetRoute>
       } />
 
