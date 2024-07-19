@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import messi from '../../../media/images/messi.webp'
 import { AiOutlineMore, } from 'react-icons/ai'
 import PostOptions from './HelperComponents/PostOptions'
 import api from '../../../Config'
@@ -10,13 +9,13 @@ import { FaCircleUser } from "react-icons/fa6";
 import { IoSend } from "react-icons/io5";
 import { useDispatch } from 'react-redux'
 import { addComment_count } from '../../../Redux/PostSlice'
-import { MdDelete } from "react-icons/md";
-import { MdReport } from "react-icons/md";
+import { MdReport ,MdMoreVert} from "react-icons/md";
 import Navbar from './HelperComponents/Navbar'
-import { MdEdit, MdMoreVert } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import IncomingCall from './HelperComponents/IncomingCall'
 import CallSocketProvider from '../../../Contexts/CallSocketProvider'
+import { BASE_URL } from '../../../secrets'
+
 
 function ViewPost() {
   const { id } = useParams()
@@ -265,7 +264,7 @@ function ViewPost() {
         <IncomingCall />
       </CallSocketProvider>
       <div className='select-none'>
-
+       <IoClose  className='absolute text-white right-4 top-3 size-6' onClick={()=>navigate(-1)}/>
         {currentpost &&
           <div className="grid grid-cols-3 gap-1 h-screen">
             <div className='block md:hidden'>
@@ -281,7 +280,9 @@ function ViewPost() {
                 <div className='w-full flex justify-between'>
                   <div className='flex gap-x-2 items-center'>
                     {currentpost.userID.profile_pic ?
-                      <img src={currentpost.userID.profile_pic} alt="profilepic" className='rounded-full size-12' />
+                      <div className='shrink-0'>
+                        <img src={currentpost.userID.profile_pic} alt="profilepic" className='rounded-full border-[1px] border-gray-400 size-12' />
+                      </div>
                       :
                       <FaCircleUser className='md:size-14 size-10 ' />
                     }
@@ -393,9 +394,11 @@ function ViewPost() {
                         <div className='flex justify-between'>
                           <div className='flex gap-y-2 items-center '>
                             {comment.userID.profile_pic ? (
-                              <img src={comment.userID.profile_pic} alt="" className='size-10 rounded-full' />
+                              <div className='shrink-0'>
+                                <img src={BASE_URL+comment.userID.profile_pic} alt="" className='border-[1px] border-gray-400 size-10 rounded-full' />
+                              </div>
                             ) : (
-                              <FaCircleUser className='md:size-12 size-7' />
+                              <FaCircleUser className='md:size-10 size-7' />
                             )}
                             <div className='flex-col justify-between'>
                               <div className='flex  gap-x-2 items-center'>
@@ -436,7 +439,7 @@ function ViewPost() {
                           (editreply ?
                             <div className='flex gap-x-3 mt-2'>
                               <div className='flex border-b border-gray-600 gap-x-1'>
-                                <span>@{showReply['username']}</span>
+                                <span className='whitespace-nowrap'>@{showReply['username']}</span>
                                 <input type="text" placeholder='Edit reply....' className='w-full h-fit bg-transparent outline-none ' value={editreply.comment}
                                   onChange={e => handleEditReply(e)} />
                                 <div className='flex gap-x-1'>
@@ -450,7 +453,7 @@ function ViewPost() {
                             :
                             <div className='flex gap-x-3 mt-2'>
                               <div className='flex border-b border-gray-600 gap-x-1'>
-                                <span>@{showReply['username']}</span>
+                                <span className='whitespace-nowrap'>@{showReply['username']}</span>
                                 <input type="text" placeholder='Add reply....' className='w-full h-fit bg-transparent outline-none ' value={replycomment}
                                   onChange={e => setreplycomment(e.target.value)} />
                                 <IoSend onClick={postCommentReply} className='cursor-pointer size-9 ml-5 text-blue-500' />
@@ -466,7 +469,9 @@ function ViewPost() {
                           <div className='flex justify-between pr-3 items-center'>
                             <div className='ml-10 mt-3 p-2 flex gap-y-2 items-center right-0' key={replyIndex}>
                               {reply.userID.profile_pic ? (
-                                <img src={reply.userID.profile_pic} alt="" className='size-10 rounded-full' />
+                                <div className='shrink-0'>
+                                  <img src={BASE_URL+reply.userID.profile_pic} alt="profilepic" className='border-[1px] border-gray-400 size-10 rounded-full' />
+                                </div>
                               ) : (
                                 <FaCircleUser className='md:size-10 size-7' />
                               )}

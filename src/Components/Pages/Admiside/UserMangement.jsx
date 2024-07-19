@@ -91,21 +91,21 @@ function UserMangement() {
             <div className='text-white md:ml-[320px] max-w-full grid grid-cols-12 '>
                 {/* header-- */}
                 <div className='col-span-12 px-4 py-3 md:py-5 border-b border-gray-500 fixed w-full bg-[#000300]'>
-                    <nav className="flex " aria-label="Breadcrumb">
+                <nav className="flex " aria-label="Breadcrumb">
                         <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                             <li className="inline-flex items-center">
-                                <Link to={'/admin/dashboard/'} className="inline-flex items-center md:text-sm text-xs font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                                <p className="inline-flex items-center md:text-sm text-xs font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
                                     <svg className="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                     </svg>
                                     Admin
-                                </Link>
+                                </p>
                             </li>
                             <li>
                                 <div className="flex items-center">
                                     <svg className="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
                                     </svg>
-                                    <Link to={'/admin/dashboard/'} className="ms-1 md:text-sm text-xs font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">Dashboard</Link>
+                                    <p className="ms-1 md:text-sm text-xs font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">User management</p>
                                 </div>
                             </li>
                         </ol>
@@ -122,7 +122,9 @@ function UserMangement() {
                             <input type="text" placeholder='Search by username...' className='text-white border-b border-gray-600 outline-none bg-transparent' onChange={(e) => handleSearch(e.target.value)} />
                         </div>
                         <h1 className={`' cursor-pointer h-fit font-bold mt-4 mt-4'${userFillter ? ' text-gray-700' : 'text-white'}`} onClick={() => setUserFillter(false)}>Active Users</h1>
-                        <h1 className={`'h-fit cursor-pointer font-bold mt-4 border-l-2 pl-2 '${userFillter ? 'text-white' : ' text-gray-700'}`} onClick={() => setUserFillter(true)}>Deactivated Users</h1>
+                        <h1 className={`'h-fit cursor-pointer font-bold mt-4 border-l-2 pl-2 '${userFillter ? 'text-white' : ' text-gray-700'}`} onClick={() =>{
+                            setUserFillter(true)
+                        } }>Deactivated Users</h1>
 
                     </div>
 

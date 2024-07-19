@@ -26,8 +26,8 @@ function AdminNavbar() {
                         <Link to={'/admin/dashboard/'}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-1 md:text-[18px] font-semibold'><span><AiFillDashboard size={24} /></span>Dashboard</li></Link>
                         <Link to={'/admin/usermanagement/'}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-1 md:text-[18px] font-semibold'><span><FaUsersCog size={24} /></span>User Management</li></Link>
                         <Link to={'/admin/postmanagement/'}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-1 md:text-[18px] font-semibold'><span><BsFillFileImageFill size={24} /></span>Post Management</li></Link>
-                        <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-1 md:text-[18px] font-semibold'><span><MdReport size={24} /></span>Reports</li>
-                        <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-1 md:text-[18px] font-semibold' ><span><MdVerified  size={24} /></span>Verifications</li>
+                        {/* <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-1 md:text-[18px] font-semibold'><span><MdReport size={24} /></span>Reports</li> */}
+                        <Link to={'/admin/verifications/'}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-1 md:text-[18px] font-semibold' ><span><MdVerified  size={24} /></span>Verifications</li></Link>
 
                     </ul>
                 </div>

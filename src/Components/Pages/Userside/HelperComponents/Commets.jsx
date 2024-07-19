@@ -7,10 +7,10 @@ import { IoSend } from "react-icons/io5";
 import { addComment_count } from '../../../../Redux/PostSlice';
 import { useDispatch } from 'react-redux';
 import { MdDelete } from "react-icons/md";
+import { BASE_URL } from '../../../../secrets';
 
 function Commets({ view, postID }) {
     const dispatch = useDispatch()
-    const profile_pic = useSelector(state => state.authInfo.profile_pic)
     const username = useSelector(state => state.authInfo.username)
     const [comments, setComments] = useState(null)
     const access = localStorage.getItem('access')
@@ -153,10 +153,6 @@ function Commets({ view, postID }) {
 
             <div className='flex sticky top-0 justify-between items-center bg-[#000300]'>
                 <div className='flex gap-x-2 '>
-                    {profile_pic ?
-                        <img src={profile_pic} alt="" className='w-7 h-7 rounded-full' /> :
-                        <FaCircleUser size={32} />
-                    }
                     <input type="text" placeholder='Type something' className='text-xs md:text-sm w-full text-white bg-transparent border-b border-gray-700 outline-none' value={comment} onChange={e => AddComment(e.target.value)} />
                     <IoSend size={23} className='text-blue-500 cursor-pointer' onClick={postComment} />
                 </div>
@@ -174,9 +170,10 @@ function Commets({ view, postID }) {
                                 {/* // comment start here--- */}
                                 <div className='flex gap-x-2 items-center mt-3 w-full'>
                                     <div>
-                                        <div>
+                                        <div className='shrink-0'>
                                             {comment.userID.profile_pic ?
-                                                <img src={comment.userID.profile_pic} alt="" className="size-5 md:size-7 rounded-full" />
+                                            
+                                                <img src={BASE_URL+comment.userID.profile_pic} alt="" className="size-5 border-[1px] border-gray-400 md:size-7 rounded-full" />
                                                 :
                                                 <FaCircleUser className='size-5 md:size-7' />
                                             }
@@ -221,9 +218,9 @@ function Commets({ view, postID }) {
 
                                         {comment.replies.map((reply, replyIndex) => (
                                             <div key={replyIndex} className="flex gap-x-2 items-center ">
-                                                <div className=''>
+                                                <div className='shrink-0'>
                                                     {reply.userID.profile_pic ? (
-                                                        <img src={reply.userID.profile_pic} alt="" className="size-5 md:size-7 rounded-full" />
+                                                        <img src={BASE_URL+reply.userID.profile_pic} alt="" className="size-5 md:size-7 border-[1px] border-gray-400 rounded-full" />
                                                     ) : (
                                                         <FaCircleUser className='size-5 md:size-7' />
                                                     )}

@@ -99,7 +99,7 @@ function Profile() {
                                 }
                                 <div>
                                     <div className='flex'>
-                                        <h1 className='md:text-3xl font-bold h-fit'>{username}</h1>
+                                        <h1 className='md:text-3xl font-bold h-fit'>{userProfile.username}</h1>
                                         {userProfile && userProfile.is_verified && <MdVerified className='md:size-8 size-5 text-blue-500' />}
                                         <div>
                                             <Link to={'/home/profile/edit/'}><FaUserEdit className='md:size-9 ml-2 size-5 cursor-pointer' /></Link>

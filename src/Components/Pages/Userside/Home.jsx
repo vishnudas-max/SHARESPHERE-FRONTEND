@@ -379,7 +379,7 @@ function Home() {
                             {/* postuserprofile_pic and usernme-- */}
                             <div className='flex gap-x-1 items-center w-fit'>
                               {post.userID.profile_pic ?
-                                <img src={post.userID.profile_pic} alt="user" className='size-8 rounded-full' />
+                                <img src={post.userID.profile_pic} alt="user" className='size-8 rounded-full border-[1px] border-gray-400' />
                                 :
                                 <FaCircleUser className='md:size-9 size-7' />
                               }

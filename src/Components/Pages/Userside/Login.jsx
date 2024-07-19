@@ -92,7 +92,7 @@ function Login() {
         const query = new URLSearchParams(location.search);
         const message = query.get('message')
         if (message) {
-            toast.error('You have been blocked to access Sharesphere', {
+            toast.error('This account is no longer accessible', {
                 position: "top-right",
                 autoClose: 1000,
                 hideProgressBar: true,
