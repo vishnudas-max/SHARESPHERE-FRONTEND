@@ -15,9 +15,11 @@ import Chat from '../Components/Pages/Userside/Chat';
 import Notification from '../Components/Pages/Userside/Notification';
 import VideoCall from '../Components/Pages/Userside/VideoCall';
 import More from '../Components/Pages/Userside/More';
-
+import ForgotPassword from '../Components/Pages/Userside/ForgotPassword';
+import ChangePassword from '../Components/Pages/Userside/ChangePassword';
 import ProfileEdit from '../Components/Pages/Userside/ProfileEdit';
 import CallSocketProvider from '../Contexts/CallSocketProvider';
+import ForgotPasswordContextProvider from '../Contexts/ForgotPasswordContextProvider'
 
 function UserWrapper() {
   return (
@@ -44,10 +46,26 @@ function UserWrapper() {
         </AuthChecker>
       } />
 
+      <Route path='/forgot/password/' element={
+        <ForgotPasswordContextProvider>
+          <AuthChecker>
+            <ForgotPassword />
+          </AuthChecker>
+        </ForgotPasswordContextProvider>
+      } />
+
+      <Route path='/forgot/password/update/' element={
+        <ForgotPasswordContextProvider>
+          <AuthChecker>
+            <ChangePassword />
+          </AuthChecker>
+        </ForgotPasswordContextProvider>
+      } />
+
       <Route path='home/' element={
         <PrivetRoute>
           <CallSocketProvider>
-          <Home />
+            <Home />
           </CallSocketProvider>
         </PrivetRoute>
       } />

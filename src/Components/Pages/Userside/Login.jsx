@@ -180,6 +180,7 @@ function Login() {
                                 </div>
 
                                 <button className='bg-blue-600 mx-auto px-5 py-1 md:px-8 md:py-2 rounded-md text-black font-medium ' onClick={handlesubmit}>LOG IN</button>
+                                <p className='text-xs font-bold tracking-wide mt-3'>Forgot Password?<Link to='/forgot/password/'><span className='text-blue-700 ms-2 cursor-pointer'>Click here</span></Link></p>
                                 <p className='text-xs font-bold tracking-wide mt-3'>Don't have and account?<Link to='/register/'><span className='text-blue-700 ms-2 cursor-pointer'>Register here</span></Link></p>
 
                                 <div className='w-full border-t border-gray-200 relative mt-5 pt-5 cursor-pointer' onClick={onGoogleLoginSuccess}>
