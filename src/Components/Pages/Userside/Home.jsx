@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { AiOutlineArrowRight, AiFillPlusCircle, AiFillHeart, AiFillMessage, AiOutlineClose } from 'react-icons/ai'
 import { GiSaveArrow } from "react-icons/gi";
-import messi from '../../../media/images/messi.webp'
 import MobileTop from './HelperComponents/MobileTop'
 import TextToggle from './HelperComponents/TextToggle'
 import Commets from './HelperComponents/Commets'

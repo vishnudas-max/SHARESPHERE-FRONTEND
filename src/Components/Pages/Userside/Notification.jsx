@@ -104,7 +104,7 @@ function Notification() {
                                                 ) : (
                                                     not.postID && not.postID.contend &&
 
-                                                    <img src={BASE_URL + not.postID.contend} alt="post" className='max-w-16 my-2 rounded-md' />
+                                                    <img src={BASE_URL + not.postID.contend} alt="post" className='max-w-16 max-h-full pt-1 pb-1 my-2 rounded-md' />
 
                                                 )
                                             }

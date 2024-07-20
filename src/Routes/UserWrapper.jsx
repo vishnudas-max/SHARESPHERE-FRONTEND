@@ -20,6 +20,7 @@ import ChangePassword from '../Components/Pages/Userside/ChangePassword';
 import ProfileEdit from '../Components/Pages/Userside/ProfileEdit';
 import CallSocketProvider from '../Contexts/CallSocketProvider';
 import ForgotPasswordContextProvider from '../Contexts/ForgotPasswordContextProvider'
+import Explore from '../Components/Pages/Userside/Explore';
 
 function UserWrapper() {
   return (
@@ -127,6 +128,12 @@ function UserWrapper() {
       <Route path='home/profile/more/' element={
         <PrivetRoute>
           <More />
+        </PrivetRoute>
+      } />
+
+      <Route path='home/Explore/' element={
+        <PrivetRoute>
+          <Explore />
         </PrivetRoute>
       } />
 

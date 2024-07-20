@@ -96,7 +96,7 @@ function Navbar() {
         <div className='max-w-[200px] mx-auto mt-4'>
           <ul className='flex-col'>
             <Link to={'/home/'}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillHome size={24} /></span>Home</li></Link>
-            <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiOutlineSearch size={24} /></span>Explore</li>
+            <Link to={'/home/explore/'}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiOutlineSearch size={24} /></span>Explore</li></Link>
             <Link to={`/home/message/`}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><BiSolidMessageRounded size={24} /></span>Message</li></Link>
 
             <Link to={`/home/notification/`}>
@@ -115,7 +115,7 @@ function Navbar() {
       <nav className='border-t border-gray-700 fixed  flex p-1 w-screen bottom-0 md:bottom-[-100%] transition-all ease-in-out delay-700 bg-[#000300] z-40 select-none'>
         <ul className='flex justify-between px-5 w-full items-center p-1'>
           <Link to={'/home/'}><li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillHome size={20} /></span></li></Link>
-          <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiOutlineSearch size={20} /></span></li>
+          <Link to={'/home/explore/'}><li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiOutlineSearch size={20} /></span></li></Link>
           <Link to={`/home/message/`}><li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><BiSolidMessageRounded size={20} /></span></li></Link>
 
           <Link to={`/home/notification/`}><li className='flex gap-x-2 p-1 cursor-pointer relative hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><IoIosNotifications size={20} /></span>
