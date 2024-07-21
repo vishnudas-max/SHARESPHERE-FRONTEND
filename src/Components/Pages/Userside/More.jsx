@@ -42,7 +42,7 @@ function More() {
         duration: '6 Months',
         price: 999
     }, {
-        duration: '1 year',
+        duration: '1 Year',
         price: 1700
     },
     {
