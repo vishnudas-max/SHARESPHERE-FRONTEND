@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from './HelperComponents/Navbar'
-import { CgProfile } from "react-icons/cg";
+import Loader from './HelperComponents/Loader';
 import { MdVerified } from "react-icons/md";
 import api from '../../../Config'
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { MdOutlineLockReset } from "react-icons/md";
 import { BASE_URL } from '../../../secrets';
 import { useDispatch } from 'react-redux';
@@ -13,6 +13,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import { FaCircleUser } from "react-icons/fa6";
 import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
+import { FaChevronLeft } from "react-icons/fa";
+
 
 function UserProfile() {
     const { id } = useParams()
@@ -23,7 +25,9 @@ function UserProfile() {
     const [report, toggleReport] = useState(false)
     const [reason, setReason] = useState('')
     const [error, setError] = useState(null)
-    console.log(userProfile)
+    const navigate = useNavigate()
+    const goback=()=>navigate(-1)
+
     useEffect(() => {
 
         const fetchProfile = async () => {
@@ -112,6 +116,39 @@ function UserProfile() {
         }
     }
 
+    const blockuser = async () => {
+        try {
+            const response = await api.post('block/user/', { userID: id }, {
+                headers: {
+                    Authorization: `Bearer ${access}`
+                }
+            })
+            if (response.data) {
+                toast.warning(response.data, {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    style: { backgroundColor: 'yellow', color: 'black' },
+                })
+            }
+        } catch (error) {
+            if (error.response.data) {
+                toast.warning(error.response.data, {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    style: { backgroundColor: 'yellow', color: 'black' },
+                })
+            }
+        }
+    }
+
     return (
         <>
             <Navbar />
@@ -134,7 +171,7 @@ function UserProfile() {
                     ease-in-out
                     ${more ? 'scale-100' : 'scale-0'}`}>
                         <ul className='px-7 py-4 select-none  bg-gray-900 h-fit  '>
-                            <li className='text-sm text-red-500 mt-2 cursor-pointer font-semibold'>Block</li>
+                            <li className='text-sm text-red-500 mt-2 cursor-pointer font-semibold' onClick={blockuser}>Block</li>
                             <li className='text-sm text-red-500 mt-2 cursor-pointer font-semibold' onClick={() => toggleReport(pre => !pre)}>Report</li>
                         </ul>
 
@@ -180,77 +217,84 @@ function UserProfile() {
                     {error && <p className='text-center text-red-500 text-sm'>{error}</p>}
 
                 </div>
+                 <div className='absolute left-2 top-2 md:hidden' onClick={goback}>
+                    <FaChevronLeft />
+                 </div>
+                {userProfile ?
+                    <>
+                        <div className='col-span-12 h-fit grid grid-cols-12 border-b border-gray-700 py-4 pt-9'>
+                            <div className='col-span-4 flex md:mb-10 mb:5'>
+                                {userProfile.profile_pic ?
 
-                <div className='col-span-12 h-fit grid grid-cols-12 border-b border-gray-700 py-4 '>
-                    <div className='col-span-4 flex md:mb-10 mb:5'>
-                        {userProfile && userProfile.profile_pic ?
-
-                            <div className='md:p-5 p-2 shrink-0'>
-                                <img src={userProfile.profile_pic} className='md:size-28 border-[2px] border-gray-500 size-20 rounded-full' />
-                            </div> :
-                            <div className='md:p-5 p-2'>
-                                <FaCircleUser className='md:size-32 size-20' />
-                            </div>
-                        }
-
-                        {userProfile && <div className='flex gap-x-1 py-3 items-start px-2 pt-8'>
-                            <div className='flex flex-col'>
-                                <div className='flex gap-x-2'>
-                                    <h1 className='md:text-3xl font-bold h-fit'>{userProfile.username}</h1>
-                                    {userProfile.is_verified && <MdVerified className='size-8 text-blue-500' />}
-                                    {userProfile.is_following ?
-
-                                        <button className='h-fit md:px-6 px-4 border border-gray-400 md:py-2 py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 z-10'
-                                            onClick={() => followUser(userProfile.username)}>UnFollow</button>
-
-                                        : <button className={`'h-fit md:px-6 px-4 border border-gray-400 md:py-2  py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 '${more ? 'md:z-10 -z-20' : 'z-10'}`}
-                                            onClick={() => followUser(userProfile.username)}>Follow</button>
-                                    }
-                                </div>
-
-                                <div className='max-h-20 mt-2 max-w-60'>
-                                    {userProfile && userProfile.bio && <p className='font-thin md:text-sm text-xs whitespace-pre-line break-words'>{userProfile.bio}</p>}
-                                </div>
-                            </div>
-
-                        </div>
-                        }
-                    </div>
-                    {userProfile && <div className='md:col-span-8 col-span-12 px-6 justify-evenly flex items-end'>
-                        <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.post_count} Posts</h1>
-                        <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.followers_count} Followers</h1>
-                        <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.following_count} Following</h1>
-                    </div>}
-                </div>
-
-                <div className='col-span-12 px-4 py-2'>
-                    {userProfile ? (
-                        userProfile.is_following ? (
-                            <div className="grid grid-cols-3 gap-2">
-                                {userProfile.posts.length > 0 ? (
-                                    userProfile.posts.map((post, index) => (
-                                        <div className="col-span-1 flex justify-center border-1 border-gray-600" key={index}>
-                                            <Link to={`/home/post/${post.id}`}>
-                                                <img src={BASE_URL + post.contend} alt="post" className='max-h-52' />
-                                            </Link>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="col-span-3 flex justify-center border-1 border-gray-600">
-                                        <p className='md:text-5xl text-3xl font-bold text-gray-500 mt-20'>No posts available</p>
+                                    <div className='md:p-5 p-2 shrink-0'>
+                                        <img src={userProfile.profile_pic} className='md:size-28 border-[2px] border-gray-500 size-20 rounded-full' />
+                                    </div> :
+                                    <div className='md:p-5 p-2'>
+                                        <FaCircleUser className='md:size-32 size-20' />
                                     </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className='flex justify-center mt-32 items-center text-gray-400'>
-                                <MdOutlineLockReset className='size-24' />
-                                <h1 className='md:text-5xl text-3xl'>Account is protected</h1></div>
+                                }
 
-                        )
-                    ) : (
-                        <div>Loading...</div>
-                    )}
-                </div>
+                                <div className='flex gap-x-1 py-3 items-start px-2 pt-8'>
+                                    <div className='flex flex-col'>
+                                        <div className='flex gap-x-2'>
+                                            <h1 className='md:text-3xl font-bold h-fit'>{userProfile.username}</h1>
+                                            {userProfile.is_verified && <MdVerified className='size-8 text-blue-500' />}
+                                            {userProfile.is_following ?
+
+                                                <button className='h-fit md:px-6 px-4 border border-gray-400 md:py-2 py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 z-10'
+                                                    onClick={() => followUser(userProfile.username)}>UnFollow</button>
+
+                                                : <button className={`'h-fit md:px-6 px-4 border border-gray-400 md:py-2  py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 '${more ? 'md:z-10 -z-20' : 'z-10'}`}
+                                                    onClick={() => followUser(userProfile.username)}>Follow</button>
+                                            }
+                                        </div>
+
+                                        <div className='max-h-20 mt-2 max-w-60'>
+                                            {userProfile.bio && <p className='font-thin md:text-sm text-xs whitespace-pre-line break-words'>{userProfile.bio}</p>}
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div className='md:col-span-8 col-span-12 px-6 justify-evenly flex items-end'>
+                                <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.post_count} Posts</h1>
+                                <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.followers_count} Followers</h1>
+                                <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.following_count} Following</h1>
+                            </div>
+                        </div>
+
+                        <div className='col-span-12 px-4 py-2'>
+
+                            {userProfile.is_following ? (
+                                <div className="grid grid-cols-3 gap-2">
+                                    {userProfile.posts.length > 0 ? (
+                                        userProfile.posts.map((post, index) => (
+                                            <div className="col-span-1 flex justify-center border-1 border-gray-600" key={index}>
+                                                <Link to={`/home/post/${post.id}`}>
+                                                    <img src={BASE_URL + post.contend} alt="post" className='max-h-52' />
+                                                </Link>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="col-span-3 flex justify-center border-1 border-gray-600">
+                                            <p className='md:text-5xl text-3xl font-bold text-gray-500 mt-20'>No posts available</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className='flex justify-center mt-32 items-center text-gray-400'>
+                                    <MdOutlineLockReset className='size-24' />
+                                    <h1 className='md:text-5xl text-3xl'>Account is protected</h1></div>
+
+                            )
+                            }
+                        </div>
+                    </> :
+                    <div className='col-span-12 mt-52'>
+                          <Loader />
+                    </div>
+                  }
             </div>
         </>
     )
