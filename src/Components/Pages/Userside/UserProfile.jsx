@@ -266,7 +266,7 @@ function UserProfile() {
 
                         <div className='col-span-12 px-4 py-2'>
 
-                            {userProfile.is_following ? (
+                            {userProfile.is_following || userProfile.is_currentUser_verified ? (
                                 <div className="grid grid-cols-3 gap-2">
                                     {userProfile.posts.length > 0 ? (
                                         userProfile.posts.map((post, index) => (

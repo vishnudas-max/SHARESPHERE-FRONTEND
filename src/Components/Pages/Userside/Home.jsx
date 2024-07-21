@@ -348,10 +348,10 @@ function Home() {
             </div>
             {/* story-end-- */}
             {/* feed-selection-- */}
-            <div className='grid grid-cols-2'>
+            {/* <div className='grid grid-cols-2'>
               <div className='col-span-1 h-8 text-center bg-gray-900'>All</div>
               <div className='col-span-1 h-8 text-center'>Following</div>
-            </div>
+            </div> */}
             {/* feed-selectionend-here--- */}
 
 
