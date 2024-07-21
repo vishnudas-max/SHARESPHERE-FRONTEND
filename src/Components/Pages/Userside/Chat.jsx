@@ -14,6 +14,7 @@ import { BASE_URL } from '../../../secrets';
 import Loader from './HelperComponents/Loader'
 import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
+import { ToastContainer, toast } from 'react-toastify';
 
 
 
@@ -33,6 +34,47 @@ function Chat() {
     const currentUsername = useSelector(state => state.authInfo.username)
     const message = useRef('')
     const [users, setUsers] = useState(null)
+    const [roomID, setRoomID] = useState(null)
+    const [openMore, toggleMore] = useState(false)
+    const access= localStorage.getItem('access')
+
+
+
+
+    const blockuser = async (userID) => {
+        try {
+            const response = await api.post('block/user/', { userID: userID }, {
+                headers: {
+                    Authorization: `Bearer ${access}`
+                }
+            })
+            if (response.data) {
+                toast.warning(response.data, {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    style: { backgroundColor: 'yellow', color: 'black' },
+                })
+            }
+            setChatRoom(null)
+            fetchUsers()
+        } catch (error) {
+            if (error.response.data) {
+                toast.warning(error.response.data, {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    style: { backgroundColor: 'yellow', color: 'black' },
+                })
+            }
+        }
+    }
 
     useEffect(() => {
         // Scroll to the bottom of the chat messages div
@@ -86,7 +128,11 @@ function Chat() {
         }
     }, [])
 
-    const handleChat = async (index, username, userID, profile_pic) => {
+    const handleChat = async (index, username, userID, profile_pic, blocked_by) => {
+        if (blocked_by) {
+            alert(`Sorry , You cannot chat with ${username} `)
+            return false
+        }
         ConnectRoom(userID);
         if (currentChatRoom === null) {
             setChatRoom({ 'id': index, 'user': username, 'userID': userID, 'profile_pic': profile_pic })
@@ -108,6 +154,20 @@ function Chat() {
                 }
             })
             setChatMessages(response.data.chats);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const readMessages = async (roomID) => {
+        let access = localStorage.getItem('access')
+        try {
+            const response = await api.post('chat/users/', { room_id: roomID }, {
+                headers: {
+                    Authorization: `Bearer ${access}`
+                }
+            })
+
         } catch (error) {
             console.log(error)
         }
@@ -135,6 +195,7 @@ function Chat() {
                 if (data.type === 'chat_history') {
                     setChatMessages(data.messages);
                 } else if (data.type === 'chat_message') {
+                    console.log(chatMessages)
                     setChatMessages(prevMessages => [...prevMessages, data]);
                 } else if (data.type === 'user_typing') {
                     setTypingStatus(data.username);
@@ -152,6 +213,8 @@ function Chat() {
                     setOnlineUsers(prevUsers => prevUsers.filter(user => user !== data.username));
                 }
                 else if (data.type === 'send_room_id') {
+                    setRoomID(data.roomID)
+                    readMessages(data.roomID)
                     fetchRommChats(data.roomID)
                 }
             };
@@ -199,6 +262,7 @@ function Chat() {
             <CallSocketProvider>
                 <IncomingCall />
             </CallSocketProvider>
+            <ToastContainer />
             <div className='text-white grid grid-cols-12 md:ml-[320px] h-screen'>
                 {/* left side--- */}
                 <div className={`border-r
@@ -218,8 +282,10 @@ function Chat() {
                     {/* friends-start-here--- */}
                     <div className=' h-[650px] overflow-y-scroll no-scrollbar mx-auto'>
                         {users ?
-                            users.map((user, index) => (
-                                <div className='px-2 border-b border-gray-800 h-16 flex' key={index} onClick={() => handleChat(index, user.username, user.id, user.profile_pic)}>
+                            users.map((user, index) =>
+                            (
+
+                                <div className='px-2 border-b border-gray-800 h-16 flex' key={index} onClick={() => handleChat(index, user.username, user.id, user.profile_pic, user.blocked_by)}>
                                     {user.profile_pic ?
                                         <div className='h-full flex items-center shrink-0'>
                                             <img src={BASE_URL + user.profile_pic} className='md:size-10 size-7 rounded-full border-[1px]' />
@@ -238,6 +304,7 @@ function Chat() {
 
                                     </div>
                                 </div>
+
                             ))
                             :
                             Array(9).fill().map((_, index) => (
@@ -300,17 +367,19 @@ function Chat() {
                                     <Link to={`/home/chat/videocall/${currentChatRoom.user}`}><FaVideo className='md:size-8 size-7' /></Link>
                                 </div>
                                 <div>
-                                    <IoMdMore className='md:size-8 size-7' />
+                                    <IoMdMore className='md:size-8 size-7' onClick={() => toggleMore(prev => !prev)} />
                                 </div>
                             </div>
                             {/* right side end-- */}
                         </div>
                         {/* chat head end here-- */}
 
-
+                        <div className={`select-none absolute top-5 right-10 h-fit w-fit px-5 pt-3 pb-2 bg-gray-900 rounded-md ${openMore ? 'scale-100' : 'scale-0'}`}>
+                            <p className='cursor-pointer' onClick={() => blockuser(currentChatRoom.userID)}>Block</p>
+                        </div>
 
                         {/* chat start here-- */}
-                        <div ref={chatEndRef} className="h-[520px] md:h-[590px] bg-gray-700 px-3  grid-cols-2 overflow-y-scroll no-scrollbar pb-3 ">
+                        <div ref={chatEndRef} className="h-[520px] select-none md:h-[590px] bg-gray-700 px-3  grid-cols-2 overflow-y-scroll no-scrollbar pb-3 ">
                             {chatMessages ? chatMessages.map((message, index) => (
                                 <div
                                     key={index}
