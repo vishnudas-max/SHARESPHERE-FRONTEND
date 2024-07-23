@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { AiOutlineArrowRight, AiFillPlusCircle, AiFillHeart, AiFillMessage, AiOutlineClose } from 'react-icons/ai'
-import { GiSaveArrow } from "react-icons/gi";
+
 import MobileTop from './HelperComponents/MobileTop'
 import TextToggle from './HelperComponents/TextToggle'
 import Commets from './HelperComponents/Commets'
@@ -47,14 +47,32 @@ function Home() {
   const [report_reason, SetReportOption] = useState('')
   const [reportError, setReportError] = useState('')
   const [reportSucces, setReportSucess] = useState('')
+  const [imgError,setImageError] = useState('')
 
   const closeStory = useCallback(() => {
     setViewStory(null)
   },
     [viewStory])
 
-  console.log(report_reason)
+
   // adding story--
+
+  const handleStoryImg = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const allowedFormats = ['image/jpeg', 'image/jpg', 'image/webp'];
+      if (allowedFormats.includes(file.type)) {
+        setStoryImg(file);
+      } else {
+        setImageError('Unsupported image format. Please upload a valid image file.');
+        setTimeout(() => {
+          setImageError('')
+        }, [2000])
+
+      }
+    }
+  };
+
   const AddStory = async () => {
     if (!addStoryImg) {
       toast.error('Select a image to share !', {
@@ -66,6 +84,7 @@ function Home() {
         draggable: true,
         style: { backgroundColor: 'red', color: 'black' },
       })
+      return false
     }
     let data = {
       content: addStoryImg,
@@ -84,7 +103,30 @@ function Home() {
 
     }
     catch (error) {
-      console.log(error)
+      if (error.response.data.content) {
+        toast.error(error.response.data.content[0], {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          style: { backgroundColor: 'red', color: 'black' },
+        })
+      } else {
+        toast.error('Something went wrong, try again later.', {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          style: { backgroundColor: 'red', color: 'black' },
+        })
+
+      }
+
+      console.log(error.response)
     }
   }
   // adding story closed---
@@ -237,7 +279,6 @@ function Home() {
       }, 2000);
     }
   }
-
   // Function to check if the current user has viewed all stories of a specific user
   const hasViewedAllStories = (userID) => {
     const currentStories = allStories.find(user => user.id === userID);
@@ -269,13 +310,14 @@ function Home() {
                   <div onClick={() => imgRef.current.click()} className='cursor-pointer'>
                     <span className='text-sm text-gray-400'>Upload Image here</span>
                   </div>
-                  <input type="file" hidden ref={imgRef} accept="image/*" onChange={e => setStoryImg(e.target.files[0])} />
+                  <input type="file" hidden ref={imgRef} accept="image/*" onChange={e => handleStoryImg(e)} />
                 </div>
                 <button className='border border-gray-300 h-fit px-4 rounded-md md:text-sm md:py-1 md:px-5 hover:bg-gray-200 hover:text-black' onClick={AddStory}>Post</button>
 
                 <AiOutlineClose className='text-gray-300 cursor-pointer' size={24} onClick={() => ToogleShowAddStory(false)} />
               </div>
             </div>
+            {imgError && <p className='text-red-600 text-center'>{imgError}</p>}
             <div className='w-full p-6 flex justify-center h-60'>
               {addStoryImg && <img src={URL.createObjectURL(addStoryImg)} className='max-h-full' alt="Story" />}
             </div>
@@ -303,11 +345,11 @@ function Home() {
                   <img
                     src={BASE_URL + currentUserStories.profile_pic}
                     alt=""
-                    className="md:size-20 size-16 rounded-full border-[3px] border-gray-500"
+                    className={`md:size-20 size-16 rounded-full border-[3px] ${(currentUserStories && currentUserStories.stories.length > 0) ? ' border-green-500' : ' border-gray-500'}`}
                     onClick={currentUserStories && currentUserStories.stories.length > 0 ? () => setViewStory({ 'userID': currentUserStories.id }) : undefined}
                   />
                   :
-                  <FaCircleUser className='md:size-20 size-16 border-[3px] border-gray-400 rounded-full' onClick={currentUserStories && currentUserStories.stories.length > 0 ? () => setViewStory({ 'userID': currentUserStories.id }) : undefined} />
+                  <FaCircleUser className={`md:size-20 size-16 border-[3px] rounded-full  ${(currentUserStories && currentUserStories.stories.length > 0) ? ' border-green-500' : ' border-gray-500'}`} onClick={currentUserStories && currentUserStories.stories.length > 0 ? () => setViewStory({ 'userID': currentUserStories.id }) : undefined} />
                 }
                 <p className='text-xs w-fit mx-auto flex items-center gap-x-2'>Your story<AiFillPlusCircle className='md:size-4' onClick={() => ToogleShowAddStory(!showAddStory)} /></p>
               </div>
@@ -315,7 +357,7 @@ function Home() {
 
 
               {/* stories start here-- */}
-              {storyStatus === 'success' | storyStatus === 'failed' ?
+              {storyStatus === 'success' ?
                 <div className="flex w-full overflow-x-scroll no-scrollbar py-2 ">
                   {allStories.map((story, index) => {
                     if (story.id !== userID) {
@@ -334,15 +376,18 @@ function Home() {
                   })}
                 </div>
                 :
-                <div className="flex w-full overflow-x-scroll no-scrollbar py-2 ">
-                  {Array(12).fill().map((_, index) => (
-                    <div key={index} className="flex-shrink-0 flex-col ml-7">
+                (storyStatus === 'failed' ?
+                  <div></div>
+                  : (<div className="flex w-full overflow-x-scroll no-scrollbar py-2 ">
+                    {Array(12).fill().map((_, index) => (
+                      <div key={index} className="flex-shrink-0 flex-col ml-7">
 
-                      <div className='md:size-20 size-16 bg-gray-700 rounded-full'></div>
-                      <p className='h-3 mt-1 rounded-xl w-16 mx-auto bg-gray-700'></p>
-                    </div>
-                  ))}
-                </div>
+                        <div className='md:size-20 size-16 bg-gray-700 rounded-full'></div>
+                        <p className='h-3 mt-1 rounded-xl w-16 mx-auto bg-gray-700'></p>
+                      </div>
+                    ))}
+                  </div>
+                  ))
               }
 
             </div>
@@ -489,7 +534,7 @@ function Home() {
                               <AiFillHeart onClick={() => handlelike(post.id)} className='cursor-pointer md:size-6 size-4' style={{ color: likedPosts.includes(post.id) ? 'red' : 'white' }} />
                               <AiFillMessage onClick={() => handleView(index)} className='cursor-pointer md:size-6 size-4' />
                             </div>
-                            <GiSaveArrow />
+
                           </div>
 
                           <p className='md:text-xs text-[11px] px-3 text-gray-400'>
@@ -601,7 +646,7 @@ function Home() {
               }
 
             </div>
-            <Link >
+            <Link to={'/home/explore/'}>
               <div className='text-[13px] ml-5 flex items-end gap-x-1'>
                 more<AiOutlineArrowRight size={12} />
               </div>

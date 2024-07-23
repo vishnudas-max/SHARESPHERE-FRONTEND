@@ -196,6 +196,7 @@ function Chat() {
                     setChatMessages(data.messages);
                 } else if (data.type === 'chat_message') {
                     console.log(chatMessages)
+                    fetchUsers()
                     setChatMessages(prevMessages => [...prevMessages, data]);
                 } else if (data.type === 'user_typing') {
                     setTypingStatus(data.username);
@@ -284,7 +285,7 @@ function Chat() {
                         {users ?
                             users.map((user, index) =>
                             (
-
+                                !user.is_blocked &&
                                 <div className='px-2 border-b border-gray-800 h-16 flex' key={index} onClick={() => handleChat(index, user.username, user.id, user.profile_pic, user.blocked_by)}>
                                     {user.profile_pic ?
                                         <div className='h-full flex items-center shrink-0'>

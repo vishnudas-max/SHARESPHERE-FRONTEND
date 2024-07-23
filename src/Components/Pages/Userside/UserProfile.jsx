@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Navbar from './HelperComponents/Navbar'
 import Loader from './HelperComponents/Loader';
 import { MdVerified } from "react-icons/md";
@@ -14,6 +14,8 @@ import { FaCircleUser } from "react-icons/fa6";
 import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
 import { FaChevronLeft } from "react-icons/fa";
+import { IoClose } from "react-icons/io5";
+import debounce from 'lodash/debounce';
 
 
 function UserProfile() {
@@ -26,7 +28,11 @@ function UserProfile() {
     const [reason, setReason] = useState('')
     const [error, setError] = useState(null)
     const navigate = useNavigate()
-    const goback=()=>navigate(-1)
+    const [showFollowingOrFollwers, toggleShowFollowingorFollowers] = useState(false)
+    const [showFollowing, ToggleshowFollowing] = useState(null)
+    const [users, setUsers] = useState(null)
+    const [searchQuery, setSearchQuery] = useState('')
+    const goback = () => navigate(-1)
 
     useEffect(() => {
 
@@ -149,6 +155,33 @@ function UserProfile() {
         }
     }
 
+    const fetchfollowingandfollowers = async () => {
+        try {
+            const response = await api.get(`get/followingorfollowers/${id}/?following=${showFollowing}&search=${searchQuery}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access}`
+                    }
+                })
+            setUsers(response.data)
+            console.log(response)
+        } catch (error) {
+            toggleShowFollowingorFollowers(false)
+            ToggleshowFollowing(false)
+        }
+    }
+
+    const handleSearch = useCallback(debounce((query) => {
+        setSearchQuery(query);
+    }, 300), []);
+
+    useEffect(() => {
+        if (showFollowingOrFollwers) {
+            fetchfollowingandfollowers()
+        }
+
+    }, [showFollowing, searchQuery,showFollowingOrFollwers])
+
     return (
         <>
             <Navbar />
@@ -217,9 +250,64 @@ function UserProfile() {
                     {error && <p className='text-center text-red-500 text-sm'>{error}</p>}
 
                 </div>
-                 <div className='absolute left-2 top-2 md:hidden' onClick={goback}>
+                <div className='absolute left-2 top-2 md:hidden' onClick={goback}>
                     <FaChevronLeft />
-                 </div>
+                </div>
+
+                {/* following and followers list-- */}
+                {showFollowingOrFollwers &&
+                    <div className=' backdrop-blur fixed left-0  right-0 h-screen z-50'>
+                        <div><IoClose className='size-9 absolute right-5 top-4' onClick={() => {
+                            if (showFollowing) ToggleshowFollowing(null)
+                            setSearchQuery('')
+                            toggleShowFollowingorFollowers(false)
+                        }} />
+                        </div>
+                        <div className='md:max-w-[450px] max-w-[300px] px-3 pt-3 pb-3 relative h-fit bg-gray-900 mx-auto mt-20 '>
+                            <div className='sticky top-0 h-fit'>
+
+                                <div className='grid-cols-2 grid select-none'>
+                                    <h1 className={`col-span-1 text-center md:text-xl  ${showFollowing ? 'text-white' : 'text-gray-600'}`} onClick={() => {
+
+                                        ToggleshowFollowing(true)
+                                    }}>Following</h1>
+
+                                    <h1 className={`col-span-1 text-center md:text-xl ${!showFollowing ? 'text-white' : 'text-gray-600'}`} onClick={() => {
+                                        ToggleshowFollowing(false)
+
+                                    }}>Followers</h1>
+
+                                </div>
+                                <div className='w-full px-2'>
+                                    <input type="text" placeholder='Search by username or email..' className=' w-full  mt-5 mb-3 outline-none bg-transparent border-b md:text-[15px] text-[12px]' onChange={(e) => handleSearch(e.target.value)} />
+                                </div>
+                            </div>
+                            <div className='flex flex-col  overflow-y-scroll no-scrollbar  md:max-h-[400px] max-h-[280px]'>
+                                {users && users.length > 0 ? (
+                                    <ul className=" py-2">
+                                        {users.map((user, index) => (
+                                            <li key={user.id} className="mt-3">
+                                                <div className='flex items-center gap-x-2 ml-3 '>
+                                                    {user.profile_pic ?
+                                                        <img src={BASE_URL + user.profile_pic} className='md:size-10 size-8 border border-gray-300  rounded-full' />
+                                                        :
+                                                        <FaCircleUser className='md:size-9 size-8' />}
+                                                    <Link to={`/home/user/profile/${user.id}`}><p className='text-sm md:text-[16px] h-fit'>{user.username}</p></Link>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )
+                                    :
+                                    (
+                                        <p className="text-center text-gray-400 mt-5">No users found</p>
+                                    )
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
                 {userProfile ?
                     <>
                         <div className='col-span-12 h-fit grid grid-cols-12 border-b border-gray-700 py-4 pt-9'>
@@ -241,10 +329,10 @@ function UserProfile() {
                                             {userProfile.is_verified && <MdVerified className='size-8 text-blue-500' />}
                                             {userProfile.is_following ?
 
-                                                <button className='h-fit md:px-6 px-4 border border-gray-400 md:py-2 py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 z-10'
+                                                <button className={`h-fit md:px-6 px-4 border border-gray-400 md:py-2 py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 ${more ? 'md:z-10 -z-20' : 'z-10'}`}
                                                     onClick={() => followUser(userProfile.username)}>UnFollow</button>
 
-                                                : <button className={`'h-fit md:px-6 px-4 border border-gray-400 md:py-2  py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 '${more ? 'md:z-10 -z-20' : 'z-10'}`}
+                                                : <button className={`h-fit md:px-6 px-4 border border-gray-400 md:py-2  py-1 ml-2 rounded-md md:text-sm text-xs font-semibold hover:text-black hover:bg-gray-200 ${more ? 'md:z-10 -z-20' : 'z-10'}`}
                                                     onClick={() => followUser(userProfile.username)}>Follow</button>
                                             }
                                         </div>
@@ -259,8 +347,14 @@ function UserProfile() {
                             </div>
                             <div className='md:col-span-8 col-span-12 px-6 justify-evenly flex items-end'>
                                 <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.post_count} Posts</h1>
-                                <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.followers_count} Followers</h1>
-                                <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.following_count} Following</h1>
+                                <h1 className='md:text-2xl tex-xl font-semibold' onClick={() => {
+                                    ToggleshowFollowing(false)
+                                    toggleShowFollowingorFollowers(true) 
+                                }}>{userProfile.followers_count} Followers</h1>
+                                <h1 className='md:text-2xl tex-xl font-semibold' onClick={() => {
+                                    ToggleshowFollowing(true)
+                                    toggleShowFollowingorFollowers(true)
+                                }}>{userProfile.following_count} Following</h1>
                             </div>
                         </div>
 
@@ -292,9 +386,9 @@ function UserProfile() {
                         </div>
                     </> :
                     <div className='col-span-12 mt-52'>
-                          <Loader />
+                        <Loader />
                     </div>
-                  }
+                }
             </div>
         </>
     )

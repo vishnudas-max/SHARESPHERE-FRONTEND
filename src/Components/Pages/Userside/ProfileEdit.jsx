@@ -18,7 +18,8 @@ function ProfileEdit() {
     const [username, setUsername] = useState('')
     const [bio, setBio] = useState('')
     const navigate = useNavigate()
-    const [error,setError] = useState('')
+    const [error, setError] = useState('')
+    const [imgerror, setImgerror] = useState('')
 
     const fetchProfile = async () => {
         try {
@@ -48,9 +49,19 @@ function ProfileEdit() {
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            setProfilePic(file)
+            const allowedFormats = ['image/jpeg', 'image/jpg', 'image/webp'];
+            if (allowedFormats.includes(file.type)) {
+                setProfilePic(file);
+            } else {
+                setImgerror('Unsupported image format. Please upload a valid image file.');
+                setTimeout(() => {
+                    setImgerror('')
+                }, [2000])
+
+            }
         }
     };
+
 
     const updateProfile = async () => {
         try {
@@ -58,11 +69,11 @@ function ProfileEdit() {
             if (profile_pic) {
                 formData.append('profile_pic', profile_pic);
             }
-            if(bio){
+            if (bio) {
                 formData.append('bio', bio);
             }
-            if(username === ''){
-                setError({username:'Username cannot be empty'})
+            if (username === '') {
+                setError({ username: 'Username cannot be empty' })
                 setTimeout(() => {
                     setError('')
                 }, 2000);
@@ -70,7 +81,7 @@ function ProfileEdit() {
             }
             formData.append('username', username);
 
-            
+
 
             const response = await api.patch(`user/profile/detailes/${userID}/`, formData, {
                 headers: {
@@ -83,7 +94,7 @@ function ProfileEdit() {
         }
         catch (error) {
             console.log(error)
-            setError({username:error.response.data})
+            setError({ username: error.response.data })
             // setError({username:'Username cannot be empty'})
             setTimeout(() => {
                 setError('')
@@ -161,13 +172,16 @@ function ProfileEdit() {
                                             onChange={handleFileUpload}
 
                                         />
-                                        <button
-                                            type='button'
-                                            onClick={() => document.getElementById('profilePic').click()}
-                                            className='ml-2 mt-2 '
-                                        >
-                                            <PiImageFill className='text-white text-2xl size-9' />
-                                        </button>
+                                        <div className='flex items-center gap-x-2'>
+                                            <button
+                                                type='button'
+                                                onClick={() => document.getElementById('profilePic').click()}
+                                                className='ml-2 mt-2 '
+                                            >
+                                                <PiImageFill className='text-white text-2xl size-9' />
+                                            </button>
+                                            {imgerror && <p className='text-red-600'>{imgerror}</p>}
+                                        </div>
                                     </div>
                                     <button className='text-black h-fit py-1 px-4 bg-blue-700 rounded-md mt-4' onClick={updateProfile}>Update Profile</button>
                                 </div>

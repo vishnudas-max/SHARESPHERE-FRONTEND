@@ -6,7 +6,7 @@ import api from '../../../../Config'
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { delPost } from '../../../../Redux/PostSlice';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast, useToast } from 'react-toastify';
 
 
 function AddPost({ setAddPost }) {
@@ -14,12 +14,29 @@ function AddPost({ setAddPost }) {
     const [caption, setCaption] = useState('')
     const [contend, setConted] = useState(null)
     const userID = useSelector(state => state.authInfo.userID)
+    const [contentError,setContentError] = useState('')
 
     const imgref = useRef()
 
     const handleClose = () => {
         setAddPost(false)
     }
+
+    const handlepostconted = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          const allowedFormats = ['image/jpeg', 'image/jpg', 'image/webp'];
+          if (allowedFormats.includes(file.type)) {
+            setConted(file);
+          } else {
+            setContentError('Unsupported image format. Please upload a valid image file.');
+            setTimeout(() => {
+              setContentError('')
+            }, [2000])
+    
+          }
+        }
+      };
 
     const handelPost =async(e) => {
         e.preventDefault()
@@ -85,10 +102,13 @@ function AddPost({ setAddPost }) {
                         onChange={e => setCaption(e.target.value)} value={caption} />
 
                     <input type="file" accept="image/*" class="w-full text-sm text-slate-500 mt-3  hidden"
-                        onChange={e => setConted(e.target.files[0])}
+                        onChange={e =>handlepostconted(e)}
                         ref={imgref}
                     />
+                    <div>
                     <FaImage color='blue' className='mt-3 md:size-9 size-6' onClick={() => imgref.current.click()} />
+                    {contentError && <p className='text-red-600'>{contentError}</p>}
+                    </div>
                     <div className='w-[340px] md:w-[700px]'>
                         <button onClick={handelPost} className='text-[13px] md:text-[15px] font-semibold  mt-4 px-3 rounded-md border md:py-1 md:px-5 hover:text-black hover:bg-slate-300 border-gray-300 mb-3'>POST</button>
                         {contend &&

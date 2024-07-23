@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Navbar from './HelperComponents/Navbar'
 import { useSelector } from 'react-redux'
 import api from '../../../Config'
@@ -10,6 +10,8 @@ import { FaUserEdit } from "react-icons/fa";
 import Loader from './HelperComponents/Loader'
 import CallSocketProvider from '../../../Contexts/CallSocketProvider'
 import IncomingCall from './HelperComponents/IncomingCall'
+import { IoClose } from "react-icons/io5";
+import debounce from 'lodash/debounce';
 
 function Profile() {
 
@@ -17,8 +19,11 @@ function Profile() {
     const username = useSelector(state => state.authInfo.username)
     const access = localStorage.getItem('access')
     const [userProfile, setUserProfile] = useState(null)
-    const [showFollowing, ToggleshowFollowing] = useState(false)
-    const [shwoFollowers, TogglShowFollowers] = useState(false)
+    const [showFollowingOrFollwers, toggleShowFollowingorFollowers] = useState(false)
+    const [showFollowing, ToggleshowFollowing] = useState(null)
+    const [users, setUsers] = useState(null)
+    const [searchQuery, setSearchQuery] = useState('')
+
 
     const fetchProfile = async () => {
         try {
@@ -69,6 +74,33 @@ function Profile() {
     },
         [])
 
+    const fetchfollowingandfollowers = async () => {
+        try {
+            const response = await api.get(`get/followingorfollowers/${userID}/?following=${showFollowing}&search=${searchQuery}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access}`
+                    }
+                })
+            setUsers(response.data)
+            console.log(response)
+        } catch (error) {
+            toggleShowFollowingorFollowers(false)
+            ToggleshowFollowing(false)
+        }
+    }
+
+    useEffect(() => {
+        if (showFollowingOrFollwers) {
+            fetchfollowingandfollowers()
+        }
+
+    }, [showFollowing, searchQuery,showFollowingOrFollwers])
+
+
+    const handleSearch = useCallback(debounce((query) => {
+        setSearchQuery(query);
+    }, 300), []);
 
     return (
         <>
@@ -78,9 +110,64 @@ function Profile() {
             </CallSocketProvider>
             <div className='md:ml-[320px] grid grid-cols-12 text-white'>
 
+                {/* following and followers list-- */}
+                {showFollowingOrFollwers &&
+                    <div className=' backdrop-blur fixed left-0  right-0 h-screen '>
+                        <div><IoClose className='size-9 absolute right-5 top-4' onClick={() => {
+                            if (showFollowing) ToggleshowFollowing(null)
+                            toggleShowFollowingorFollowers(false)
+                            setSearchQuery('')
+                        }} />
+                        </div>
+                        <div className='md:max-w-[450px] max-w-[300px] px-3 pt-3 pb-3 relative h-fit bg-gray-900 mx-auto mt-20 '>
+                            <div className='sticky top-0 h-fit'>
+
+                                <div className='grid-cols-2 grid select-none'>
+                                    <h1 className={`col-span-1 text-center md:text-xl  ${showFollowing ? 'text-white' : 'text-gray-600'}`} onClick={() => {
+
+                                        ToggleshowFollowing(true)
+                                    }}>Following</h1>
+
+                                    <h1 className={`col-span-1 text-center md:text-xl ${!showFollowing ? 'text-white' : 'text-gray-600'}`} onClick={() => {
+                                        ToggleshowFollowing(false)
+
+                                    }}>Followers</h1>
+
+                                </div>
+                                <div className='w-full px-2'>
+                                    <input type="text" placeholder='Search by username or email..' className=' w-full  mt-5 mb-3 outline-none bg-transparent border-b md:text-[15px] text-[12px]' onChange={(e) => handleSearch(e.target.value)} />
+                                </div>
+                            </div>
+                            <div className='flex flex-col  overflow-y-scroll no-scrollbar  md:max-h-[400px] max-h-[280px]'>
+                                {users && users.length > 0 ? (
+                                   <ul className=" py-2">
+                                        {users.map((user, index) => (
+                                            <li key={user.id} className="mt-3">
+                                                <div className='flex items-center gap-x-2 ml-3 '>
+                                                    {user.profile_pic ?
+                                                        <img src={BASE_URL + user.profile_pic} className='md:size-10 size-8 border border-gray-300  rounded-full' />
+                                                        :
+                                                        <FaCircleUser className='md:size-9 size-8' />}
+                                                    <Link to={`/home/user/profile/${user.id}`}><p className='text-sm md:text-[16px] h-fit'>{user.username}</p></Link>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    )
+                                    :
+                                    (
+                                        <p className="text-center text-gray-400 mt-5">No users found</p>
+                                    )
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                }
+
                 {
                     userProfile ?
-                        <div className='col-span-12 h-fit grid grid-cols-12 border-b border-gray-700 py-4'>
+                        <div className='col-span-12 h-fit grid grid-cols-12 border-b border-gray-700 py-4 '>
                             <div className='col-span-12 md:col-span-5 flex items-center'>
                                 {userProfile ? (userProfile.profile_pic ?
                                     <div className='md:p-5 p-2 shrink-0'>
@@ -121,55 +208,26 @@ function Profile() {
 
                                         <div>
                                             <h1 className='md:text-2xl text-sm font-semibold select-none'
-                                                onClick={() => TogglShowFollowers(!shwoFollowers)}
+                                                onClick={() => {
+                                                    ToggleshowFollowing(false)
+                                                    toggleShowFollowingorFollowers(true)
+                                                }}
                                             >{userProfile.followers_count} Followers
                                             </h1>
 
-                                            <div className={`absolute w-fit md:px-7 px-2 overflow-y-scroll no-scrollbar mt-2 transition-all ease-in-out delay-500  bg-[#000300] shadow-md shadow-gray-700 ${shwoFollowers ? 'md:max-h-64 max-h-32 ' : 'h-0 '}`}>
-                                                {userProfile.followers.length > 0 ?
-                                                    <ul className=" py-2">
-                                                        {userProfile.followers.map((user, index) => (
-                                                            <li key={user.id} className="mt-3">
-                                                                <div className='flex items-center gap-x-2 '>
-                                                                    {user.profile_pic ?
-                                                                        <img src={BASE_URL + user.profile_pic} className='md:size-5 size-4 rounded-full' />
-                                                                        :
-                                                                        <FaCircleUser className='md:size-5 size-4' />}
-                                                                    <Link to={`/home/user/profile/${user.id}`}><p className='text-xs md:text-sm'>{user.username}</p></Link>
-                                                                </div>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                    :
-                                                    <h1 className='text-gray-600 font-semibold'>No Followers</h1>}
-                                            </div>
-
+                                           
                                         </div>
 
                                         <div className=''>
                                             <h1 className='md:text-2xl text-sm font-semibold cursor-pointer select-none'
-                                                onClick={() => ToggleshowFollowing(!showFollowing)}
+                                                onClick={() => {
+                                                    ToggleshowFollowing(true)
+                                                    toggleShowFollowingorFollowers(true)
+                                                }}
                                             >{userProfile.following_count} Following
                                             </h1>
 
-                                            <div className={`absolute w-fit md:px-7 px-2 overflow-y-scroll no-scrollbar mt-2 transition-all ease-in-out delay-300  bg-[#000300] shadow-md shadow-gray-700 ${showFollowing ? 'md:max-h-64 max-h-32' : 'h-0'}`}>
-                                                {userProfile.following.length > 0 ?
-                                                    <ul className=" py-2">
-                                                        {userProfile.following.map((user, index) => (
-                                                            <li key={user.id} className="mt-3">
-                                                                <div className='flex items-center gap-x-2 '>
-                                                                    {user.profile_pic ?
-                                                                        <img src={BASE_URL + user.profile_pic} className='md:size-5 size-4 rounded-full' />
-                                                                        :
-                                                                        <FaCircleUser className='md:size-5 size-4' />}
-                                                                    <Link to={`/home/user/profile/${user.id}`}><p className='text-xs md:text-sm'>{user.username}</p></Link>
-                                                                </div>
-                                                            </li>
-                                                        ))}
-                                                    </ul> :
-                                                    <h1 className='text-gray-600 font-semibold'>Following Empty</h1>
-                                                }
-                                            </div>
+                                            
 
                                         </div>
 
@@ -188,12 +246,12 @@ function Profile() {
             <div className='col-span-12 md:ml-[320px] px-6 py-2 md:mt-14'>
                 {userProfile ? (
 
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid md:grid-cols-3 grid-cols-2 gap-2">
                         {userProfile.posts.length > 0 ? (
                             userProfile.posts.map((post, index) => (
-                                <div className="col-span-1 flex justify-center border-1 border-gray-600" key={index}>
+                                <div className="col-span-1 flex justify-center border-1 border-gray-600 h-fit" key={index}>
                                     <Link to={`/home/post/${post.id}`}>
-                                        <img src={BASE_URL + post.contend} alt="post" className='max-h-52' />
+                                        <img src={BASE_URL + post.contend} alt="post" className='h-fit' />
                                     </Link>
                                 </div>
                             ))
