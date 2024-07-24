@@ -69,10 +69,10 @@ function AdminHome() {
               <h1 className='mx-auto w-fit font-bold text-xl md:text-2xl'>Posts</h1>
               <h1 className='mx-auto w-fit font-semibold md:text-xl text-sm md:mt-2'>{overViewData.total_post}</h1>
             </div>
-            <div className='h-fit md:w-32 w-20 rounded-xl bg-zinc-900 md:py-3 py-2 flex-col'>
-              <h1 className='mx-auto w-fit font-bold text-xl md:text-2xl'>Reports</h1>
-              <h1 className='mx-auto w-fit font-semibold md:text-xl text-sm md:mt-2'>100</h1>
-            </div>
+              {/* <div className='h-fit md:w-32 w-20 rounded-xl bg-zinc-900 md:py-3 py-2 flex-col'>
+                <h1 className='mx-auto w-fit font-bold text-xl md:text-2xl'>Reports</h1>
+                <h1 className='mx-auto w-fit font-semibold md:text-xl text-sm md:mt-2'>100</h1>
+              </div> */}
           </div>
           :
           <div className='col-span-12 h-fit md:mt-16 mt-10 flex justify-around px-10 py-6'>

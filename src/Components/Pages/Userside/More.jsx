@@ -26,11 +26,15 @@ function More() {
     const [moreOption, setMoreOption] = useState('')
     const dispatch = useDispatch()
     const imgRef = useRef()
-    const [doc, setDoc] = useState(null)
     const [accountSecOption, setAccountsecOption] = useState('')
     const [passwrod, setPassword] = useState('')
     const [confirm, setConfirm] = useState('')
     const navigate = useNavigate()
+    const [docOptionSelected, setDocoptionSelected] = useState(null)
+    const docOptions = ['Aadhaar', 'Driving Licence', 'PAN Card']
+    const [credentialNumber, setCredentialNumber] = useState('')
+    const [credentialError, setCredentialError] = useState('')
+
     const [errors, setErrors] = useState({
         password: '',
         confirm: '',
@@ -50,9 +54,6 @@ function More() {
         price: 3000
     }
     ]
-
-    const [selectedPlan, handlePlanChange] = useState('')
-
     const handlePassword = (password) => {
         let re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
         let test_result = re.test(password)
@@ -170,20 +171,19 @@ function More() {
     // request for verification---
     const handleverification = async () => {
 
-        const verficatinData = new FormData();
-        if (doc === null) {
-            let obj = { ...errors, doc: 'You should provide Either Adhar or License for verification' }
-            setErrors(obj)
-            setTimeout(() => {
-                let obj = { ...errors, doc: '' }
-                setErrors(obj)
-            }, (3000));
+        const verficatinData = new FormData();  
+        if (credentialError) {
+            return false
+        }
+        if (credentialNumber === '') {
+            setCredentialError('This field cannot be empty')
             return false
         }
         if (!userID) {
             return false
         }
-        verficatinData.append('document', doc)
+        verficatinData.append('document_type',docOptionSelected)
+        verficatinData.append('document_number', credentialNumber)
         verficatinData.append('userID', userID)
         try {
             const response = await api.post('verify/account/', verficatinData, {
@@ -195,6 +195,12 @@ function More() {
             let obj = { ...profile, is_requested: true }
             setUserProfile(obj)
         } catch (error) {
+            if(error.response.data.message){
+                setCredentialError(error.response.data.message)
+                setTimeout(()=>(
+                    setCredentialError('')
+                ),[2000])
+            }
             console.log(error)
         }
     }
@@ -324,10 +330,55 @@ function More() {
         rzp1.open();
     };
 
+    const handleCredential = (value) => {
+        if (docOptionSelected === 'Aadhaar') {
 
+            const isDigitOnly = /^\d*$/;
+            if (!isDigitOnly.test(value)) {
+                return false
+            } else if (value.length > 12) {
+                return false
+            }
+            setCredentialNumber(value);
 
+            if (value === '') {
+                setCredentialError('');
+                return false;
+            }
+            if (value.length < 12) {
+                setCredentialError('Invalid Aadhaar Number.');
+            } else {
+                setCredentialError('');
+            }
+        } else if (docOptionSelected === 'Driving Licence') {
+            if (value.length > 16) return false
+            setCredentialNumber(value);
+            if (value === '') {
+                setCredentialError('');
+                return false
+            }
+            const dlRegex = /^[A-Z]{2}\d{2} \d{11}$/;
+            if (!dlRegex.test(value)) {
+                setCredentialError('Invalid Driving Licence Number.');
+            } else {
+                setCredentialError('')
+            }
 
-
+        } else if (docOptionSelected === 'PAN Card') {
+            if (value.length > 10) return false
+            setCredentialNumber(value);
+            const panRegex = /^[A-Za-z0-9]{5}\d{4}[A-Za-z]$/;
+            if (value === '') {
+                setCredentialError('')
+                return false
+            }
+            if (!panRegex.test(value)) {
+                setCredentialError('Invalid PAN Card Number.');
+            } else {
+                setCredentialError('');
+            }
+        }
+    };
     return (
         <>
             <Navbar />
@@ -652,9 +703,49 @@ function More() {
                                 // ui if not requested---
                                 <div className='flex flex-col gap-y-5 pl-10 pt-5'>
                                     <div className='flex flex-col gap-y-2'>
-                                        <label htmlFor="doc">Provide Your Adhaar or Driving licence Image For Verification</label>
+                                        <p >Provide Your Adhaar or Driving licence Image For Verification</p>
                                         {errors.doc && <p className='text-xs text-red-600'>{errors.doc}</p>}
-                                        <div className='flex gap-x-1 items-center'>
+                                        <div className='flex flex-col gap-y-2 w-fit border-none'>
+                                            <select
+                                                name="documentOption"
+                                                className="bg-transparent outline-none pr-3 border-gray-600"
+                                                onChange={(e) => {
+                                                    if (credentialError) setCredentialError('')
+                                                    setDocoptionSelected(e.target.value
+                                                    )
+                                                }}
+                                            >
+                                                <option value="" disabled selected className="">
+                                                    Select the Credential type for submission.
+                                                </option>
+                                                {docOptions.map((docOption, index) => (
+                                                    <option key={index} value={docOption} className="text-black mt-1">
+                                                        {docOption}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        {docOptionSelected &&
+                                            (
+                                                <><input
+                                                    type='text'
+                                                    value={credentialNumber}
+                                                    onChange={(e) => handleCredential(e.target.value)}
+                                                    placeholder={
+                                                        docOptionSelected === 'Aadhaar' ? '0000 0000 0000' :
+                                                            docOptionSelected === 'Driving Licence' ? 'XX14 20110012345' :
+                                                                docOptionSelected === 'PAN Card' ? 'ABCDE1234F' :
+                                                                    ''
+                                                    }
+                                                    className='w-fit bg-transparent outline-none border-b'
+                                                />
+                                                    <p className="text-red-500">{credentialError}</p>
+                                                    <div>
+                                                        <button className='bg-blue-600 text-sm w-fit h-fit py-1 px-2 rounded-md' onClick={handleverification}>Request Verification</button>
+                                                    </div>
+                                                </>
+                                            )}
+                                        {/* <div className='flex gap-x-1 items-center'>
                                             <IoDocumentSharp className='size-6' onClick={() => imgRef.current.click()}
                                             />
                                             {doc && (
@@ -665,13 +756,11 @@ function More() {
                                                     <div className='h-fit'><IoClose className='size-5 cursor-pointer' onClick={() => setDoc(null)} /></div>
                                                 </div>
                                             )}
-                                        </div>
+                                        </div> */}
 
-                                        <input type="file" accept='image/*' ref={imgRef} className='hidden' name='doc' onChange={e => setDoc(e.target.files[0])} />
+                                        {/* <input type="file" accept='image/*' ref={imgRef} className='hidden' name='doc' onChange={e => setDoc(e.target.files[0])} /> */}
                                     </div>
-                                    <div>
-                                        <button className='bg-blue-600 text-sm w-fit h-fit py-1 px-2 rounded-md' onClick={handleverification}>Request Verification</button>
-                                    </div>
+
                                 </div>
                         }
                     </div >

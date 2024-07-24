@@ -9,12 +9,13 @@ import { FaCircleUser } from "react-icons/fa6";
 import { IoSend } from "react-icons/io5";
 import { useDispatch } from 'react-redux'
 import { addComment_count } from '../../../Redux/PostSlice'
-import { MdReport ,MdMoreVert} from "react-icons/md";
+import { MdReport, MdMoreVert } from "react-icons/md";
 import Navbar from './HelperComponents/Navbar'
 import { IoClose } from "react-icons/io5";
 import IncomingCall from './HelperComponents/IncomingCall'
 import CallSocketProvider from '../../../Contexts/CallSocketProvider'
 import { BASE_URL } from '../../../secrets'
+import { MdVerified } from "react-icons/md";
 
 
 function ViewPost() {
@@ -242,10 +243,17 @@ function ViewPost() {
       ), 1000)
 
     } catch (error) {
-      setReportError('something wenet wrong ! try again later')
-      setTimeout(() => {
-        setReportError('')
-      }, 2000);
+      if (error.response.data.detail) {
+        setReportError(error.response.data.detail)
+        setTimeout(() => {
+          setReportError('')
+        }, 2000);
+      } else {
+        setReportError('something wenet wrong ! try again later')
+        setTimeout(() => {
+          setReportError('')
+        }, 2000);
+      }
     }
   }
 
@@ -264,7 +272,7 @@ function ViewPost() {
         <IncomingCall />
       </CallSocketProvider>
       <div className='select-none'>
-       <IoClose  className='absolute text-white right-4 top-3 size-6' onClick={()=>navigate(-1)}/>
+        <IoClose className='absolute text-white right-4 top-3 size-6' onClick={() => navigate(-1)} />
         {currentpost &&
           <div className="grid grid-cols-3 gap-1 h-screen">
             <div className='block md:hidden'>
@@ -286,7 +294,11 @@ function ViewPost() {
                       :
                       <FaCircleUser className='md:size-14 size-10 ' />
                     }
+                    <div className='flex gap-1 items-center'>
                     <h1 className='font-semibold text-xl'>{currentpost.userID.username}</h1>
+                    {currentpost.userID.is_verified && 
+                    <div ><MdVerified className='md:size-6 text-blue-600' /></div>}
+                    </div>
                   </div>
                   {userID === currentpost.userID.id &&
                     <AiOutlineMore color='white' className='size-8 cursor-pointer' onClick={() => setOptions(o => !o)} />
@@ -395,7 +407,7 @@ function ViewPost() {
                           <div className='flex gap-y-2 items-center '>
                             {comment.userID.profile_pic ? (
                               <div className='shrink-0'>
-                                <img src={BASE_URL+comment.userID.profile_pic} alt="" className='border-[1px] border-gray-400 size-10 rounded-full' />
+                                <img src={BASE_URL + comment.userID.profile_pic} alt="" className='border-[1px] border-gray-400 size-10 rounded-full' />
                               </div>
                             ) : (
                               <FaCircleUser className='md:size-10 size-7' />
@@ -470,7 +482,7 @@ function ViewPost() {
                             <div className='ml-10 mt-3 p-2 flex gap-y-2 items-center right-0' key={replyIndex}>
                               {reply.userID.profile_pic ? (
                                 <div className='shrink-0'>
-                                  <img src={BASE_URL+reply.userID.profile_pic} alt="profilepic" className='border-[1px] border-gray-400 size-10 rounded-full' />
+                                  <img src={BASE_URL + reply.userID.profile_pic} alt="profilepic" className='border-[1px] border-gray-400 size-10 rounded-full' />
                                 </div>
                               ) : (
                                 <FaCircleUser className='md:size-10 size-7' />

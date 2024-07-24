@@ -8,6 +8,8 @@ import api from '../../../Config'
 import { FaCircleUser } from "react-icons/fa6";
 import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
+import { FcApproval } from "react-icons/fc";
+import { IoCloseCircle } from "react-icons/io5";
 
 function Notification() {
     const status = useSelector(state => state.notifications.status)
@@ -84,16 +86,27 @@ function Notification() {
 
 
                                         <div className='flex justify-between bg-gray-900 mt-3 h-14 mr-3 rounded-md px-2 items-center' key={idx}>
-                                            <Link to={not.notification_type === 'follow' ? `/home/user/profile/${not.invoked_user.id}` : `/home/post/${not.postID ? not.postID.id : ''}`}>
-                                                <div className='max-w-[400px] flex gap-x-2 items-center'>
-                                                    <div>
-                                                        {not.invoked_user.profile_pic ?
-                                                            <img src={BASE_URL + not.invoked_user.profile_pic} alt="" className='size-9 rounded-full border-[1px] border-gray-500' />
+                                            <Link to={not.notification_type === 'follow' ? `/home/user/profile/${not.invoked_user.id}`
+                                                : not.notification_type === 'verification' ? '/home/profile/more/' : `/home/post/${not.postID ? not.postID.id : ''}`}>
+                                                <div className='max-w-[full] flex gap-x-2 items-center'>
+                                                    {not.notification_type !== 'verification' &&
+                                                        <div>
+                                                            {not.invoked_user.profile_pic ?
+                                                                <div className='shrink-0 h-fit w-fit'>
+                                                                    <img src={BASE_URL + not.invoked_user.profile_pic} alt="profile" className='size-9 rounded-full border-[1px] border-gray-500' />
+                                                                </div>
+                                                                :
+                                                                <FaCircleUser className='size-9' />
+                                                            }
+                                                        </div>}
+                                                    <p className={`
+                                                    ${not.notification_type === 'verification' ?
+                                                            'max-w-full md:text-[16px] text-sm pl-2'
                                                             :
-                                                            <FaCircleUser className='size-9' />
-                                                        }
-                                                    </div>
-                                                    <p className='max-w-[400px] md:text-[17px] text-sm'>{not.message}</p>
+                                                            'max-w-[400px] md:text-[17px] text-sm'
+                                                        }`
+                                                    }
+                                                    >{not.message}</p>
                                                 </div>
                                             </Link>
                                             {

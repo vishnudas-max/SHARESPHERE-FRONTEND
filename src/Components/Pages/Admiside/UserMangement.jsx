@@ -56,7 +56,7 @@ function UserMangement() {
 
     const handleDelete = async (userID) => {
         try {
-            const response = await api.delete(`admin/users/${userID}/`, {
+            const response = await api.delete(`admin/user/delete/${userID}/`, {
                 headers: {
                     Authorization: `Bearer ${access}`
                 }
@@ -91,7 +91,7 @@ function UserMangement() {
             <div className='text-white md:ml-[320px] max-w-full grid grid-cols-12 '>
                 {/* header-- */}
                 <div className='col-span-12 px-4 py-3 md:py-5 border-b border-gray-500 fixed w-full bg-[#000300]'>
-                <nav className="flex " aria-label="Breadcrumb">
+                    <nav className="flex " aria-label="Breadcrumb">
                         <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                             <li className="inline-flex items-center">
                                 <p className="inline-flex items-center md:text-sm text-xs font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
@@ -122,9 +122,9 @@ function UserMangement() {
                             <input type="text" placeholder='Search by username...' className='text-white border-b border-gray-600 outline-none bg-transparent' onChange={(e) => handleSearch(e.target.value)} />
                         </div>
                         <h1 className={`' cursor-pointer h-fit font-bold mt-4 mt-4'${userFillter ? ' text-gray-700' : 'text-white'}`} onClick={() => setUserFillter(false)}>Active Users</h1>
-                        <h1 className={`'h-fit cursor-pointer font-bold mt-4 border-l-2 pl-2 '${userFillter ? 'text-white' : ' text-gray-700'}`} onClick={() =>{
+                        <h1 className={`'h-fit cursor-pointer font-bold mt-4 border-l-2 pl-2 '${userFillter ? 'text-white' : ' text-gray-700'}`} onClick={() => {
                             setUserFillter(true)
-                        } }>Deactivated Users</h1>
+                        }}>Deactivated Users</h1>
 
                     </div>
 
@@ -173,12 +173,13 @@ function UserMangement() {
                                 <th scope="col" class="px-6 py-3">
                                     Total Reports
                                 </th>
+                                {!userFillter &&
+                                    <th scope="col" class="px-6 py-3">
+                                        Status
+                                    </th>}
                                 <th scope="col" class="px-6 py-3">
-                                    Status
-                                </th>
-                                {!userFillter && <th scope="col" class="px-6 py-3">
                                     Action
-                                </th>}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -204,15 +205,22 @@ function UserMangement() {
                                             <p className='cursor-pointer' onClick={() => seeReports(user.id, user.username)}>See all {user.report_count} Reports </p>
                                             : 'No reports'}
                                     </td>
-                                    <td class="px-6 py-4">
-                                        {user.is_active ?
-                                            <span className='text-black bg-green-500 px-4 font-semibold h-fit py-[1px] rounded-full'>Active</span>
-                                            :
-                                            <span className='text-black bg-red-500 px-3 font-semibold h-fit py-[1px] rounded-full' >Inactive</span>}
-                                    </td>
-                                    {!userFillter && <td class="px-6 py-4 ">
-                                        {user.report_count > 0 && user.is_active === true && <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline" onClick={() => handleDelete(user.id)}>Deactivate</a>}
-                                    </td>}
+                                    {!userFillter &&
+                                        <td class="px-6 py-4">
+                                            {user.is_active &&
+                                                <span className='text-black bg-green-500 px-4 font-semibold h-fit py-[1px] rounded-full'>Active</span>}
+                                        </td>
+                                    }
+                                    {
+                                        <td class="px-6 py-4 ">
+                                            {(user.report_count > 4 && user.is_active === true) ?
+                                                user.is_active ===true && <p class="font-medium text-red-600 dark:text-red-500 hover:underline" onClick={() => handleDelete(user.id)}>Deactivate</p>
+                                                :
+                                                user.is_active === false && <p class="font-medium text-red-600 dark:text-green-500 hover:underline" onClick={() => handleDelete(user.id)}>Activate</p>
+                                            }
+                                        </td>
+                                    }
+
                                 </tr>
                             ))
                             }

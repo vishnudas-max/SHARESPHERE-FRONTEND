@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { AiOutlineArrowRight, AiFillPlusCircle, AiFillHeart, AiFillMessage, AiOutlineClose } from 'react-icons/ai'
-
+import { MdVerified } from "react-icons/md";
 import MobileTop from './HelperComponents/MobileTop'
 import TextToggle from './HelperComponents/TextToggle'
 import Commets from './HelperComponents/Commets'
@@ -47,7 +47,7 @@ function Home() {
   const [report_reason, SetReportOption] = useState('')
   const [reportError, setReportError] = useState('')
   const [reportSucces, setReportSucess] = useState('')
-  const [imgError,setImageError] = useState('')
+  const [imgError, setImageError] = useState('')
 
   const closeStory = useCallback(() => {
     setViewStory(null)
@@ -273,10 +273,17 @@ function Home() {
         toggleShowReports(null)
       ), 1000)
     } catch (error) {
-      setReportError('Something went wrong ! Try again later..')
-      setTimeout(() => {
-        setReportError('')
-      }, 2000);
+      if (error.response.data.detail) {
+        setReportError(error.response.data.detail)
+        setTimeout(() => {
+          setReportError('')
+        }, 2000);
+      } else {
+        setReportError('Something went wrong ! Try again later..')
+        setTimeout(() => {
+          setReportError('')
+        }, 2000);
+      }
     }
   }
   // Function to check if the current user has viewed all stories of a specific user
@@ -427,10 +434,16 @@ function Home() {
                                 :
                                 <FaCircleUser className='md:size-9 size-7' />
                               }
+                              <div className='flex gap-x-1 items-center'>
+                                <Link to={currentUsername !== post.userID.username ? `/home/user/profile/${post.userID.id}` : `/home/profile/`}>
+                                  <p className='md:text-sm text-xs font-normal'>{post.userID.username}</p>
+                                </Link>
+                                {post.userID.is_verified &&
+                                  <div>
+                                    <MdVerified className='text-blue-700 md:size-5'/>
+                                  </div>}
+                              </div>
 
-                              <Link to={currentUsername !== post.userID.username ? `/home/user/profile/${post.userID.id}` : `/home/profile/`}>
-                                <p className='md:text-sm text-xs font-normal'>{post.userID.username}</p>
-                              </Link>
 
                             </div>
                             {/* postuser profile pic and username end-- */}

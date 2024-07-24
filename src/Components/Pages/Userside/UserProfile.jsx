@@ -118,7 +118,36 @@ function UserProfile() {
                 toggleReport(false)
             ), 1000)
         } catch (error) {
-            setError('something went wrong')
+            console.log(error)
+            if (error.response.data.detail) {
+                toast.error(error.response.data.detail, {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    style: { backgroundColor: 'red', color: 'black' },
+                })
+                setTimeout(() => (
+                    toggleReport(false)
+                ), 1000)
+            } else {
+                toast.error('Something went wroing ! Try again later.', {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    style: { backgroundColor: 'red', color: 'black' },
+                })
+                setTimeout(() => (
+                    toggleReport(false)
+                ), 1000)
+
+            }
+
         }
     }
 
@@ -180,7 +209,7 @@ function UserProfile() {
             fetchfollowingandfollowers()
         }
 
-    }, [showFollowing, searchQuery,showFollowingOrFollwers])
+    }, [showFollowing, searchQuery, showFollowingOrFollwers])
 
     return (
         <>
@@ -349,7 +378,7 @@ function UserProfile() {
                                 <h1 className='md:text-2xl tex-xl font-semibold'>{userProfile.post_count} Posts</h1>
                                 <h1 className='md:text-2xl tex-xl font-semibold' onClick={() => {
                                     ToggleshowFollowing(false)
-                                    toggleShowFollowingorFollowers(true) 
+                                    toggleShowFollowingorFollowers(true)
                                 }}>{userProfile.followers_count} Followers</h1>
                                 <h1 className='md:text-2xl tex-xl font-semibold' onClick={() => {
                                     ToggleshowFollowing(true)

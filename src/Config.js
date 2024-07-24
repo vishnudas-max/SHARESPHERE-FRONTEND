@@ -1,6 +1,4 @@
 import axios from 'axios'
-// import { delAuth } from './Redux/UserdataSlice';
-// import { useDispatch } from 'react-redux';
 import { BASE_URL } from './secrets';
 
 
@@ -47,11 +45,7 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// function handleTokenRefreshFailure() {
 
-//   dispatch(delAuth()); // Dispatch your action to clear authentication state
-//   localStorage.clear(); // Clear local storage or take appropriate logout actions
-// }
 
 export default axiosInstance;
 

@@ -23,13 +23,6 @@ function Navbar() {
     setAddPost(prevState => !prevState);
   }, [addPost]);
 
-  // const handleLogout = () => {
-  //   localStorage.clear()
-  //   dispatch(delAuth())
-  //   dispatch(delStories())
-  //   dispatch(delPost())
-
-  // }
 
   const fetchUnreadNotificationCount = async () => {
     try {

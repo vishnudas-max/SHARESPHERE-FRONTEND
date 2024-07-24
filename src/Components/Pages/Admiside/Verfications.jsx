@@ -157,7 +157,10 @@ function Verfications() {
                                         Username
                                     </th>
                                     <th scope="col" class="px-6 py-3">
-                                        Document
+                                        Document Type
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Document Number
                                     </th>
                                     {!accepted && !rejected && (
                                         <>
@@ -181,9 +184,10 @@ function Verfications() {
                                             {request.userID}
                                         </th>
                                         <th scope="row" class="px-6 py-4 font-thin text-gray-900 whitespace-nowrap dark:text-white">
-                                            <img src={request.document} className='size-8' onClick={() => {
-                                                toggleZoomcontend({ index: index })
-                                            }} />
+                                           {request.document_type}
+                                        </th>
+                                        <th scope="row" class="px-6 py-4 font-thin text-gray-900 whitespace-nowrap dark:text-white">
+                                           {request.document_number}
                                         </th>
                                         {!accepted && !rejected &&
                                             <>

@@ -36,10 +36,10 @@ function PostManagement() {
             console.log(error);
         }
     };
-  
+
     useEffect(() => {
         fetchposts();
-    }, [currentPage, postFilter]); 
+    }, [currentPage, postFilter]);
 
 
     const handlePageChange = (action) => {
@@ -88,7 +88,7 @@ function PostManagement() {
             <div className='text-white md:ml-[320px] max-w-full grid grid-cols-12 '>
                 {/* header-- */}
                 <div className='col-span-12 px-4 py-3 md:py-5 border-b border-gray-500 fixed w-full bg-[#000300]'>
-                <nav className="flex " aria-label="Breadcrumb">
+                    <nav className="flex " aria-label="Breadcrumb">
                         <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                             <li className="inline-flex items-center">
                                 <p className="inline-flex items-center md:text-sm text-xs font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
@@ -183,9 +183,10 @@ function PostManagement() {
                                 <th scope="col" class="px-6 py-3">
                                     Total Reports
                                 </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Status
-                                </th>
+                                {!postFilter &&
+                                    <th scope="col" class="px-6 py-3">
+                                        Status
+                                    </th>}
                                 {!postFilter && <th scope="col" class="px-6 py-3">
                                     Action
                                 </th>}
@@ -224,14 +225,13 @@ function PostManagement() {
                                             <p className='cursor-pointer' onClick={() => seeReports(post.id, post.username)}>See all {post.report_count} Reports </p>
                                             : 'No reports'}
                                     </td>
-                                    <td class="px-6 py-4">
-                                        {post.is_deleted ?
-                                            <span className='text-black bg-red-500 px-4 font-semibold h-fit py-[1px] rounded-full'>Deleted</span>
-                                            :
-                                            <span className='text-black bg-green-500 px-3 font-semibold h-fit py-[1px] rounded-full' >Active</span>}
-                                    </td>
+                                    {!postFilter &&
+                                        <td class="px-6 py-4">
+                                            {post.is_deleted === false &&
+                                                <span className='text-black bg-green-500 px-3 font-semibold h-fit py-[1px] rounded-full' >Active</span>}
+                                        </td>}
                                     {!postFilter && <td class="px-6 py-4 ">
-                                        {post.report_count > 0 && post.is_deleted === false && <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline" onClick={() => handleDelete(post.id)}>Delete</a>}
+                                        {post.report_count > 4 && post.is_deleted === false && <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline" onClick={() => handleDelete(post.id)}>Delete</a>}
                                     </td>}
                                 </tr>
                             ))
