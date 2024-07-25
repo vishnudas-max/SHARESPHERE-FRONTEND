@@ -86,11 +86,11 @@ function Commets({ view, postID }) {
     const postCommentReply = async () => {
         // Ensure replycomment is a string
 
-        let comment = `@${showReply.username} ${replycomment}`;
+        
         let data = {
             "userID": userID, // Ensure userID is a valid string or number
             "postID": postID, // Ensure id is a valid string or number
-            "comment": comment,
+            "comment": replycomment,
             "parent_comment": showReply.id // Ensure commentID is a valid string or number
         };
 

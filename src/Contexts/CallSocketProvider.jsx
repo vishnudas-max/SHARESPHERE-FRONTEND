@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import {WEBSOCKET_BASE_URL} from '../secrets'
 
 // Create a context for WebSocket
 export const CallContext = createContext();
@@ -10,7 +11,7 @@ function CallSocketProvider({ children }) {
 
     useEffect(() => {
 
-        const callsocket =new WebSocket(`ws://127.0.0.1:8000/ws/call/?token=${access}`);
+        const callsocket =new WebSocket(`${WEBSOCKET_BASE_URL}/call/?token=${access}`);
         callsocket.onopen = () => {
             console.log('WebSocket connected');
         };

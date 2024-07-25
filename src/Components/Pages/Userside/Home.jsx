@@ -440,7 +440,7 @@ function Home() {
                                 </Link>
                                 {post.userID.is_verified &&
                                   <div>
-                                    <MdVerified className='text-blue-700 md:size-5'/>
+                                    <MdVerified className='text-blue-700 md:size-5' />
                                   </div>}
                               </div>
 
@@ -451,22 +451,25 @@ function Home() {
                             {/* post head right side-- */}
                             <div className='flex gap-x-2 relative px-'>
                               {post.is_following === false && <button className='text-[11px] px-5 h-fit py-[2px] rounded-md border border-gray-400' onClick={() => followUser(post.userID.username)}>Follow</button>}
-                              <div><IoMdMore className='size-5 cursor-pointer' onClick={() => {
-                                if (showReports) {
-                                  toggleShowReports(null)
-                                }
-                                if (showMore) {
-                                  if (showMore.postID !== post.id) {
-                                    toggleShowmore({ postID: post.id })
-                                  } else {
-                                    toggleShowmore(null)
+                              {post.userID.username !== currentUsername
+                              &&
+                              <div>
+                                <IoMdMore className='size-5 cursor-pointer' onClick={() => {
+                                  if (showReports) {
+                                    toggleShowReports(null)
                                   }
-                                } else {
-                                  toggleShowmore({ postID: post.id })
-                                }
+                                  if (showMore) {
+                                    if (showMore.postID !== post.id) {
+                                      toggleShowmore({ postID: post.id })
+                                    } else {
+                                      toggleShowmore(null)
+                                    }
+                                  } else {
+                                    toggleShowmore({ postID: post.id })
+                                  }
 
 
-                              }} /></div>
+                                }} /></div>}
 
                               <div className={`' bg-gray-900  transition-all ease-in-out delay-100
                            absolute select-none right-5 px-3 py-2 md:py-3 md:px-5 rounded-tl-md rounded-bl-md rounded-br-md'

@@ -295,9 +295,9 @@ function ViewPost() {
                       <FaCircleUser className='md:size-14 size-10 ' />
                     }
                     <div className='flex gap-1 items-center'>
-                    <h1 className='font-semibold text-xl'>{currentpost.userID.username}</h1>
-                    {currentpost.userID.is_verified && 
-                    <div ><MdVerified className='md:size-6 text-blue-600' /></div>}
+                      <h1 className='font-semibold text-xl'>{currentpost.userID.username}</h1>
+                      {currentpost.userID.is_verified &&
+                        <div ><MdVerified className='md:size-6 text-blue-600' /></div>}
                     </div>
                   </div>
                   {userID === currentpost.userID.id &&
@@ -317,7 +317,8 @@ function ViewPost() {
                   <p className='md:text-[15px] text-[13px] text-gray-200'>{currentpost.caption}</p>
                   <div className='flex justify-between pr-6 items-baseline'>
                     <p className='md:text-[15px] text-[13px] text-gray-400 font-semibold mt-3'>{currentpost.formatted_uploadDate}</p>
-                    <MdReport className='size-6 text-red-600' onClick={() => toggleshowreport(prev => !prev)} />
+                    {currentpost.userID.id !== userID &&
+                      <MdReport className='size-6 text-red-600' onClick={() => toggleshowreport(prev => !prev)} />}
                   </div>
                 </div>
               </div>

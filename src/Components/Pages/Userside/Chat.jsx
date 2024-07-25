@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import Navbar from './HelperComponents/Navbar'
-import { AiOutlineSearch } from 'react-icons/ai'
 import { FaCircleUser, FaVideo, FaFaceSmile } from "react-icons/fa6";
 import { IoMdMore } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
@@ -15,6 +14,8 @@ import Loader from './HelperComponents/Loader'
 import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
 import { ToastContainer, toast } from 'react-toastify';
+import { WEBSOCKET_BASE_URL } from '../../../secrets';
+
 
 
 
@@ -29,14 +30,13 @@ function Chat() {
     const chatEndRef = useRef(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [typingStatus, setTypingStatus] = useState('');
-    // const [message, setMessage] = useState('')
     const currentUser = useSelector(state => state.authInfo.userID)
     const currentUsername = useSelector(state => state.authInfo.username)
     const message = useRef('')
     const [users, setUsers] = useState(null)
     const [roomID, setRoomID] = useState(null)
     const [openMore, toggleMore] = useState(false)
-    const access= localStorage.getItem('access')
+    const access = localStorage.getItem('access')
 
 
 
@@ -80,13 +80,15 @@ function Chat() {
         // Scroll to the bottom of the chat messages div
         if (chatEndRef.current) {
             chatEndRef.current.scrollTop = chatEndRef.current.scrollHeight;
+
         }
+
     }, [chatMessages, currentChatRoom]);
 
     // establishing connection--
     const ConnectRoom = (userID) => {
         const access = localStorage.getItem('access');
-        const newSocket = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${userID}/?token=${access}`);
+        const newSocket = new WebSocket(`${WEBSOCKET_BASE_URL}/chat/${userID}/?token=${access}`);
 
         newSocket.onopen = () => {
             console.log('WebSocket connection established.');
@@ -130,7 +132,15 @@ function Chat() {
 
     const handleChat = async (index, username, userID, profile_pic, blocked_by) => {
         if (blocked_by) {
-            alert(`Sorry , You cannot chat with ${username} `)
+            toast.warning(`You can't chat with ${username}!.`, {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    style: { backgroundColor: 'yellow', color: 'black' },
+                })
             return false
         }
         ConnectRoom(userID);
@@ -167,6 +177,7 @@ function Chat() {
                     Authorization: `Bearer ${access}`
                 }
             })
+            fetchUsers()
 
         } catch (error) {
             console.log(error)
@@ -195,8 +206,8 @@ function Chat() {
                 if (data.type === 'chat_history') {
                     setChatMessages(data.messages);
                 } else if (data.type === 'chat_message') {
-                    console.log(chatMessages)
                     fetchUsers()
+                    readMessages(roomID)
                     setChatMessages(prevMessages => [...prevMessages, data]);
                 } else if (data.type === 'user_typing') {
                     setTypingStatus(data.username);
@@ -256,6 +267,7 @@ function Chat() {
         }
         setShowEmojiPicker(false);
     };
+    
 
     return (
         <div>
@@ -270,12 +282,13 @@ function Chat() {
                     ${currentChatRoom !== null && 'md:block hidden'}
                     border-gray-700 md:col-span-5 col-span-12 md:px-5 px-10 h-screen`}>
                     {/* search bar-- */}
-                    <div className='w-full flex justify-center py-2 sticky top-0 bg-[#000300]'>
-                        <div className='flex mt-6 bg-gray-800 px-5 py-2 itmes-center gap-x-1 rounded-full w-full'>
-                            <div className='h-fit'>
+                    <div className='w-full flex justify-center  sticky top-0 border-b bg-[#000300]'>
+                        <div className='flex mt-6 px-5 py-2 itmes-center gap-x-1 rounded-full w-full'>
+                            {/* <div className='h-fit'>
                                 <AiOutlineSearch className='md:size-6 size-6' />
                             </div>
-                            <input type="text" placeholder='  Search...' className='outline-none bg-transparent py-1 px-2' />
+                            <input type="text" placeholder='  Search...' className='outline-none bg-transparent py-1 px-2' /> */}
+                            <h1 className='text-2xl font-semibold'>Chat</h1>
                         </div>
                     </div>
                     {/* search bar end -here-- */}
@@ -288,12 +301,18 @@ function Chat() {
                                 !user.is_blocked &&
                                 <div className='px-2 border-b border-gray-800 h-16 flex' key={index} onClick={() => handleChat(index, user.username, user.id, user.profile_pic, user.blocked_by)}>
                                     {user.profile_pic ?
-                                        <div className='h-full flex items-center shrink-0'>
+                                        <div className='h-full flex items-center shrink-0 relative'>
                                             <img src={BASE_URL + user.profile_pic} className='md:size-10 size-7 rounded-full border-[1px]' />
+                                            {user.message_count > 0 &&
+                                                <div className='absolute -right-2 size-4 flex justify-center items-center top-1 rounded-full text-xs bg-red-600'>{user.message_count}</div>
+                                            }
                                         </div>
                                         :
-                                        <div className='h-full flex items-center'>
+                                        <div className='h-full flex items-center relative'>
                                             <FaCircleUser className='md:size-10 size-7' />
+                                            {user.message_count > 0 &&
+                                                <div className='absolute -right-2 size-4 flex justify-center items-center top-1 rounded-full text-xs bg-red-600'>{user.message_count}</div>
+                                            }
                                         </div>
                                     }
                                     <div className=' px-2 w-full grid grid-rows-2 py-2'>

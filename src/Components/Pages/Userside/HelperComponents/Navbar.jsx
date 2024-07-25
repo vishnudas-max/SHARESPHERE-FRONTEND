@@ -5,20 +5,19 @@ import { FaUser } from "react-icons/fa";
 import AddPost from './AddPost'
 import PrivetRoute from '../../../Wrappers/PrivetRoute'
 import { useDispatch } from 'react-redux'
-import { delAuth } from '../../../../Redux/UserdataSlice'
 import { Link } from 'react-router-dom'
-import { delStories } from '../../../../Redux/StoriesSlice'
-import { delPost } from '../../../../Redux/PostSlice'
 import { IoIosNotifications } from "react-icons/io";
 import { fetchNotifications } from './../../../../Redux/NotificationSlice'
 import api from '../../../../Config'
+import { WEBSOCKET_BASE_URL } from '../../../../secrets';
 
 function Navbar() {
   const dispatch = useDispatch()
   const [addPost, setAddPost] = useState(false)
   const [notificationCount, setNotificationCount] = useState(0)
+  const [chatNotificationCount, setChatNotificationCount] = useState(0)
   const access = localStorage.getItem('access')
-  
+
   const addPostCloseFun = useCallback(() => {
     setAddPost(prevState => !prevState);
   }, [addPost]);
@@ -37,16 +36,33 @@ function Navbar() {
     }
   }
 
-  useEffect(() => {
-    if(!notificationCount){
-      fetchUnreadNotificationCount()
+
+  const fetchUnreadMessageCount = async () => {
+    try {
+      const response = await api.get(`get/unread/message/count/`, {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      })
+      setChatNotificationCount(response.data.message_count)
+    } catch (error) {
+      console.log(error)
     }
-    
-  },
-  [notificationCount])
+  }
 
   useEffect(() => {
-    const notificationSocket = new WebSocket(`ws://127.0.0.1:8000/ws/notification/?token=${access}`);
+    if (!notificationCount) {
+      fetchUnreadNotificationCount()
+    }
+    if (!chatNotificationCount) {
+      fetchUnreadMessageCount()
+    }
+
+  },
+    [])
+
+  useEffect(() => {
+    const notificationSocket = new WebSocket(`${WEBSOCKET_BASE_URL}/notification/?token=${access}`);
     console.log(notificationSocket)
     notificationSocket.onopen = () => {
       console.log('WebSocket connection established.');
@@ -64,6 +80,9 @@ function Navbar() {
         if (data.type === 'notification') {
           setNotificationCount(prev => prev + 1)
           dispatch(fetchNotifications())
+        }
+        else if (data.type === 'chat_notification') {
+          fetchUnreadMessageCount()
         }
       } catch (error) {
         console.error('Error parsing message:', error);
@@ -90,7 +109,10 @@ function Navbar() {
           <ul className='flex-col'>
             <Link to={'/home/'}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillHome size={24} /></span>Home</li></Link>
             <Link to={'/home/explore/'}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiOutlineSearch size={24} /></span>Explore</li></Link>
-            <Link to={`/home/message/`}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><BiSolidMessageRounded size={24} /></span>Message</li></Link>
+
+            <Link to={`/home/message/`}><li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl relative'><span><BiSolidMessageRounded size={24} /></span>Message
+            {chatNotificationCount > 0 && <div className='absolute bg-red-600 flex justify-center items-center left-5 -top-3 rounded-full text-sm size-5'>{chatNotificationCount}</div>}
+            </li></Link>
 
             <Link to={`/home/notification/`}>
               <li className='flex gap-x-2 py-2 mt-3 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl relative'><span><IoIosNotifications size={25} /></span>Notification
@@ -109,7 +131,10 @@ function Navbar() {
         <ul className='flex justify-between px-5 w-full items-center p-1'>
           <Link to={'/home/'}><li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillHome size={20} /></span></li></Link>
           <Link to={'/home/explore/'}><li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiOutlineSearch size={20} /></span></li></Link>
-          <Link to={`/home/message/`}><li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><BiSolidMessageRounded size={20} /></span></li></Link>
+
+          <Link to={`/home/message/`}><li className='flex relative  gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><BiSolidMessageRounded size={20} /></span>
+          {chatNotificationCount > 0 && <div className='absolute left-5 -top-1 bg-red-600 size-4 text-xs rounded-full flex justify-center'>{chatNotificationCount}</div>}
+          </li></Link>
 
           <Link to={`/home/notification/`}><li className='flex gap-x-2 p-1 cursor-pointer relative hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><IoIosNotifications size={20} /></span>
             {notificationCount > 0 && <div className='absolute left-5 -top-1 bg-red-600 size-4 text-xs rounded-full flex justify-center'>{notificationCount}</div>}
