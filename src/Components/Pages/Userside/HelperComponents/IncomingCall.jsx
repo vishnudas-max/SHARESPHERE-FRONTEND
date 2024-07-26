@@ -2,9 +2,10 @@ import React, { useContext, useEffect, useState } from 'react'
 import { FaUserCircle } from "react-icons/fa";
 import { IoCall } from "react-icons/io5";
 import { CallContext } from '../.././../../Contexts/CallSocketProvider'
-import { CLIENT_BASE_RUL } from '../../../../secrets';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+
+const CLIENT_BASE_RUL= process.env.CLIENT_BASE_RUL
 
 function IncomingCall() {
     const { ws } = useContext(CallContext)

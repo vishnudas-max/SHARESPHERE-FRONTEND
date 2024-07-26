@@ -14,8 +14,9 @@ import Navbar from './HelperComponents/Navbar'
 import { IoClose } from "react-icons/io5";
 import IncomingCall from './HelperComponents/IncomingCall'
 import CallSocketProvider from '../../../Contexts/CallSocketProvider'
-import { BASE_URL } from '../../../secrets'
 import { MdVerified } from "react-icons/md";
+
+const BASE_URL = process.env.REACT_APP_BASE_URL
 
 
 function ViewPost() {

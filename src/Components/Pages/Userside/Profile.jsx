@@ -3,7 +3,6 @@ import Navbar from './HelperComponents/Navbar'
 import { useSelector } from 'react-redux'
 import api from '../../../Config'
 import { Link } from 'react-router-dom'
-import { BASE_URL } from '../../../secrets'
 import { MdVerified } from "react-icons/md";
 import { FaCircleUser } from "react-icons/fa6";
 import { FaUserEdit } from "react-icons/fa";
@@ -12,6 +11,8 @@ import CallSocketProvider from '../../../Contexts/CallSocketProvider'
 import IncomingCall from './HelperComponents/IncomingCall'
 import { IoClose } from "react-icons/io5";
 import debounce from 'lodash/debounce';
+
+const BASE_URL = process.env.REACT_APP_BASE_URL
 
 function Profile() {
 

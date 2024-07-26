@@ -5,7 +5,6 @@ import { MdVerified } from "react-icons/md";
 import api from '../../../Config'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { MdOutlineLockReset } from "react-icons/md";
-import { BASE_URL } from '../../../secrets';
 import { useDispatch } from 'react-redux';
 import { Toggle_is_following } from '../../../Redux/PostSlice';
 import { IoMdMore } from "react-icons/io";
@@ -16,6 +15,8 @@ import CallSocketProvider from '../../../Contexts/CallSocketProvider';
 import { FaChevronLeft } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import debounce from 'lodash/debounce';
+
+const BASE_URL = process.env.REACT_APP_BASE_URL
 
 
 function UserProfile() {

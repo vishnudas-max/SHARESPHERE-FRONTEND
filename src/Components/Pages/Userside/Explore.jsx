@@ -4,7 +4,7 @@ import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { IoIosSearch } from "react-icons/io";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import api from '../../../Config';
 import { Link } from 'react-router-dom';
 import debounce from 'lodash/debounce';

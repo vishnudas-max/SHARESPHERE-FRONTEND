@@ -11,9 +11,8 @@ import { useDispatch } from 'react-redux'
 import { delAuth } from '../../../Redux/UserdataSlice'
 import { delPost } from '../../../Redux/PostSlice'
 import { delStories } from '../../../Redux/StoriesSlice'
-import { IoDocumentSharp, IoClose } from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom'
-import { BASE_URL, RAZORPAY_KEY_ID, RAZORPAY_SECRET } from '../../../secrets'
 import { TiTick } from "react-icons/ti";
 import { MdVerified } from "react-icons/md";
 
@@ -400,7 +399,7 @@ function More() {
                                                 {
                                                     profile.profile_pic ?
                                                         <div className='shrink-0'>
-                                                            <img src={BASE_URL + profile.profile_pic} alt='ProfilePic' className='md:size-16 size-12 rounded-full
+                                                            <img src={process.env.REACT_APP_BASE_URL + profile.profile_pic} alt='ProfilePic' className='md:size-16 size-12 rounded-full
                                         border-[1px] border-gray-300'/>
                                                         </div>
                                                         :
@@ -574,7 +573,7 @@ function More() {
                                             <div className='flex gap-x-2 items-center basis-2/3'>
                                                 <div className='shrink-0 size-14 rounded-full'>
                                                     {user.profile_pic ?
-                                                        <img src={BASE_URL + user.profile_pic} alt="profile_pic" className='rounded-full size-12 border border-gray-400' />
+                                                        <img src={process.env.REACT_APP_BASE_URL + user.profile_pic} alt="profile_pic" className='rounded-full size-12 border border-gray-400' />
                                                         :
                                                         <div>
                                                             <FaCircleUser className='size-12' />

@@ -8,8 +8,7 @@ import api from '../../../Config'
 import { FaCircleUser } from "react-icons/fa6";
 import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
-import { FcApproval } from "react-icons/fc";
-import { IoCloseCircle } from "react-icons/io5";
+
 
 function Notification() {
     const status = useSelector(state => state.notifications.status)
@@ -93,7 +92,7 @@ function Notification() {
                                                         <div>
                                                             {not.invoked_user.profile_pic ?
                                                                 <div className='shrink-0 h-fit w-fit'>
-                                                                    <img src={BASE_URL + not.invoked_user.profile_pic} alt="profile" className='size-9 rounded-full border-[1px] border-gray-500' />
+                                                                    <img src={process.env.REACT_APP_BASE_URL + not.invoked_user.profile_pic} alt="profile" className='size-9 rounded-full border-[1px] border-gray-500' />
                                                                 </div>
                                                                 :
                                                                 <FaCircleUser className='size-9' />
@@ -117,7 +116,7 @@ function Notification() {
                                                 ) : (
                                                     not.postID && not.postID.contend &&
 
-                                                    <img src={BASE_URL + not.postID.contend} alt="post" className='max-w-16 max-h-full pt-1 pb-1 my-2 rounded-md' />
+                                                    <img src={process.env.REACT_APP_BASE_URL + not.postID.contend} alt="post" className='max-w-16 max-h-full pt-1 pb-1 my-2 rounded-md' />
 
                                                 )
                                             }

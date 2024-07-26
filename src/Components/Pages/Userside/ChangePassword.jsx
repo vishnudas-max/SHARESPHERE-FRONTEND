@@ -3,7 +3,7 @@ import { ReactTyped } from "react-typed";
 import api from '../../../Config'
 import { ForgotPasswordContext } from '../../../Contexts/ForgotPasswordContextProvider';
 import { ToastContainer, toast } from 'react-toastify';
-import { redirect, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 
 function Register() {
     const { forgotpasswordData, setForgotpasswordData } = useContext(ForgotPasswordContext)

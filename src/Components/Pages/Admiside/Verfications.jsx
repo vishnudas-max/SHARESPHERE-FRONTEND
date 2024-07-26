@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
 import AdminNavbar from './HelperComponents.jsx/AdminNavbar'
-import { Link } from 'react-router-dom'
 import api from '../../../Config'
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import { TiTick } from "react-icons/ti";

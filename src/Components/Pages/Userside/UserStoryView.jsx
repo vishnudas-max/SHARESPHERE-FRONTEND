@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { BASE_URL } from '../../../secrets';
 import { FaCircleUser } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import api from '../../../Config'
 import { addUsertoViewdUser } from '../../../Redux/StoriesSlice';
 import { useDispatch } from 'react-redux';
 import ProgressBar from './HelperComponents/StoryProgressBar';
+
+const BASE_URL= process.env.REACT_APP_BASE_URL
 
 function UserStoryView({ userID, closeStory }) {
     const UserWithStories = useSelector(state => state.stories.stories)

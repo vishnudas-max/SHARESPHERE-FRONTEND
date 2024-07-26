@@ -9,15 +9,15 @@ import { useRef } from 'react';
 import Picker from 'emoji-picker-react';
 import { RiArrowLeftWideLine } from "react-icons/ri";
 import { Link } from 'react-router-dom';
-import { BASE_URL } from '../../../secrets';
 import Loader from './HelperComponents/Loader'
 import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
 import { ToastContainer, toast } from 'react-toastify';
-import { WEBSOCKET_BASE_URL } from '../../../secrets';
 
 
 
+const WEBSOCKET_BASE_URL = process.env.REACT_APP_WEBSOCKET_BASE_URL
+const BASE_URL = process.env.REACT_APP_BASE_URL
 
 function Chat() {
 

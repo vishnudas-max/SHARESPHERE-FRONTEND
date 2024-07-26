@@ -3,7 +3,7 @@ import { ReactTyped } from "react-typed";
 import api from '../../../Config'
 import { RegisterContext } from '../../../Contexts/RegisterContextProvider';
 import { ToastContainer, toast } from 'react-toastify';
-import { redirect, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 
 function Register() {
     const { regdata, setRegdata } = useContext(RegisterContext)

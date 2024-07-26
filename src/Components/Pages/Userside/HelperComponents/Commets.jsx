@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useSyncExternalStore } from 'react'
+import React, { useEffect, useState } from 'react'
 import api from '../../../../Config'
 import Loader from './Loader'
 import { FaCircleUser } from "react-icons/fa6";
@@ -7,7 +7,11 @@ import { IoSend } from "react-icons/io5";
 import { addComment_count } from '../../../../Redux/PostSlice';
 import { useDispatch } from 'react-redux';
 import { MdDelete } from "react-icons/md";
-import { BASE_URL } from '../../../../secrets';
+
+
+
+
+const BASE_URL = process.env.REACT_APP_BASE_URL
 
 function Commets({ view, postID }) {
     const dispatch = useDispatch()

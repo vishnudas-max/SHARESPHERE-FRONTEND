@@ -1,14 +1,20 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
-import { REACT_APP_APP_ID, REACT_APP_SERVER_SECRET } from '../../../secrets';
 import { useNavigate } from 'react-router-dom';
 import { CallContext } from '../../../Contexts/CallSocketProvider';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
+const REACT_APP_APP_ID = parseInt(process.env.REACT_APP_ID)
+const REACT_APP_SERVER_SECRET = process.env.REACT_APP_SERVER_SECRET
+
+
+
 const generateRandomRoomID = () => {
     return Math.random().toString(36).substring(7); // Generate a random string
 };
+
+console.log(REACT_APP_SERVER_SECRET,REACT_APP_APP_ID)
 
 function VideoCall() {
     const roomID = "sharesphere"

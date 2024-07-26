@@ -18,11 +18,12 @@ import { fetchStory } from '../../../Redux/StoriesSlice';
 import { FaCircleUser } from "react-icons/fa6";
 import UserStoryView from './UserStoryView';
 import { IoMdMore } from "react-icons/io";
-import { BASE_URL } from '../../../secrets';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Loader from './HelperComponents/Loader';
 import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
+
+const BASE_URL = process.env.REACT_APP_BASE_URL
 
 
 function Home() {

@@ -1,8 +1,5 @@
-import React, { act, useEffect, useState } from 'react'
+import React, {  useEffect, useState } from 'react'
 import AdminNavbar from './HelperComponents.jsx/AdminNavbar'
-import { Link } from 'react-router-dom'
-import { MdOutlinePersonSearch } from "react-icons/md";
-import { debounce } from 'lodash'
 import api from '../../../Config'
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import { IoCloseSharp } from "react-icons/io5";

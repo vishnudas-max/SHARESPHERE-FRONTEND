@@ -9,7 +9,9 @@ import { Link } from 'react-router-dom'
 import { IoIosNotifications } from "react-icons/io";
 import { fetchNotifications } from './../../../../Redux/NotificationSlice'
 import api from '../../../../Config'
-import { WEBSOCKET_BASE_URL } from '../../../../secrets';
+
+
+const WEBSOCKET_BASE_URL = process.env.REACT_APP_WEBSOCKET_BASE_URL
 
 function Navbar() {
   const dispatch = useDispatch()

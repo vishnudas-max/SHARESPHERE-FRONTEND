@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect } from 'react';
-import {WEBSOCKET_BASE_URL} from '../secrets'
 
+
+
+const WEBSOCKET_BASE_URL = process.env.REACT_APP_WEBSOCKET_BASE_URL
 // Create a context for WebSocket
 export const CallContext = createContext();
 

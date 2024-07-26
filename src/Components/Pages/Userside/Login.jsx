@@ -8,7 +8,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../../../Redux/UserdataSlice';
-import { BASE_URL,GOOGLE_OAUTH2_CLIENT_ID,GOOGLE_OAUTH2_CLIENT_SECRET } from '../../../secrets';
 import { FcGoogle } from "react-icons/fc";
 import Loader from './HelperComponents/Loader'
 
@@ -78,8 +77,8 @@ function Login() {
 
         const params = {
             response_type: 'code',
-            client_id: GOOGLE_OAUTH2_CLIENT_ID,
-            redirect_uri: `${BASE_URL}/${REDIRECT_URI}`,
+            client_id: process.env.REACT_APP_GOOGLE_OAUTH2_CLIENT_ID,
+            redirect_uri: `${process.env.REACT_APP_BASE_URL}/${REDIRECT_URI}`,
             prompt: 'select_account',
             access_type: 'offline',
             scope
