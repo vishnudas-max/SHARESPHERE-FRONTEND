@@ -1,12 +1,13 @@
-import React, { useState, useRef } from 'react'
-import messi from '../../../../media/images/messi.webp'
+import React, { useState, useRef, useEffect } from 'react'
 import { FaImage } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import api from '../../../../Config'
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { delPost } from '../../../../Redux/PostSlice';
-import { ToastContainer, toast, useToast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
+import { FaCircleUser } from "react-icons/fa6";
+
 
 
 function AddPost({ setAddPost }) {
@@ -15,8 +16,26 @@ function AddPost({ setAddPost }) {
     const [contend, setConted] = useState(null)
     const userID = useSelector(state => state.authInfo.userID)
     const [contentError,setContentError] = useState('')
+    const username = useSelector(state => state.authInfo.username)
+    const [userData,setUserData] = useState(null)
+    const access = localStorage.getItem('access')
 
     const imgref = useRef()
+
+    const fetchProfile = async () => {
+        try {
+            const response = await api.get(`user/profile/detailes/${userID}/`, {
+                headers: {
+                    Authorization: `Bearer ${access}`
+                }
+            })
+            setUserData(response.data)
+
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
 
     const handleClose = () => {
         setAddPost(false)
@@ -87,6 +106,11 @@ function AddPost({ setAddPost }) {
 
 
     }
+
+    useEffect(()=>{
+        if(userData === null)
+        fetchProfile()
+    })
     return (
         <div className='w-screen flex h-screen fixed  backdrop-blur-md z-30 justify-center px-10'>
              <ToastContainer />
@@ -94,8 +118,17 @@ function AddPost({ setAddPost }) {
             <div className='max-w-[340px] md:max-w-[900px] bg-gray-900 h-fit text-white p-4 rounded-md mt-20 md:mt-21'>
                 <h1 className='w-full border-b border-gray-400 text-[16px] font-semibold md:text-3xl py-2'>Create Post</h1>
                 <div className='flex gap-x-2 py-2 items-center text-[12px] md:text-[14px]'>
-                    <img src={messi} alt="profilepic" className='size-7 rounded-full md:size-10' />
-                    <p>_John02</p>
+                    {
+                        userData && userData.profile_pic ?
+                        <div>
+                            <img src={userData.profile_pic} alt="profile_pic" className='size-9 rounded-full border border-gray-400'/>
+                        </div>
+                        :
+                        <div>
+                            <FaCircleUser className='size-9'/>
+                        </div>
+                    }
+                    <p>{username}</p>
                 </div>
                 <form action="" className='max:w-[340px] md:max:w-[700px] relative'>
                     <input type="text" placeholder="What's happening...." className='bg-transparent border-b border-gray-500 outline-none w-[300px] md:w-[700px] '

@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react'
-import messi from '../../../media/images/messi.webp'
 import { FaImage } from 'react-icons/fa'
 import { useSelector, useDispatch } from 'react-redux'
 import api from '../../../Config'
@@ -7,6 +6,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { edit_post } from '../../../Redux/PostSlice'
 import CallSocketProvider from '../../../Contexts/CallSocketProvider'
 import IncomingCall from './HelperComponents/IncomingCall'
+import { FaCircleUser } from "react-icons/fa6";
+
 
 function EditPost() {
     const dispatch = useDispatch()
@@ -14,9 +15,11 @@ function EditPost() {
     const [caption, setCaption] = useState('')
     const [contend, setConted] = useState(null)
     const username = useSelector(state => state.authInfo.username)
+    const userID = useSelector(state => state.authInfo.userID)
     const { id } = useParams()
     const access = localStorage.getItem('access')
     const imgref = useRef()
+    const [userData,setUserData] = useState(null)
     const { nextPage } = useSelector(state => state.posts);
     const [contentError,setContentError] = useState('')
 
@@ -67,6 +70,27 @@ function EditPost() {
         }
 
     }
+
+    const fetchProfile = async () => {
+        try {
+            const response = await api.get(`user/profile/detailes/${userID}/`, {
+                headers: {
+                    Authorization: `Bearer ${access}`
+                }
+            })
+            setUserData(response.data)
+
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+    useEffect(()=>{
+        if(userData === null){
+            fetchProfile()
+        }
+    },[])
+
     return (
         <>
             <CallSocketProvider>
@@ -77,7 +101,16 @@ function EditPost() {
                 <div className='max-w-[340px] md:max-w-[900px] bg-gray-900 h-fit text-white p-4 rounded-md mt-20 md:mt-21'>
                     <h1 className='w-full border-b border-gray-400 text-[16px] font-semibold md:text-3xl py-2'>Edit Post</h1>
                     <div className='flex gap-x-2 py-2 items-center text-[12px] md:text-[14px]'>
-                        <img src={messi} alt="profilepic" className='size-7 rounded-full md:size-10' />
+                    {
+                        userData && userData.profile_pic ?
+                        <div>
+                            <img src={userData.profile_pic} alt="profile_pic" className='size-9 rounded-full border border-gray-400'/>
+                        </div>
+                        :
+                        <div>
+                            <FaCircleUser className='size-9'/>
+                        </div>
+                    }
                         <p>{username}</p>
                     </div>
                     <form action="" className='max:w-[340px] md:max:w-[700px] relative'>
