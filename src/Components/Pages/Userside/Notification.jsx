@@ -93,7 +93,7 @@ function Notification() {
                                                         <div>
                                                             {not.invoked_user.profile_pic ?
                                                                 <div className='shrink-0 h-fit w-fit'>
-                                                                    <img src={process.env.REACT_APP_BASE_URL + not.invoked_user.profile_pic} alt="profile" className='size-9 rounded-full border-[1px] border-gray-500' />
+                                                                    <img src={BASE_URL + not.invoked_user.profile_pic} alt="profile" className='size-9 rounded-full border-[1px] border-gray-500' />
                                                                 </div>
                                                                 :
                                                                 <FaCircleUser className='size-9' />
@@ -117,7 +117,7 @@ function Notification() {
                                                 ) : (
                                                     not.postID && not.postID.contend &&
 
-                                                    <img src={process.env.REACT_APP_BASE_URL + not.postID.contend} alt="post" className='max-w-16 max-h-full pt-1 pb-1 my-2 rounded-md' />
+                                                    <img src={BASE_URL + not.postID.contend} alt="post" className='max-w-16 max-h-full pt-1 pb-1 my-2 rounded-md' />
 
                                                 )
                                             }
