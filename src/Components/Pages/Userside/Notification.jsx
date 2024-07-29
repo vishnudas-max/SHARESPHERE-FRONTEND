@@ -2,12 +2,13 @@ import React, { useEffect } from 'react'
 import Navbar from './HelperComponents/Navbar'
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNotifications, followback } from '../../../Redux/NotificationSlice'
-import { BASE_URL } from '../../../secrets';
 import { Link } from 'react-router-dom';
 import api from '../../../Config'
 import { FaCircleUser } from "react-icons/fa6";
 import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
+
+BASE_URL = process.env.REACT_APP_BASE_URL
 
 
 function Notification() {
