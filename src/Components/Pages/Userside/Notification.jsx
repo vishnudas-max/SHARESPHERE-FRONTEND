@@ -8,7 +8,7 @@ import { FaCircleUser } from "react-icons/fa6";
 import IncomingCall from './HelperComponents/IncomingCall';
 import CallSocketProvider from '../../../Contexts/CallSocketProvider';
 
-BASE_URL = process.env.REACT_APP_BASE_URL
+const BASE_URL = process.env.REACT_APP_BASE_URL
 
 
 function Notification() {
