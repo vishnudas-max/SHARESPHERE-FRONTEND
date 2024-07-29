@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from '../Config'
-import { act } from "react";
+
 
 export const fetchStory = createAsyncThunk('get/stories/', async () => {
     let access = localStorage.getItem('access')

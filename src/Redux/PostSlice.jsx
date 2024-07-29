@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import api from '../Config'
-import { BASE_URL } from '../secrets';
+
+
+const BASE_URL = process.env.REACT_APP_BASE_URL
 
 export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (page) => {
     let access = localStorage.getItem('access')

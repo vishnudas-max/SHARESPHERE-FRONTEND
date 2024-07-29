@@ -69,7 +69,7 @@ function Login() {
 
         localStorage.setItem('loading', true)
         const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
-        const REDIRECT_URI = 'api/auth/login/google/';
+        const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URL
         const scope = [
             'https://www.googleapis.com/auth/userinfo.email',
             'https://www.googleapis.com/auth/userinfo.profile'
