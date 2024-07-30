@@ -52,15 +52,17 @@ function Login() {
             })
             .catch(err => {
                 console.log(err)
-                toast.error(err.response.data, {
-                    position: "top-right",
-                    autoClose: 1000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: true,
-                    style: { backgroundColor: 'red', color: 'black' },
-                })
+                if (err.response.data) {
+                    toast.error(err.response.data, {
+                        position: "top-right",
+                        autoClose: 1000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: false,
+                        draggable: true,
+                        style: { backgroundColor: 'red', color: 'black' },
+                    })
+                }
             })
     }
 

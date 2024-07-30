@@ -184,9 +184,9 @@ function Register() {
             return false
         }
         let data = {
-            "first_name" :firstname,
-            "last_name":lastname,
-            "phone_number":phonenumber,
+            "first_name": firstname,
+            "last_name": lastname,
+            "phone_number": phonenumber,
             "username": username,
             "email": email,
             "password": password
@@ -194,20 +194,22 @@ function Register() {
         api.post('register/', data)
             .then(data => {
                 console.log(data.data)
-                setRegdata({email:data.data.email,phonenumber:data.data.phone_number})
+                setRegdata({ email: data.data.email, phonenumber: data.data.phone_number })
                 navigate('/register/otp/')
             })
             .catch(errors => {
                 console.log(errors)
-                toast.error(errors.response.data.errors.non_field_errors[0], {
-                    position: "top-right",
-                    autoClose: 1000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: true,
-                    style: { backgroundColor: 'red', color: 'black' },
-                })
+                if (errors.response.data.errors.non_field_errors) {
+                    toast.error(errors.response.data.errors.non_field_errors[0], {
+                        position: "top-right",
+                        autoClose: 1000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: false,
+                        draggable: true,
+                        style: { backgroundColor: 'red', color: 'black' },
+                    })
+                }
             })
     }
 
@@ -277,7 +279,7 @@ function Register() {
                             onInput={(e) => {
                                 e.target.value = e.target.value.slice(0, 10); // Ensure max length
                             }}
-                    
+
                         />
 
 
