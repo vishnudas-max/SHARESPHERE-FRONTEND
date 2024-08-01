@@ -36,11 +36,11 @@ function AdminNavbar() {
 
             <nav className='border-t border-gray-700 fixed  flex p-1 w-screen bottom-0 md:bottom-[-100%] transition-all ease-in-out delay-700 bg-[#000300] z-40'>
                 <ul className='flex justify-between px-5 w-full items-center p-1'>
-                    <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillDashboard size={20} /></span></li>
-                    <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><FaUsersCog size={20} /></span></li>
-                    <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><BsFillFileImageFill size={20} /></span></li>
-                    <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><MdReport size={20} /></span></li>
-                    <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><MdVerified  size={20} /></span></li>
+                <Link to={'/admin/dashboard/'}><li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><AiFillDashboard size={20} /></span></li></Link>
+                <Link to={'/admin/usermanagement/'}><li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><FaUsersCog size={20} /></span></li></Link>
+                <Link to={'/admin/postmanagement/'}> <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><BsFillFileImageFill size={20} /></span></li></Link>
+                <Link to={'/admin/verifications/'}>   <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl'><span><MdVerified  size={20} /></span></li></Link>
+                 <li className='flex gap-x-2 p-1 cursor-pointer hover:bg-gray-900 rounded-md px-2 md:text-xl' onClick={handleLogout}><span><BiLogOutCircle size={24} className='text-red-600'/></span></li>
                 </ul>
             </nav>
         </div>
