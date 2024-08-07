@@ -20,8 +20,8 @@ function EditPost() {
     const access = localStorage.getItem('access')
     const imgref = useRef()
     const [userData,setUserData] = useState(null)
-    const { nextPage } = useSelector(state => state.posts);
     const [contentError,setContentError] = useState('')
+    const [error,SetError] = useState('')
 
     const handlepostconted = (event) => {
         const file = event.target.files[0];
@@ -66,7 +66,13 @@ function EditPost() {
             navigate(-1,{replace:true})
         }
         catch (error) {
-            console.log('something went wrong')
+            if(error.response.data.message){
+                SetError(error.response.data.message)
+                setTimeout(() => {
+                    SetError('')
+                }, 2000);
+            }
+            console.log(error.response)
         }
 
     }
@@ -125,6 +131,7 @@ function EditPost() {
                         <FaImage color='blue' className='mt-3 md:size-9 size-6' onClick={() => imgref.current.click()} />
                         {contentError && <p className='text-red-600 '>{contentError}</p>}
                         </div>
+                        {error && <p className='text-red-600 text-xs'>{error}</p>}
                         <div className='w-[340px] md:w-[700px]'>
                             <button onClick={handelPost} className='text-[13px] md:text-[15px] font-semibold  mt-4 px-3 rounded-md border md:py-1 md:px-5 hover:text-black hover:bg-slate-300 border-gray-300 mb-3'>POST</button>
                             <img src={contend ? URL.createObjectURL(contend) : ''} alt="" className='h-[150px] md:h-[200px]' />

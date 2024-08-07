@@ -16,10 +16,13 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If the error is 401 (Unauthorized), try to refresh the token
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response.data.status === false && !originalRequest._retry && error.response.status === 401) {
       originalRequest._retry = true;
+      return Promise.reject(error);
+    }
 
+    if(error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem('refresh');
         let url =BASE_URL+'/api/token/refresh/'
@@ -31,7 +34,7 @@ axiosInstance.interceptors.response.use(
 
         // Store the new access token
         localStorage.setItem('access', response.data.access);
-
+        console.log('access token updated')
         // Update the Authorization header in the original request and retry it
         originalRequest.headers['Authorization'] = `Bearer ${response.data.access}`;
         return axiosInstance(originalRequest);

@@ -371,13 +371,13 @@ function Chat() {
                                         <FaCircleUser className='md:size-16 size-12' />
                                     </div>
                                 }
-                                <div className='grid grid-rows-2'>
-                                    <div className='flex'>
-                                        <h1 className='row-span-1 md:text-xl text-md h-fit font-semibold'>{currentChatRoom.user}</h1>
-                                        {onlineUsers.includes(currentChatRoom.user) ? <h1>Online</h1> : <h1>Offline</h1>}
-                                    </div>
+                                <div className='flex flex-col'>
+                                
+                                    <h1 className='md:text-xl text-md h-fit font-semibold'>{currentChatRoom.user}</h1>
+                                    {onlineUsers.includes(currentChatRoom.user) ? <h1 className='text-green-600'>Online</h1> : <h1>Offline</h1>}
+                                    
 
-                                    <p className='row-span-1 md:text-sm text-xs text-gray-400 h-fit'>last seen 10 min ago...</p>
+                                    {/* <p className='row-span-1 md:text-sm text-xs text-gray-400 h-fit'>last seen 10 min ago...</p> */}
                                 </div>
                             </div>
                             {/* left side end-- */}

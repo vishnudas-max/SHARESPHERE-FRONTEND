@@ -33,6 +33,7 @@ function More() {
     const docOptions = ['Aadhaar', 'Driving Licence', 'PAN Card']
     const [credentialNumber, setCredentialNumber] = useState('')
     const [credentialError, setCredentialError] = useState('')
+    const [isDeleteOpen, toggleisDeleteOpen] = useState(false)
 
     const [errors, setErrors] = useState({
         password: '',
@@ -170,7 +171,7 @@ function More() {
     // request for verification---
     const handleverification = async () => {
 
-        const verficatinData = new FormData();  
+        const verficatinData = new FormData();
         if (credentialError) {
             return false
         }
@@ -181,7 +182,7 @@ function More() {
         if (!userID) {
             return false
         }
-        verficatinData.append('document_type',docOptionSelected)
+        verficatinData.append('document_type', docOptionSelected)
         verficatinData.append('document_number', credentialNumber)
         verficatinData.append('userID', userID)
         try {
@@ -194,11 +195,11 @@ function More() {
             let obj = { ...profile, is_requested: true }
             setUserProfile(obj)
         } catch (error) {
-            if(error.response.data.message){
+            if (error.response.data.message) {
                 setCredentialError(error.response.data.message)
-                setTimeout(()=>(
+                setTimeout(() => (
                     setCredentialError('')
-                ),[2000])
+                ), [2000])
             }
             console.log(error)
         }
@@ -410,7 +411,11 @@ function More() {
                                             </div>
                                         )
                                         :
-                                        <Loader />
+                                        <div className='flex justify-between items-center gap-x-3'>
+                                            <div className='bg-gray-800 size-14 animate-pulse rounded-full '></div>
+                                            <div className='w-32 h-8 bg-gray-800 rounded-full animate-pulse'></div>
+
+                                        </div>
                                 }
                             </div>
                         </div>
@@ -429,6 +434,7 @@ function More() {
                                     if (accountSecOption) {
                                         setAccountsecOption('')
                                     }
+                                    if(isDeleteOpen)toggleisDeleteOpen(false)
                                     setMoreOption('Verify Account')
                                 }
                                 } className='md:text-xl text-md w-full bg-gray mt-4 font-sans font-light cursor-pointer hover:bg-gray-800 rounded-full    flex justify-center py-1' >Verify</li>
@@ -448,42 +454,56 @@ function More() {
 
                 {/* continer for Account Security options-- */}
                 {moreOption === 'Account Security' &&
-
                     <div className={`'md:basis-6/12 md:basis-6/12  w-screen md:border-r border-gray-700 h-full overflow-x-auto'
                     ${accountSecOption ? 'hidden ' : 'block '}`}>
                         <div className='pl-3 pt-3 text-sm text-gray-500 fixed'>
-                            <span className='cursor-pointer' onClick={() => setMoreOption('')}>More</span>
+                            <span className='cursor-pointer' onClick={() => {
+                                if(isDeleteOpen)toggleisDeleteOpen(false)
+                                setMoreOption('')
+                                }}>More</span>
                             &nbsp;
                             &gt;
                             &nbsp;
                             <span className='cursor-pointer' >Security</span>
                         </div>
-                        <div className='w-full h-fit pb-10 bg-gray-900 max-w-[300px] mx-auto mt-20 rounded-3xl border border-gray-700'>
-                            <div className='w-full bg-gray-950 h-fit py-4 px-2 rounded-tl-3xl rounded-tr-3xl'>
-                                <h1 className='text-center text-2xl font-semibold'>{moreOption}</h1>
-                            </div>
-                            <div className='w-full px-10'>
-
-
-                                <ul>
-
-                                    <li className='font-light w-full py-1 flex justify-center h-fit mt-5 hover:bg-gray-800 rounded-full
+                        {isDeleteOpen === false &&
+                            <div className={`w-full h-fit pb-10 bg-gray-900 max-w-[300px] mx-auto mt-20 rounded-3xl border border-gray-700`}>
+                                <div className='w-full bg-gray-950 h-fit py-4 px-2 rounded-tl-3xl rounded-tr-3xl'>
+                                    <h1 className='text-center text-2xl font-semibold'>{moreOption}</h1>
+                                </div>
+                                <div className='w-full px-10'>
+                                    <ul>
+                                        <li className='font-light w-full py-1 flex justify-center h-fit mt-5 hover:bg-gray-800 rounded-full
                             cursor-pointer' onClick={() => setAccountsecOption('Change Password')}>Change Password</li>
 
-                                    <li className='font-light w-full py-1 flex justify-center h-fit mt-5 hover:bg-gray-800 rounded-full
+                                        <li className='font-light w-full py-1 flex justify-center h-fit mt-5 hover:bg-gray-800 rounded-full
                             cursor-pointer' onClick={() => {
-                                            gettingBlockedUsers()
-                                            setAccountsecOption('Block List')
-                                        }}>Block List</li>
+                                                gettingBlockedUsers()
+                                                setAccountsecOption('Block List')
+                                            }}>Block List</li>
 
-                                    <li className='font-light w-full py-1 flex justify-center h-fit mt-5 hover:bg-gray-800 rounded-full
-                            cursor-pointer' onClick={deleteAccount}>Delete Account</li>
+                                        <li className='font-light w-full py-1 flex justify-center h-fit mt-5 hover:bg-gray-800 rounded-full
+                            cursor-pointer ' onClick={() => toggleisDeleteOpen(true)}>Delete Account
+                                        </li>
 
-                                </ul>
+                                    </ul>
+                                </div>
+                            </div>}
+                        <div className={`w-fit h-fit mt-32 mx-auto px-5 transition-all ease-in-out delay-75 pt-3 pb-2 bg-gray-800 rounded-xl border border-gray-700
+                           ${isDeleteOpen ? 'block':'hidden'}
+                            `}>
+                            <p className='text-wrap text-[15px] font-bold'>Are you sure You want to delete the account ?</p>
+                            <p className='text-[14px] text-center font-semibold text-red-600'>you cannot access your account after this!</p>
+                            <div className='flex justify-between px-2 mt-7'>
+                                <button className='w-28 text-black font-semibold h-fit py-1 rounded-xl bg-red-700' onClick={()=>toggleisDeleteOpen(false)}>Close</button>
+                                <button className='w-28 text-black font-semibold h-fit py-1 rounded-xl bg-red-700' onClick={deleteAccount}>Delete</button>
                             </div>
                         </div>
                     </div>
+
                 }
+
+
 
                 {/* conatiner for Change password form-- */}
                 {

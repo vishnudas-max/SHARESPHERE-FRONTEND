@@ -44,7 +44,7 @@ function AddPost({ setAddPost }) {
     const handlepostconted = (event) => {
         const file = event.target.files[0];
         if (file) {
-          const allowedFormats = ['image/jpeg', 'image/jpg', 'image/webp'];
+          const allowedFormats = ['image/jpeg', 'image/jpg', 'image/webp', 'image/png'];
           if (allowedFormats.includes(file.type)) {
             setConted(file);
           } else {

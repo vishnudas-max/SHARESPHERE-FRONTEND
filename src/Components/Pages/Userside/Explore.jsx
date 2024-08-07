@@ -94,19 +94,19 @@ function Explore() {
                 </div>
                 {users &&
 
-                    <div className='md:w-[400px] bg-gray-900 fixed ml-1 pb-5 max-h-[500px] top-16 pt-3  rounded-bl-xl rounded-br-xl '>
+                    <div className='md:w-[400px] w-[300px] bg-gray-900 fixed ml-1 pb-5 max-h-[500px] top-16 pt-3  rounded-bl-xl rounded-br-xl '>
                         <div className='w-full max-h-[470px] overflow-y-scroll no-scrollbar'>
                             {
                                 users.map((user, index) => (
                                     <Link to={currentUsername !== user.username ? `/home/user/profile/${user.id}` : `/home/profile/`}>
-                                    <div className='flex gap-x-2 items-center mt-5 ml-10'>
+                                    <div className='flex gap-x-2 items-center mt-5 ml-10 '>
                                         {user.profile_pic ?
                                             <div>
-                                                <img src={user.profile_pic} alt="profile" className='md:size-9 rounded-full border border-gray-300' />
+                                                <img src={user.profile_pic} alt="profile" className='md:size-9 size-8 rounded-full border border-gray-300' />
                                             </div>
                                             :
                                             <div>
-                                                <FaCircleUser className='md:size-8' />
+                                                <FaCircleUser className='md:size-8 size-8' />
                                             </div>}
                                         <p className='text-md'>{user.username}</p>
                                     </div>
