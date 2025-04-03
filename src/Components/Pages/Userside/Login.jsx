@@ -76,7 +76,7 @@ function Login() {
             'https://www.googleapis.com/auth/userinfo.email',
             'https://www.googleapis.com/auth/userinfo.profile'
         ].join(' ');
-
+        console.log(`${process.env.REACT_APP_BASE_URL}/${REDIRECT_URI}`)
         const params = {
             response_type: 'code',
             client_id: process.env.REACT_APP_GOOGLE_OAUTH2_CLIENT_ID,

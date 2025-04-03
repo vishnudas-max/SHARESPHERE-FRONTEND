@@ -13,6 +13,7 @@ import { IoClose } from "react-icons/io5";
 import debounce from 'lodash/debounce';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL
+const REACT_APP_WEBSOCKET_BASE_URL=process.env.REACT_APP_WEBSOCKET_BASE_URL
 
 function Profile() {
 
@@ -47,7 +48,7 @@ function Profile() {
         [access])
 
     useEffect(() => {
-        const followwebsocket = new WebSocket(`ws://127.0.0.1:8000/ws/follow/?token=${access}`);
+        const followwebsocket = new WebSocket(`${REACT_APP_WEBSOCKET_BASE_URL}/ws/follow/?token=${access}`);
         console.log(followwebsocket)
         followwebsocket.onopen = () => {
             console.log('WebSocket connection established.');
