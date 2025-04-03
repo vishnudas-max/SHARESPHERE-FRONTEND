@@ -253,7 +253,7 @@ function Profile() {
                             userProfile.posts.map((post, index) => (
                                 <div className="col-span-1 flex justify-center border-1 border-gray-600 h-fit" key={index}>
                                     <Link to={`/home/post/${post.id}`}>
-                                        <img src={BASE_URL + post.contend} alt="post" className='h-fit' />
+                                        <img src={post.contend} alt="post" className='h-fit' />
                                     </Link>
                                 </div>
                             ))
