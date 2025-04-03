@@ -302,7 +302,7 @@ function Chat() {
                                 <div className='px-2 border-b border-gray-800 h-16 flex' key={index} onClick={() => handleChat(index, user.username, user.id, user.profile_pic, user.blocked_by)}>
                                     {user.profile_pic ?
                                         <div className='h-full flex items-center shrink-0 relative'>
-                                            <img src={BASE_URL + user.profile_pic} className='md:size-10 size-7 rounded-full border-[1px]' />
+                                            <img src={user.profile_pic} className='md:size-10 size-7 rounded-full border-[1px]' />
                                             {user.message_count > 0 &&
                                                 <div className='absolute -right-2 size-4 flex justify-center items-center top-1 rounded-full text-xs bg-red-600'>{user.message_count}</div>
                                             }
@@ -364,7 +364,7 @@ function Chat() {
                                 <RiArrowLeftWideLine className='size-10 cursor-pointer' onClick={() => setChatRoom(null)} />
                                 {currentChatRoom.profile_pic ?
                                     <div className='h-fit shrink-0'>
-                                        <img src={BASE_URL + currentChatRoom.profile_pic} className='md:size-16 size-12 rounded-full' />
+                                        <img src={currentChatRoom.profile_pic} className='md:size-16 size-12 rounded-full' />
                                     </div>
                                     :
                                     <div className='h-fit'>

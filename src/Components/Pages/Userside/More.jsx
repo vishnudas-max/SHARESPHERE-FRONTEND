@@ -400,7 +400,7 @@ function More() {
                                                 {
                                                     profile.profile_pic ?
                                                         <div className='shrink-0'>
-                                                            <img src={process.env.REACT_APP_BASE_URL + profile.profile_pic} alt='ProfilePic' className='md:size-16 size-12 rounded-full
+                                                            <img src={profile.profile_pic} alt='ProfilePic' className='md:size-16 size-12 rounded-full
                                         border-[1px] border-gray-300'/>
                                                         </div>
                                                         :

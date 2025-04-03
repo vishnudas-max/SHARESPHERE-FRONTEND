@@ -351,7 +351,7 @@ function Home() {
               <div className="flex-shrink-0 py-2 flex-col pl-4">
                 {storyStatus === 'success' && currentUserStories.profile_pic ?
                   <img
-                    src={BASE_URL + currentUserStories.profile_pic}
+                    src={currentUserStories.profile_pic}
                     alt=""
                     className={`md:size-20 size-16 rounded-full border-[3px] ${(currentUserStories && currentUserStories.stories.length > 0) ? ' border-green-500' : ' border-gray-500'}`}
                     onClick={currentUserStories && currentUserStories.stories.length > 0 ? () => setViewStory({ 'userID': currentUserStories.id }) : undefined}
@@ -373,7 +373,7 @@ function Home() {
                       return (
                         <div key={story.id} className="flex-shrink-0 flex-col ml-7">
                           {story.profile_pic ?
-                            <img src={BASE_URL + story.profile_pic} alt="" className={`'md:size-20 size-16 border-[3px]  rounded-full md:size-20 ' ${borderColor}`} onClick={() => setViewStory({ 'userID': story.id })} />
+                            <img src={story.profile_pic} alt="" className={`'md:size-20 size-16 border-[3px]  rounded-full md:size-20 ' ${borderColor}`} onClick={() => setViewStory({ 'userID': story.id })} />
                             : <FaCircleUser className={`'md:size-20 size-16 border-[3px]  rounded-full md:size-20 ' ${borderColor}`} onClick={() => setViewStory({ 'userID': story.id })} />
                           }
                           <p className='text-xs w-fit mx-auto'>{story.username}</p>

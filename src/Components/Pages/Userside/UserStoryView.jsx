@@ -66,7 +66,7 @@ function UserStoryView({ userID, closeStory }) {
             <div className='px-3 py-5 flex gap-x-2'>
                 <div>
                     {currentUserStories.profile_pic ?
-                        <img src={BASE_URL+currentUserStories.profile_pic} alt='Profile' className='rounded-full size-9' />
+                        <img src={currentUserStories.profile_pic} alt='Profile' className='rounded-full size-9' />
                         :
                         <FaCircleUser className='size-8 md:size-9' />
                     }
@@ -94,7 +94,7 @@ function UserStoryView({ userID, closeStory }) {
                         return prevStory + 1
                     })
                 }}>
-                    <img src={BASE_URL + currentUserStories.stories[currentStory].content} alt="story" className='max-h-[600px]' />
+                    <img src={currentUserStories.stories[currentStory].content} alt="story" className='max-h-[600px]' />
                 </div>
             </div>
         </div>
