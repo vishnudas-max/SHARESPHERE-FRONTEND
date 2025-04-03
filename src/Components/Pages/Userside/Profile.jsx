@@ -48,7 +48,7 @@ function Profile() {
         [access])
 
     useEffect(() => {
-        const followwebsocket = new WebSocket(`${REACT_APP_WEBSOCKET_BASE_URL}/ws/follow/?token=${access}`);
+        const followwebsocket = new WebSocket(`${REACT_APP_WEBSOCKET_BASE_URL}/follow/?token=${access}`);
         console.log(followwebsocket)
         followwebsocket.onopen = () => {
             console.log('WebSocket connection established.');
