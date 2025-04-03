@@ -409,7 +409,7 @@ function ViewPost() {
                           <div className='flex gap-y-2 items-center '>
                             {comment.userID.profile_pic ? (
                               <div className='shrink-0'>
-                                <img src={BASE_URL + comment.userID.profile_pic} alt="" className='border-[1px] border-gray-400 size-10 rounded-full' />
+                                <img src={comment.userID.profile_pic} alt="" className='border-[1px] border-gray-400 size-10 rounded-full' />
                               </div>
                             ) : (
                               <FaCircleUser className='md:size-10 size-7' />
@@ -484,7 +484,7 @@ function ViewPost() {
                             <div className='ml-10 mt-3 p-2 flex gap-y-2 items-center right-0' key={replyIndex}>
                               {reply.userID.profile_pic ? (
                                 <div className='shrink-0'>
-                                  <img src={BASE_URL + reply.userID.profile_pic} alt="profilepic" className='border-[1px] border-gray-400 size-10 rounded-full' />
+                                  <img src={reply.userID.profile_pic} alt="profilepic" className='border-[1px] border-gray-400 size-10 rounded-full' />
                                 </div>
                               ) : (
                                 <FaCircleUser className='md:size-10 size-7' />

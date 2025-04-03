@@ -177,7 +177,7 @@ function Commets({ view, postID }) {
                                         <div className='shrink-0'>
                                             {comment.userID.profile_pic ?
                                             
-                                                <img src={BASE_URL+comment.userID.profile_pic} alt="" className="size-5 border-[1px] border-gray-400 md:size-7 rounded-full" />
+                                                <img src={comment.userID.profile_pic} alt="" className="size-5 border-[1px] border-gray-400 md:size-7 rounded-full" />
                                                 :
                                                 <FaCircleUser className='size-5 md:size-7' />
                                             }
@@ -224,7 +224,7 @@ function Commets({ view, postID }) {
                                             <div key={replyIndex} className="flex gap-x-2 items-center ">
                                                 <div className='shrink-0'>
                                                     {reply.userID.profile_pic ? (
-                                                        <img src={BASE_URL+reply.userID.profile_pic} alt="" className="size-5 md:size-7 border-[1px] border-gray-400 rounded-full" />
+                                                        <img src={reply.userID.profile_pic} alt="" className="size-5 md:size-7 border-[1px] border-gray-400 rounded-full" />
                                                     ) : (
                                                         <FaCircleUser className='size-5 md:size-7' />
                                                     )}
