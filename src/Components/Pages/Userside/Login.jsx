@@ -71,16 +71,15 @@ function Login() {
 
         localStorage.setItem('loading', true)
         const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
-        const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URL
+        const REDIRECT_URl = process.env.REACT_APP_REDIRECT_URL
         const scope = [
             'https://www.googleapis.com/auth/userinfo.email',
             'https://www.googleapis.com/auth/userinfo.profile'
         ].join(' ');
-        console.log(`${process.env.REACT_APP_BASE_URL}/${REDIRECT_URI}`)
         const params = {
             response_type: 'code',
             client_id: process.env.REACT_APP_GOOGLE_OAUTH2_CLIENT_ID,
-            redirect_uri: `${process.env.REACT_APP_BASE_URL}/${REDIRECT_URI}`,
+            redirect_uri: REDIRECT_URl,
             prompt: 'select_account',
             access_type: 'offline',
             scope
