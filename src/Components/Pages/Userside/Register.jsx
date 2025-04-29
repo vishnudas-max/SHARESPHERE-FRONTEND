@@ -31,7 +31,22 @@ function Register() {
         phonenumber: ''
 
     })
+
+    function isPotentialSQLInjection(input) {
+        if (typeof input !== 'string') return false;
+        // Patterns to catch:
+        //  - single-quote or double-quote
+        //  - semicolon, comment markers (--, /* */)
+        //  - * (asterisk)
+        //  - SQL keywords: SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, TRUNCATE, EXEC, UNION, SHUTDOWN
+        const sqlInjectionPattern = /('|"|;|--|\/\*|\*\/|\*|\b(select|insert|update|delete|drop|alter|create|truncate|exec|union|shutdown)\b)/i;
+      
+        return sqlInjectionPattern.test(input);
+      }
+
+
     const handlefirstname = (e) => {
+
 
         if (e.target.value === '') {
             let obj = { ...errors, firstname: 'firstname cannot be empty' }
@@ -44,6 +59,12 @@ function Register() {
             setErrors(obj);
             setFirstname(e.target.value);
             return false;
+        }
+        else if(isPotentialSQLInjection(e.target.value)){
+            let obj = { ...errors, firstname: 'firstname containes unsafe characters!' }
+            setErrors(obj)
+            setFirstname(e.target.value)
+            return false
         }
         else if (e.target.value.length < 3) {
             let obj = { ...errors, firstname: 'firstname should be atleast three letters' }
@@ -59,13 +80,20 @@ function Register() {
 
     }
     const handleusername = (e) => {
+    
 
         if (e.target.value.length < 3) {
             let obj = { ...errors, username: 'Username should be atleast 3 letter size!' }
             setErrors(obj)
             setUsername(e.target.value)
             return false
+        }else if(isPotentialSQLInjection(e.target.value)){
+            let obj = { ...errors, username: 'username containes unsafe characters!' }
+            setErrors(obj)
+            setUsername(e.target.value)
+            return false
         }
+
         else {
             let obj = { ...errors, username: '' }
             setErrors(obj)
@@ -75,7 +103,18 @@ function Register() {
 
     }
     const handlelastname = (e) => {
-        setLastname(e.target.value)
+        if(isPotentialSQLInjection(e.target.value)){
+            let obj = { ...errors, lastname: 'lastname containes unsafe characters!' }
+            setErrors(obj)
+            setLastname(e.target.value)
+            return false
+        }else{
+            let obj = { ...errors, lastname: '' }
+            setErrors(obj)
+            setLastname(e.target.value)
+            return true
+        }
+      
     }
     const handlephonenumber = (e) => {
 

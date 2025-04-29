@@ -93,7 +93,7 @@ function Login() {
         const query = new URLSearchParams(location.search);
         const message = query.get('message')
         if (message) {
-            toast.error('This account is no longer accessible', {
+            toast.error(message, {
                 position: "top-right",
                 autoClose: 1000,
                 hideProgressBar: true,
